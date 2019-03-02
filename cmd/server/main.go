@@ -1,8 +1,8 @@
 package main
 
 import (
-	"2019_1_5factorial-team/internal/app/server"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
 	"os"
 )
 

@@ -1,7 +1,7 @@
 package server
 
 import (
-	"2019_1_5factorial-team/internal/pkg/controllers"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
 	"github.com/gorilla/mux"
 	"net/http"
 )
