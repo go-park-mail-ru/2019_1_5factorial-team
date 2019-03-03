@@ -30,3 +30,20 @@ func init() {
 			AvatarLink: "./avatars/default.jpg"})
 	})
 }
+
+func getUsers() []DatabaseUser {
+	fmt.Println(users)
+
+	return users
+}
+
+func addUser(in DatabaseUser) {
+	users = append(users, in)
+}
+
+func PrintUsers() {
+	for i, val := range users {
+		fmt.Println("\t", i, val)
+	}
+	fmt.Println("----end----")
+}

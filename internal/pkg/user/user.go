@@ -9,4 +9,15 @@ type User struct {
 	AvatarLink string
 }
 
+func CreateUser(nickname string, email string, password string) error {
+	// TODO(smet1): добавить валидацию
+	addUser(DatabaseUser{
+		Email: email,
+		Nickname: nickname,
+		Password: password,
+	})
+
+	return nil
+}
+
 

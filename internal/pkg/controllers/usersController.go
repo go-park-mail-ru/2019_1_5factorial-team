@@ -3,20 +3,22 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/tempUsers"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"io/ioutil"
 	"net/http"
 )
 
 // 'Content-Type': 'application/json; charset=utf-8'
 // 	"login":
+//	"email":
 // 	"password":
 type SingUp struct {
 	Login string `json:"login"`
+	Email string `json:"email"`
 	Password string `json:"password"`
 }
 
-func CreateUser(res http.ResponseWriter, req *http.Request)  {
+func SignUp(res http.ResponseWriter, req *http.Request)  {
 	fmt.Println("createUser")
 
 	body, err := ioutil.ReadAll(req.Body)
@@ -33,11 +35,16 @@ func CreateUser(res http.ResponseWriter, req *http.Request)  {
 		fmt.Println(err)
 		return
 	}
-
 	fmt.Println(data)
 
-	tempUsers.AddUser(tempUsers.User{
+	err = user.CreateUser(data.Login, data.Email, data.Password)
+	if err != nil {
+		// some errors with validation
+		fmt.Println(err)
+		return
+	}
+	user.PrintUsers()
 
-	})
+	// return user id
 
 }
