@@ -15,6 +15,6 @@ func Run(portIn string) error {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/hello", controllers.HW).Methods("GET")
-
+	router.HandleFunc("/api/user", controllers.CreateUser).Methods("POST")
 	return http.ListenAndServe(portFull, router)
 }
