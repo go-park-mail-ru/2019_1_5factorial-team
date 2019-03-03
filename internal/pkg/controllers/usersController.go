@@ -18,7 +18,7 @@ type SingUp struct {
 	Password string `json:"password"`
 }
 
-type SignUpResp struct {
+type SignUpOkResp struct {
 	Id int `json:"id"`
 }
 
@@ -28,6 +28,8 @@ func SignUp(res http.ResponseWriter, req *http.Request)  {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		// bad request
+		AddErrHeader(res, http.StatusInternalServerError)
+		AddErrBody(res, "body parsing error")
 		fmt.Println(err)
 		return
 	}
@@ -36,6 +38,8 @@ func SignUp(res http.ResponseWriter, req *http.Request)  {
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		// json unmarshal error
+		AddErrHeader(res, http.StatusInternalServerError)
+		AddErrBody(res, "json parsing error")
 		fmt.Println(err)
 		return
 	}
@@ -44,6 +48,9 @@ func SignUp(res http.ResponseWriter, req *http.Request)  {
 	u, err := user.CreateUser(data.Login, data.Email, data.Password)
 	if err != nil {
 		// some errors with validation
+		// TODO(smet1): указать точную ошибку
+		AddErrHeader(res, http.StatusBadRequest)
+		AddErrBody(res, "err in user data")
 		fmt.Println(err)
 		return
 	}
@@ -51,5 +58,5 @@ func SignUp(res http.ResponseWriter, req *http.Request)  {
 
 	// return user id
 	AddOkHeader(res)
-	AddBody(res, SignUpResp{u.Id})
+	AddBody(res, SignUpOkResp{u.Id})
 }
