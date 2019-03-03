@@ -18,6 +18,10 @@ type SingUp struct {
 	Password string `json:"password"`
 }
 
+type SignUpResp struct {
+	Id int `json:"id"`
+}
+
 func SignUp(res http.ResponseWriter, req *http.Request)  {
 	fmt.Println("createUser")
 
@@ -37,7 +41,7 @@ func SignUp(res http.ResponseWriter, req *http.Request)  {
 	}
 	fmt.Println(data)
 
-	err = user.CreateUser(data.Login, data.Email, data.Password)
+	u, err := user.CreateUser(data.Login, data.Email, data.Password)
 	if err != nil {
 		// some errors with validation
 		fmt.Println(err)
@@ -46,5 +50,6 @@ func SignUp(res http.ResponseWriter, req *http.Request)  {
 	user.PrintUsers()
 
 	// return user id
-
+	AddOkHeader(res)
+	AddBody(res, SignUpResp{u.Id})
 }

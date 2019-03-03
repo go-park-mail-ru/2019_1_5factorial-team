@@ -6,6 +6,7 @@ import (
 )
 
 type DatabaseUser struct {
+	id int
 	Email string
 	Nickname string
 	Password string
@@ -47,3 +48,4 @@ func PrintUsers() {
 	}
 	fmt.Println("----end----")
 }
+

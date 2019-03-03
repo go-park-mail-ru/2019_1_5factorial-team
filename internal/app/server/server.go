@@ -14,7 +14,10 @@ func Run(portIn string) error {
 
 	router := mux.NewRouter()
 
+	// CORS middleware
+
 	router.HandleFunc("/hello", controllers.HW).Methods("GET")
 	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST")
+
 	return http.ListenAndServe(portFull, router)
 }
