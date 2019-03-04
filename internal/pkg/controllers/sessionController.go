@@ -21,6 +21,13 @@ type signInRequest struct {
 }
 
 func SignIn(res http.ResponseWriter, req *http.Request) {
+	_, err := req.Cookie("user_id")
+	if err != http.ErrNoCookie {
+		ErrResponse(res, http.StatusBadRequest, "already auth")
+		
+		return
+	}
+
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, "body parsing error")
