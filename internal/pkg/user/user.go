@@ -9,19 +9,23 @@ type User struct {
 	Id int
 	Email string
 	Nickname string
-	Password string
-	Score int
-	AvatarLink string
+	HashPassword string
 }
 
 func CreateUser(nickname string, email string, password string) (User, error) {
-	// TODO(smet1): добавить валидацию
+	// TODO(smet1): добавить валидацию на повторение ника и почты
+
 	rid := rand.Int()
-	err := addUser(DatabaseUser{
+	hashPassword, err := getPasswordHash(password)
+	if err != nil {
+		return User{}, errors.Wrap(err, "Hasher password error")
+	}
+
+	err = addUser(DatabaseUser{
 		Id: rid,
 		Email: email,
 		Nickname: nickname,
-		Password: password,
+		HashPassword: hashPassword,
 	})
 	if err != nil {
 		err = errors.Wrap(err, "Cannot create user")
@@ -32,7 +36,7 @@ func CreateUser(nickname string, email string, password string) (User, error) {
 		Id: rid,
 		Email: email,
 		Nickname: nickname,
-		Password: password,
+		HashPassword: hashPassword,
 	}
 
 	return u, nil

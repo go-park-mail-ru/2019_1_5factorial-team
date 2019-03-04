@@ -44,6 +44,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 		log.Println(errors.Wrap(err, "json parsing error"))
 		return
 	}
+	// TODO(smet1): валидация на данные, правда ли мыло - мыло, а самолет - вертолет?
 	fmt.Println(data)
 
 	u, err := user.CreateUser(data.Login, data.Email, data.Password)

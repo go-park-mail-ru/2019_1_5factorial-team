@@ -10,7 +10,7 @@ type DatabaseUser struct {
 	Id int
 	Email string
 	Nickname string
-	Password string
+	HashPassword string
 	Score int
 	AvatarLink string
 }
@@ -24,11 +24,12 @@ func init() {
 		fmt.Println("init users map")
 		//users = make([]DatabaseUser, 0)
 		users = make(map[string]DatabaseUser)
+		hash, _ := getPasswordHash("password")
 		users["kek"] = DatabaseUser{
 			Id: 1,
 			Email: "kek.k.ek",
 			Nickname: "kek",
-			Password: "password",
+			HashPassword: hash,
 			Score: 100500,
 			AvatarLink: "./avatars/default.jpg"}
 
