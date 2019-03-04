@@ -15,6 +15,6 @@ func main() {
 
 	err := server.Run(*port)
 	if err != nil {
-		fmt.Println("error happened: ", err)
+		panic(err)
 	}
 }
