@@ -10,11 +10,11 @@ type errorMessage struct {
 	Error string `json:"error"`
 }
 
-func AddOkHeader(res http.ResponseWriter) {
+func addOkHeader(res http.ResponseWriter) {
 	res.WriteHeader(http.StatusOK)
 }
 
-func AddBody(res http.ResponseWriter, bodyMessage interface{}) {
+func addBody(res http.ResponseWriter, bodyMessage interface{}) {
 	marshalBody, err := json.Marshal(bodyMessage)
 	if err != nil {
 		fmt.Println(err)
@@ -24,10 +24,20 @@ func AddBody(res http.ResponseWriter, bodyMessage interface{}) {
 	res.Write(marshalBody)
 }
 
-func AddErrHeader(res http.ResponseWriter, errCode int) {
+func OkResponse(res http.ResponseWriter, bodyMessage interface{}) {
+	addOkHeader(res)
+	addBody(res, bodyMessage)
+}
+
+func addErrHeader(res http.ResponseWriter, errCode int) {
 	res.WriteHeader(errCode)
 }
 
-func AddErrBody(res http.ResponseWriter, errMsg string) {
-	AddBody(res, errorMessage{errMsg})
+func addErrBody(res http.ResponseWriter, errMsg string) {
+	addBody(res, errorMessage{errMsg})
+}
+
+func ErrResponse(res http.ResponseWriter, errCode int, errMsg string) {
+	addErrHeader(res, errCode)
+	addErrBody(res, errMsg)
 }

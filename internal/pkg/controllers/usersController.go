@@ -27,9 +27,7 @@ func SignUp(res http.ResponseWriter, req *http.Request)  {
 
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		// bad request
-		AddErrHeader(res, http.StatusInternalServerError)
-		AddErrBody(res, "body parsing error")
+		ErrResponse(res, http.StatusInternalServerError, "body parsing error")
 		fmt.Println(err)
 		return
 	}
@@ -37,9 +35,7 @@ func SignUp(res http.ResponseWriter, req *http.Request)  {
 	data := SingUp{}
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		// json unmarshal error
-		AddErrHeader(res, http.StatusInternalServerError)
-		AddErrBody(res, "json parsing error")
+		ErrResponse(res, http.StatusInternalServerError, "json parsing error")
 		fmt.Println(err)
 		return
 	}
@@ -47,16 +43,12 @@ func SignUp(res http.ResponseWriter, req *http.Request)  {
 
 	u, err := user.CreateUser(data.Login, data.Email, data.Password)
 	if err != nil {
-		// some errors with validation
 		// TODO(smet1): указать точную ошибку
-		AddErrHeader(res, http.StatusBadRequest)
-		AddErrBody(res, "err in user data")
+		ErrResponse(res, http.StatusBadRequest, "err in user data")
 		fmt.Println(err)
 		return
 	}
 	user.PrintUsers()
 
-	// return user id
-	AddOkHeader(res)
-	AddBody(res, SignUpOkResp{u.Id})
+	OkResponse(res, SignUpOkResp{u.Id})
 }
