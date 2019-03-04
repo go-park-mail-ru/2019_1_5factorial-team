@@ -15,6 +15,7 @@ func Run(port string) error {
 
 	router.HandleFunc("/hello", controllers.HW).Methods("GET")
 	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST")
+	router.HandleFunc("/api/session", controllers.SignIn).Methods("POST")
 
 	err := http.ListenAndServe(address, router)
 	if err != nil {

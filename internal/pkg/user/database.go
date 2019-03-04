@@ -46,6 +46,17 @@ func getUsers() map[string]DatabaseUser {
 	return users
 }
 
+func getUser(login string) (DatabaseUser, error) {
+	defer mu.Unlock()
+
+	mu.Lock()
+	if _, ok := users[login]; !ok {
+		return DatabaseUser{}, errors.New("Invalid login")
+	} else {
+		return users[login], nil
+	}
+}
+
 func addUser(in DatabaseUser) error {
 	defer mu.Unlock()
 	mu.Lock()
