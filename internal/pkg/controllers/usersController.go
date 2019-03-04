@@ -14,13 +14,13 @@ import (
 // 	"login":
 //	"email":
 // 	"password":
-type SingUp struct {
+type SingUpRequest struct {
 	Login string `json:"login"`
 	Email string `json:"email"`
 	Password string `json:"password"`
 }
 
-type SignUpOkResp struct {
+type SignUpResponse struct {
 	Id int `json:"id"`
 }
 
@@ -36,7 +36,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	}
 
 	fmt.Println()
-	data := SingUp{}
+	data := SingUpRequest{}
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, "json parsing error")
@@ -56,5 +56,5 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	}
 	user.PrintUsers()
 
-	OkResponse(res, SignUpOkResp{u.Id})
+	OkResponse(res, SignUpResponse{u.Id})
 }
