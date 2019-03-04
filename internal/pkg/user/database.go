@@ -6,40 +6,42 @@ import (
 )
 
 type DatabaseUser struct {
-	id int
+	Id int
 	Email string
 	Nickname string
 	Password string
 	Score int
-	AvatarType string
 	AvatarLink string
 }
 
-var users []DatabaseUser
 var once sync.Once
+var users map[string]DatabaseUser
 
 func init() {
 	once.Do(func() {
-		fmt.Println("once do")
-		users = make([]DatabaseUser, 0)
-		users = append(users, DatabaseUser{
+		fmt.Println("init users map")
+		//users = make([]DatabaseUser, 0)
+		users = make(map[string]DatabaseUser)
+		users["kek"] = DatabaseUser{
+			Id: 1,
 			Email: "kek.k.ek",
 			Nickname: "kek",
 			Password: "password",
 			Score: 100500,
-			AvatarType: "jpg",
-			AvatarLink: "./avatars/default.jpg"})
+			AvatarLink: "./avatars/default.jpg"}
+
 	})
 }
 
-func getUsers() []DatabaseUser {
+func getUsers() map[string]DatabaseUser {
 	fmt.Println(users)
 
 	return users
 }
 
-func addUser(in DatabaseUser) {
-	users = append(users, in)
+func addUser(in DatabaseUser) error {
+	// TODO(): add mutex
+	users[in.Nickname] = in
 }
 
 func PrintUsers() {
