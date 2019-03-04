@@ -18,15 +18,17 @@ type DatabaseUser struct {
 var once sync.Once
 var users map[string]DatabaseUser
 var mu *sync.Mutex
+var currentId int
 
 func init() {
 	once.Do(func() {
 		fmt.Println("init users map")
-		//users = make([]DatabaseUser, 0)
+
 		users = make(map[string]DatabaseUser)
+
 		hash, _ := getPasswordHash("password")
 		users["kek"] = DatabaseUser{
-			Id: 1,
+			Id: 0,
 			Email: "kek.k.ek",
 			Nickname: "kek",
 			HashPassword: hash,
@@ -34,6 +36,7 @@ func init() {
 			AvatarLink: "./avatars/default.jpg"}
 
 		mu = &sync.Mutex{}
+		currentId = 0
 	})
 }
 
@@ -61,4 +64,12 @@ func PrintUsers() {
 		fmt.Println("\t", i, val)
 	}
 	fmt.Println("----end----")
+}
+
+func getNextId() int {
+	defer mu.Unlock()
+	mu.Lock()
+	currentId++
+
+	return currentId
 }

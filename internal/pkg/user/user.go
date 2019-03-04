@@ -2,7 +2,6 @@ package user
 
 import (
 	"github.com/pkg/errors"
-	"math/rand"
 )
 
 type User struct {
@@ -15,7 +14,7 @@ type User struct {
 func CreateUser(nickname string, email string, password string) (User, error) {
 	// TODO(smet1): добавить валидацию на повторение ника и почты
 
-	rid := rand.Int()
+	rid := getNextId()
 	hashPassword, err := getPasswordHash(password)
 	if err != nil {
 		return User{}, errors.Wrap(err, "Hasher password error")
