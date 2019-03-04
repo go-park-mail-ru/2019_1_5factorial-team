@@ -54,6 +54,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 
 	fmt.Println(u)
 	// unsafe
+	// можно генерить вместо айди уникальный токен и пихать его в отдельную таблицу, которую постоянно проверять
 	expiration := time.Now().Add(10 * time.Hour)
 	cookie := http.Cookie{
 		Name:    "user_id",
@@ -64,4 +65,17 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 
 	http.SetCookie(res, &cookie)
 	OkResponse(res, "")
+}
+
+func SignOut(res http.ResponseWriter, req *http.Request) {
+	session, err := req.Cookie("user_id")
+	if err == http.ErrNoCookie {
+		ErrResponse(res, http.StatusBadRequest, "not authorized")
+
+		return
+	}
+
+	session.Expires = time.Now().AddDate(0, 0, -1)
+	http.SetCookie(res, session)
+	OkResponse(res, "ok logout")
 }
