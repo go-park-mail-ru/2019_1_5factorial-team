@@ -1,6 +1,9 @@
 package user
 
-import "math/rand"
+import (
+	"github.com/pkg/errors"
+	"math/rand"
+)
 
 type User struct {
 	Id int
@@ -8,19 +11,22 @@ type User struct {
 	Nickname string
 	Password string
 	Score int
-	AvatarType string
 	AvatarLink string
 }
 
 func CreateUser(nickname string, email string, password string) (User, error) {
 	// TODO(smet1): добавить валидацию
 	rid := rand.Int()
-	addUser(DatabaseUser{
-		id: rid,
+	err := addUser(DatabaseUser{
+		Id: rid,
 		Email: email,
 		Nickname: nickname,
 		Password: password,
 	})
+	if err != nil {
+		err = errors.Wrap(err, "Cannot create user")
+		return User{}, err
+	}
 
 	u := User{
 		Id: rid,

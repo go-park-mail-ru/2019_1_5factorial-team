@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"sync"
 )
 
@@ -16,6 +17,7 @@ type DatabaseUser struct {
 
 var once sync.Once
 var users map[string]DatabaseUser
+var mu *sync.Mutex
 
 func init() {
 	once.Do(func() {
@@ -30,6 +32,7 @@ func init() {
 			Score: 100500,
 			AvatarLink: "./avatars/default.jpg"}
 
+		mu = &sync.Mutex{}
 	})
 }
 
@@ -40,8 +43,16 @@ func getUsers() map[string]DatabaseUser {
 }
 
 func addUser(in DatabaseUser) error {
-	// TODO(): add mutex
+	defer mu.Unlock()
+	mu.Lock()
+
+	if _, ok := users[in.Nickname]; ok {
+		return errors.New("User with this nickname already exist")
+	}
+
 	users[in.Nickname] = in
+
+	return nil
 }
 
 func PrintUsers() {
@@ -50,4 +61,3 @@ func PrintUsers() {
 	}
 	fmt.Println("----end----")
 }
-
