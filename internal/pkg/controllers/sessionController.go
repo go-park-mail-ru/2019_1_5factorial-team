@@ -79,3 +79,14 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 	http.SetCookie(res, session)
 	OkResponse(res, "ok logout")
 }
+
+type userInfoResponse struct {
+	Email string `json:"email"`
+	Nickname string `json:"nickname"`
+	Score int `json:"score"`
+	AvatarLink string `json:"avatar_link"`
+}
+
+func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
+
+}

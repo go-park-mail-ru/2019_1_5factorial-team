@@ -7,12 +7,12 @@ import (
 )
 
 type DatabaseUser struct {
-	Id int
-	Email string
-	Nickname string
+	Id           int
+	Email        string
+	Nickname     string
 	HashPassword string
-	Score int
-	AvatarLink string
+	Score        int
+	AvatarLink   string
 }
 
 var once sync.Once
@@ -28,12 +28,12 @@ func init() {
 
 		hash, _ := getPasswordHash("password")
 		users["kek"] = DatabaseUser{
-			Id: 0,
-			Email: "kek.k.ek",
-			Nickname: "kek",
+			Id:           0,
+			Email:        "kek.k.ek",
+			Nickname:     "kek",
 			HashPassword: hash,
-			Score: 100500,
-			AvatarLink: "./avatars/default.jpg"}
+			Score:        100500,
+			AvatarLink:   "./avatars/default.jpg"}
 
 		mu = &sync.Mutex{}
 		currentId = 0
