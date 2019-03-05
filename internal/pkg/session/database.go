@@ -20,6 +20,7 @@ func init() {
 		fmt.Println("init tokens map")
 
 		tokens = make(map[string]int64)
+		mu = &sync.Mutex{}
 	})
 }
 

@@ -7,7 +7,7 @@ import (
 )
 
 type DatabaseUser struct {
-	Id           int
+	Id           int64
 	Email        string
 	Nickname     string
 	HashPassword string
@@ -18,7 +18,7 @@ type DatabaseUser struct {
 var once sync.Once
 var users map[string]DatabaseUser
 var mu *sync.Mutex
-var currentId int
+var currentId int64
 
 func init() {
 	once.Do(func() {
@@ -77,7 +77,7 @@ func PrintUsers() {
 	fmt.Println("----end----")
 }
 
-func getNextId() int {
+func getNextId() int64 {
 	defer mu.Unlock()
 	mu.Lock()
 	currentId++
