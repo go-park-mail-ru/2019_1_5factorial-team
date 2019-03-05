@@ -61,6 +61,9 @@ func addUser(in DatabaseUser) error {
 }
 
 func PrintUsers() {
+	defer mu.Unlock()
+	mu.Lock()
+
 	for i, val := range users {
 		fmt.Println("\t", i, val)
 	}
