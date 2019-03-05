@@ -57,5 +57,5 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	}
 	user.PrintUsers()
 
-	OkResponse(res, SignUpResponse{u.Id})
+	OkResponse(res, SignUpResponse{Id: u.Id})
 }
