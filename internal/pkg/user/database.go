@@ -42,6 +42,9 @@ func init() {
 }
 
 func getUsers() map[string]DatabaseUser {
+	defer mu.Unlock()
+	mu.Lock()
+	
 	fmt.Println(users)
 
 	return users
