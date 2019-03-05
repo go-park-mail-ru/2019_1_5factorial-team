@@ -11,7 +11,10 @@ func Run(port string) error {
 	address := ":" + port
 	router := mux.NewRouter()
 
-	router.HandleFunc("/hello", controllers.HelloWorld).Methods("GET")
+	// TODO: CORS, panic and auth middleware
+
+	router.HandleFunc("/hello", controllers.HW).Methods("GET")
+	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST")
 
 	err := http.ListenAndServe(address, router)
 	if err != nil {
