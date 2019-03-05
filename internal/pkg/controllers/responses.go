@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type errorMessage struct {
+type errorResponse struct {
 	Error string `json:"error"`
 }
 
@@ -34,7 +34,7 @@ func addErrHeader(res http.ResponseWriter, errCode int) {
 }
 
 func addErrBody(res http.ResponseWriter, errMsg string) {
-	addBody(res, errorMessage{Error: errMsg})
+	addBody(res, errorResponse{Error: errMsg})
 }
 
 func ErrResponse(res http.ResponseWriter, errCode int, errMsg string) {
