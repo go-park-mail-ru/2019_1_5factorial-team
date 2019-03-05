@@ -1,10 +1,11 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-	"net/http"
 )
 
 func Run(port string) error {
@@ -12,6 +13,8 @@ func Run(port string) error {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/hello", controllers.HelloWorld).Methods("GET")
+
+	router.HandleFunc("/getimg", controllers.GetImg).Methods("GET")
 
 	err := http.ListenAndServe(address, router)
 	if err != nil {
