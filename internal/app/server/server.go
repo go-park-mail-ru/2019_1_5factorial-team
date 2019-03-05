@@ -13,7 +13,7 @@ func Run(port string) error {
 
 	// TODO: CORS, panic and auth middleware
 
-	router.HandleFunc("/hello", controllers.HW).Methods("GET")
+	router.HandleFunc("/hello", controllers.HelloWorld).Methods("GET")
 	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST")
 
 	err := http.ListenAndServe(address, router)
