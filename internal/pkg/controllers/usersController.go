@@ -21,7 +21,7 @@ type SingUpRequest struct {
 }
 
 type SignUpResponse struct {
-	Id int `json:"id"`
+	Id int64 `json:"id"`
 }
 
 func SignUp(res http.ResponseWriter, req *http.Request) {

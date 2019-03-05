@@ -4,21 +4,22 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"sync"
+	"sync/atomic"
 )
 
 type DatabaseUser struct {
-	Id int
+	Id int64
 	Email string
 	Nickname string
 	HashPassword string
-	Score int
+	Score int64
 	AvatarLink string
 }
 
 var once sync.Once
 var users map[string]DatabaseUser
 var mu *sync.Mutex
-var currentId int
+var currentId int64
 
 func init() {
 	once.Do(func() {
@@ -66,10 +67,8 @@ func PrintUsers() {
 	fmt.Println("----end----")
 }
 
-func getNextId() int {
-	defer mu.Unlock()
-	mu.Lock()
-	currentId++
+func getNextId() int64 {
+	atomic.AddInt64(&currentId, 1)
 
 	return currentId
 }
