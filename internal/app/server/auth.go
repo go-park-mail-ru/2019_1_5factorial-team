@@ -33,6 +33,7 @@ func cookieMiddleware(next http.Handler) http.Handler {
 
 			ctx = context.WithValue(ctx,"realId", uId)
 			ctx = context.WithValue(ctx, "authorized", true)
+			ctx = context.WithValue(ctx, "token", cookie.Value)
 
 			// сетим новое время куки
 			cookie.Expires = time.Now().Add(10 * time.Hour)
