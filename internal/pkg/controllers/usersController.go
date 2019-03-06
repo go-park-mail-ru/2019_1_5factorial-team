@@ -3,11 +3,13 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 // 'Content-Type': 'application/json; charset=utf-8'
@@ -25,8 +27,14 @@ type SignUpResponse struct {
 }
 
 func SignUp(res http.ResponseWriter, req *http.Request) {
-	// TODO(): проверка куки
 	fmt.Println("createUser")
+
+	id := req.Context().Value("authorized").(bool)
+	if id == true {
+		ErrResponse(res, http.StatusBadRequest, "already auth")
+
+		return
+	}
 
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
@@ -58,5 +66,30 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	}
 	user.PrintUsers()
 
-	OkResponse(res, SignUpResponse{u.Id})
+	// TODO(smet1): сразу его логинить или нет????
+	expiration := time.Now().Add(10 * time.Hour)
+	randToken := session.GenerateToken()
+
+	err = session.SetToken(randToken, u.Id)
+	// чет дичь
+	if err != nil {
+		for {
+			randToken = session.GenerateToken()
+			err = session.SetToken(randToken, u.Id)
+			if err != nil {
+				break
+			}
+		}
+	}
+
+	cookie := http.Cookie{
+		Name:    "token",
+		Value:   randToken,
+		Expires: expiration,
+		HttpOnly: true,
+	}
+
+
+	http.SetCookie(res, &cookie)
+	OkResponse(res, "signUp ok")
 }
