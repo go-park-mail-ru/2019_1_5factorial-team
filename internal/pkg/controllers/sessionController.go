@@ -21,12 +21,7 @@ type signInRequest struct {
 }
 
 func SignIn(res http.ResponseWriter, req *http.Request) {
-	//_, err := req.Cookie("user_id")
-	//if err != http.ErrNoCookie {
-	//	ErrResponse(res, http.StatusBadRequest, "already auth")
-	//
-	//	return
-	//}
+
 	id := req.Context().Value("authorized").(bool)
 	if id == true {
 		ErrResponse(res, http.StatusBadRequest, "already auth")
@@ -59,8 +54,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	}
 
 	fmt.Println(u)
-	// unsafe
-	// можно генерить вместо айди уникальный токен и пихать его в отдельную таблицу, которую постоянно проверять
+
 	expiration := time.Now().Add(10 * time.Hour)
 	randToken := session.GenerateToken()
 
@@ -117,13 +111,38 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 	OkResponse(res, "ok logout")
 }
 
-type userInfoResponse struct {
+type UserInfoResponse struct {
 	Email string `json:"email"`
 	Nickname string `json:"nickname"`
 	Score int `json:"score"`
+	// возможно ну нужно линку на аватарку
 	AvatarLink string `json:"avatar_link"`
 }
 
 func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
+	isAuth := req.Context().Value("authorized").(bool)
+	if isAuth == false {
+		ErrResponse(res, http.StatusBadRequest, "not authorized")
 
+		return
+	}
+
+	id := req.Context().Value("realId").(int64)
+	u, err := user.GetUserById(id)
+	if err != nil {
+		currentSession, err := req.Cookie("token")
+		currentSession.Expires = time.Now().AddDate(0, 0, -1)
+		http.SetCookie(res, currentSession)
+
+		ErrResponse(res, http.StatusBadRequest, "error")
+		log.Println(errors.Wrap(err, "user have invalid id, his cookie set expired"))
+		return
+	}
+
+	OkResponse(res, UserInfoResponse{
+		Email: u.Email,
+		Nickname: u.Nickname,
+		Score: u.Score,
+		AvatarLink: u.AvatarLink,
+	})
 }
