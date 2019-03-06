@@ -49,7 +49,7 @@ func DownloadFile(fileName string, url string) error {
 		return err
 	}
 	defer out.Close()
-	// test precommit
+	// test precommit 2
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
 	return err
