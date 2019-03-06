@@ -12,7 +12,7 @@ func Run(port string) error {
 	router := mux.NewRouter()
 
 	// TODO: CORS, panic and auth middleware
-	router.Use(cookieMiddleware)
+	router.Use(authMiddleware)
 
 	router.HandleFunc("/hello", controllers.HW).Methods("GET")
 	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST")
