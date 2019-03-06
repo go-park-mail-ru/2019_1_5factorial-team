@@ -57,6 +57,19 @@ func getUser(login string) (DatabaseUser, error) {
 	}
 }
 
+func GetUserById(id int64) (DatabaseUser, error) {
+	defer mu.Unlock()
+
+	mu.Lock()
+	for _, val := range users {
+		if val.Id == id {
+			return val, nil
+		}
+	}
+
+	return DatabaseUser{}, errors.New("user with this id not found")
+}
+
 func addUser(in DatabaseUser) error {
 	defer mu.Unlock()
 	mu.Lock()
