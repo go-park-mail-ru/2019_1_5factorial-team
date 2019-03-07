@@ -57,15 +57,15 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	randToken, expiration, err := session.SetToken(u.Id)
 
 	cookie := http.Cookie{
-		Name:    "token",
+		Name:    session.CookieName,
 		Value:   randToken,
 		Expires: expiration,
-		HttpOnly: true,
+		HttpOnly: session.HttpOnly,
 	}
 
 
 	http.SetCookie(res, &cookie)
-	OkResponse(res, "")
+	OkResponse(res, "ok auth")
 }
 
 func SignOut(res http.ResponseWriter, req *http.Request) {

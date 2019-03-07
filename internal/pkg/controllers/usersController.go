@@ -71,10 +71,10 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	randToken, expiration, err := session.SetToken(u.Id)
 
 	cookie := http.Cookie{
-		Name:    "token",
+		Name:    session.CookieName,
 		Value:   randToken,
 		Expires: expiration,
-		HttpOnly: true,
+		HttpOnly: session.HttpOnly,
 	}
 
 

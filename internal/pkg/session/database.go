@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-const cookieTimeHours = 1
-
 type DatabaseToken struct {
 	UserId int64
 	CookieIssuedTime time.Time
