@@ -111,7 +111,7 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	id := req.Context().Value("realId").(int64)
+	id := req.Context().Value("userID").(int64)
 	u, err := user.GetUserById(id)
 	if err != nil {
 		currentSession, err := req.Cookie("token")

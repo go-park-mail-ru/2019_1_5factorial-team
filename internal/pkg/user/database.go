@@ -33,7 +33,8 @@ func init() {
 			Nickname:     "kek",
 			HashPassword: hash,
 			Score:        100500,
-			AvatarLink:   "./avatars/default.jpg"}
+			AvatarLink:   "./avatars/default.jpg",
+		}
 
 		mu = &sync.Mutex{}
 		currentId = 0
