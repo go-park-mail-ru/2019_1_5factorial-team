@@ -101,7 +101,6 @@ type UserInfoResponse struct {
 	Email string `json:"email"`
 	Nickname string `json:"nickname"`
 	Score int `json:"score"`
-	// возможно ну нужно линку на аватарку
 	AvatarLink string `json:"avatar_link"`
 }
 
