@@ -55,19 +55,8 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	fmt.Println(u)
 
 	expiration := time.Now().Add(10 * time.Hour)
-	randToken := session.GenerateToken()
 
-	err = session.SetToken(randToken, u.Id)
-	// чет дичь
-	if err != nil {
-		for {
-			randToken = session.GenerateToken()
-			err = session.SetToken(randToken, u.Id)
-			if err != nil {
-				break
-			}
-		}
-	}
+	randToken, err := session.SetToken(u.Id)
 
 	cookie := http.Cookie{
 		Name:    "token",

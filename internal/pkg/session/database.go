@@ -24,18 +24,24 @@ func init() {
 	})
 }
 
-func SetToken(token string, id int64) error {
+func SetToken(id int64) (string, error) {
 	defer mu.Unlock()
+
+	token := GenerateToken()
 
 	mu.Lock()
 
-	if _, ok := tokens[token]; ok {
-		return errors.New("token already in use")
+	// генерю токен, пока не найдет неиспользованный
+	LOOP:
+	for {
+		if _, ok := tokens[token]; !ok {
+			break LOOP
+		}
 	}
 
 	tokens[token] = id
 
-	return nil
+	return token, nil
 }
 
 func GetId(token string) (int64, error) {
