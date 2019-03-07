@@ -21,9 +21,8 @@ type signInRequest struct {
 }
 
 func SignIn(res http.ResponseWriter, req *http.Request) {
-
-	id := req.Context().Value("authorized").(bool)
-	if id == true {
+	isAuth := req.Context().Value("authorized").(bool)
+	if isAuth == true {
 		ErrResponse(res, http.StatusBadRequest, "already auth")
 
 		return
@@ -83,8 +82,8 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 }
 
 func SignOut(res http.ResponseWriter, req *http.Request) {
-	id := req.Context().Value("authorized").(bool)
-	if id == false {
+	isAuth := req.Context().Value("authorized").(bool)
+	if isAuth == false {
 		ErrResponse(res, http.StatusBadRequest, "not authorized")
 
 		return

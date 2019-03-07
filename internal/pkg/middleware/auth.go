@@ -1,4 +1,4 @@
-package server
+package middleware
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func authMiddleware(next http.Handler) http.Handler {
+func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 
 		ctx := req.Context()
