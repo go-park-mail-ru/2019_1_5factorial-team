@@ -54,9 +54,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 
 	fmt.Println(u)
 
-	expiration := time.Now().Add(10 * time.Hour)
-
-	randToken, err := session.SetToken(u.Id)
+	randToken, expiration, err := session.SetToken(u.Id)
 
 	cookie := http.Cookie{
 		Name:    "token",
@@ -85,7 +83,7 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	currentSession.Expires = time.Now().AddDate(0, 0, -1)
+	currentSession.Expires = time.Unix(0, 0)
 	http.SetCookie(res, currentSession)
 
 	err = session.DeleteToken(currentSession.Value)

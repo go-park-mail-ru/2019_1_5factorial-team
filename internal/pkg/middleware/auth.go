@@ -25,9 +25,9 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				// KILL HIM
 				// TODO(smet1): ничего умнее не придумал
 
-				cookie.Expires = time.Now().AddDate(0, 0, -1)
+				cookie.Expires = time.Unix(0,0)
 				http.SetCookie(res, cookie)
-				http.Error(res, "cookie invalid", http.StatusTeapot)
+				http.Error(res, "cookie invalid, relogin please", http.StatusTeapot)
 				return
 			}
 
@@ -36,7 +36,13 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			ctx = context.WithValue(ctx, "token", cookie.Value)
 
 			// сетим новое время куки
-			cookie.Expires = time.Now().Add(10 * time.Hour)
+			// юзер может придти, когда его токен испортиться в момент обращения к серверу,
+			// поэтому добавлю его текущий токен
+			updatedToken, err := session.UpdateToken(cookie.Value, uId)
+			if err != nil {
+				http.Error(res, "relogin, please", http.StatusInternalServerError)
+			}
+			cookie.Expires = updatedToken.CookieExpiredTime
 			http.SetCookie(res, cookie)
 		}
 

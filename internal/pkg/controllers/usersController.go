@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 )
 
 // 'Content-Type': 'application/json; charset=utf-8'
@@ -67,20 +66,9 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	user.PrintUsers()
 
 	// TODO(smet1): сразу его логинить или нет????
-	expiration := time.Now().Add(10 * time.Hour)
 	randToken := session.GenerateToken()
 
-	err = session.SetToken(randToken, u.Id)
-	// чет дичь
-	if err != nil {
-		for {
-			randToken = session.GenerateToken()
-			err = session.SetToken(randToken, u.Id)
-			if err != nil {
-				break
-			}
-		}
-	}
+	randToken, expiration, err := session.SetToken(u.Id)
 
 	cookie := http.Cookie{
 		Name:    "token",
