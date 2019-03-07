@@ -8,8 +8,8 @@ import (
 )
 
 type DatabaseToken struct {
-	UserId int64
-	CookieIssuedTime time.Time
+	UserId            int64
+	CookieIssuedTime  time.Time
 	CookieExpiredTime time.Time
 }
 
@@ -34,7 +34,7 @@ func SetToken(id int64) (string, time.Time, error) {
 	mu.Lock()
 
 	// генерю токен, пока не найдет неиспользованный
-	LOOP:
+LOOP:
 	for {
 		if _, ok := tokens[token]; !ok {
 			break LOOP
@@ -43,8 +43,8 @@ func SetToken(id int64) (string, time.Time, error) {
 
 	now := time.Now()
 	tokens[token] = DatabaseToken{
-		UserId: id,
-		CookieIssuedTime: now,
+		UserId:            id,
+		CookieIssuedTime:  now,
 		CookieExpiredTime: now.Add(cookieTimeHours * time.Minute),
 	}
 
@@ -64,8 +64,8 @@ func UpdateToken(token string, id int64) (DatabaseToken, error) {
 
 	now := time.Now()
 	tokens[token] = DatabaseToken{
-		UserId: id,
-		CookieIssuedTime: now,
+		UserId:            id,
+		CookieIssuedTime:  now,
 		CookieExpiredTime: now.Add(cookieTimeHours * time.Minute),
 	}
 

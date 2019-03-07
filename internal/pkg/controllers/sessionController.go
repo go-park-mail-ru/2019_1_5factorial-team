@@ -16,7 +16,7 @@ import (
 // 	"login":
 // 	"password":
 type signInRequest struct {
-	Login string `json:"login"`
+	Login    string `json:"login"`
 	Password string `json:"password"`
 }
 
@@ -57,12 +57,11 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	randToken, expiration, err := session.SetToken(u.Id)
 
 	cookie := http.Cookie{
-		Name:    session.CookieName,
-		Value:   randToken,
-		Expires: expiration,
+		Name:     session.CookieName,
+		Value:    randToken,
+		Expires:  expiration,
 		HttpOnly: session.HttpOnly,
 	}
-
 
 	http.SetCookie(res, &cookie)
 	OkResponse(res, "ok auth")
@@ -98,9 +97,9 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 }
 
 type UserInfoResponse struct {
-	Email string `json:"email"`
-	Nickname string `json:"nickname"`
-	Score int `json:"score"`
+	Email      string `json:"email"`
+	Nickname   string `json:"nickname"`
+	Score      int    `json:"score"`
 	AvatarLink string `json:"avatar_link"`
 }
 
@@ -125,9 +124,9 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 	}
 
 	OkResponse(res, UserInfoResponse{
-		Email: u.Email,
-		Nickname: u.Nickname,
-		Score: u.Score,
+		Email:      u.Email,
+		Nickname:   u.Nickname,
+		Score:      u.Score,
 		AvatarLink: u.AvatarLink,
 	})
 }

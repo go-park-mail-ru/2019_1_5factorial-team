@@ -16,8 +16,8 @@ import (
 //	"email":
 // 	"password":
 type SingUpRequest struct {
-	Login string `json:"login"`
-	Email string `json:"email"`
+	Login    string `json:"login"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -71,12 +71,11 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	randToken, expiration, err := session.SetToken(u.Id)
 
 	cookie := http.Cookie{
-		Name:    session.CookieName,
-		Value:   randToken,
-		Expires: expiration,
+		Name:     session.CookieName,
+		Value:    randToken,
+		Expires:  expiration,
 		HttpOnly: session.HttpOnly,
 	}
-
 
 	http.SetCookie(res, &cookie)
 	OkResponse(res, "signUp ok")

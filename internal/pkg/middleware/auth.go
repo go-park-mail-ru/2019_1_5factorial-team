@@ -15,7 +15,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		cookie, err := req.Cookie("token")
 		if err != nil {
 
-			ctx = context.WithValue(ctx,"realId", -1)
+			ctx = context.WithValue(ctx, "realId", -1)
 			ctx = context.WithValue(ctx, "authorized", false)
 		} else {
 
@@ -25,13 +25,13 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				// KILL HIM
 				// TODO(smet1): ничего умнее не придумал
 
-				cookie.Expires = time.Unix(0,0)
+				cookie.Expires = time.Unix(0, 0)
 				http.SetCookie(res, cookie)
 				http.Error(res, "cookie invalid, relogin please", http.StatusTeapot)
 				return
 			}
 
-			ctx = context.WithValue(ctx,"realId", uId)
+			ctx = context.WithValue(ctx, "realId", uId)
 			ctx = context.WithValue(ctx, "authorized", true)
 			ctx = context.WithValue(ctx, "token", cookie.Value)
 
@@ -48,5 +48,5 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(res, req.WithContext(ctx))
 	})
-	
+
 }
