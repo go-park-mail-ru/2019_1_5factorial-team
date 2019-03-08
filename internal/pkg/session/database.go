@@ -45,29 +45,21 @@ LOOP:
 	tokens[token] = DatabaseToken{
 		UserId:            id,
 		CookieIssuedTime:  now,
-		CookieExpiredTime: now.Add(cookieTimeHours * time.Minute),
+		CookieExpiredTime: now.Add(cookieTimeHours * time.Hour),
 	}
 
-	return token, now.Add(cookieTimeHours * time.Minute), nil
+	return token, now.Add(cookieTimeHours * time.Hour), nil
 }
 
-func UpdateToken(token string, id int64) (DatabaseToken, error) {
+func UpdateToken(token string) (DatabaseToken, error) {
 	defer mu.Unlock()
-
-	err := DeleteToken(token)
 
 	mu.Lock()
 
-	if err != nil {
-		return DatabaseToken{}, errors.Wrap(err, "cannot update this token")
-	}
-
-	now := time.Now()
-	tokens[token] = DatabaseToken{
-		UserId:            id,
-		CookieIssuedTime:  now,
-		CookieExpiredTime: now.Add(cookieTimeHours * time.Minute),
-	}
+	// updating values in map not via ptrs
+	tmpToken := tokens[token]
+	tmpToken.CookieExpiredTime = time.Now().Add(cookieTimeHours * time.Minute)
+	tokens[token] = tmpToken
 
 	return tokens[token], nil
 }
@@ -81,7 +73,7 @@ func GetId(token string) (int64, error) {
 		return 0, errors.New("token not found")
 	} else {
 		if i.CookieExpiredTime.Unix() < time.Now().Unix() {
-			return 0, errors.New("your's token has been expired, relogin please")
+			return 0, errors.New("your's session has been expired, relogin please")
 		} else {
 			return i.UserId, nil
 		}
