@@ -149,7 +149,7 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		log.Println(errors.Wrap(err, "body parsing error"))
 		return
 	}
-
+	// TODO(): аватарки должны будут обновлять по-другому, жду лелю
 	fmt.Println()
 	data := ProfileUpdateRequest{}
 	err = json.Unmarshal(body, &data)
