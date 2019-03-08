@@ -77,16 +77,16 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	currentSession.Expires = time.Unix(0, 0)
-	http.SetCookie(res, currentSession)
-
 	err = session.DeleteToken(currentSession.Value)
 	if err != nil {
-		ErrResponse(res, http.StatusBadRequest, "error")
+		// bad token
 		log.Println(errors.Wrap(err, "cannot delete token from current session, user cookie set expired"))
-
-		return
 	}
+
+	// on other errors -> not logout, just answer ErrResponse
+
+	currentSession.Expires = time.Unix(0, 0)
+	http.SetCookie(res, currentSession)
 
 	OkResponse(res, "ok logout")
 }
