@@ -12,7 +12,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		ctx := req.Context()
 
-		cookie, err := req.Cookie("token")
+		cookie, err := req.Cookie(session.CookieName)
 		if err != nil {
 
 			ctx = context.WithValue(ctx, "userID", -1)
@@ -21,17 +21,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		} else {
 
 			uId, err := session.GetId(cookie.Value)
-			// TODO(smet1):
-			//if err != nil {
-			//	// invalid token
-			//	// KILL HIM
-			//	// TODO(smet1): ничего умнее не придумал
-			//
-			//	cookie.Expires = time.Unix(0, 0)
-			//	http.SetCookie(res, cookie)
-			//	http.Error(res, "cookie invalid, relogin please", http.StatusTeapot)
-			//	return
-			//}
 
 			if err != nil {
 				ctx = context.WithValue(ctx, "userID", -1)
@@ -47,18 +36,32 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				ctx = context.WithValue(ctx, "token", cookie.Value)
 
 				// сетим новое время куки
-				// юзер может придти, когда его токен испортиться в момент обращения к серверу,
-				// поэтому добавлю его текущий токен
-				updatedToken, err := session.UpdateToken(cookie.Value, uId)
+				// и обновляем время токена
+				updatedToken, err := session.UpdateToken(cookie.Value)
 				if err != nil {
 					http.Error(res, "relogin, please", http.StatusInternalServerError)
 				}
+
 				cookie.Expires = updatedToken.CookieExpiredTime
 				http.SetCookie(res, cookie)
 			}
 		}
 
 		next.ServeHTTP(res, req.WithContext(ctx))
+	})
+
+}
+
+func CheckLoginMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+
+		// request has context, bcs its coming after AuthMiddleware
+		if req.Context().Value("authorized").(bool) == false {
+			http.Error(res, "unauthorized, login please", http.StatusUnauthorized)
+
+			return
+		}
+		next.ServeHTTP(res, req)
 	})
 
 }

@@ -68,16 +68,11 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 }
 
 func SignOut(res http.ResponseWriter, req *http.Request) {
-	isAuth := req.Context().Value("authorized").(bool)
-	if isAuth == false {
-		ErrResponse(res, http.StatusBadRequest, "not authorized")
-
-		return
-	}
 
 	currentSession, err := req.Cookie("token")
 	if err == http.ErrNoCookie {
-		ErrResponse(res, http.StatusBadRequest, "not authorized")
+		// бесполезная проверка, так кука валидна, но по гостайлу нужна
+		ErrResponse(res, http.StatusUnauthorized, "not authorized")
 
 		return
 	}
@@ -104,22 +99,18 @@ type UserInfoResponse struct {
 }
 
 func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
-	isAuth := req.Context().Value("authorized").(bool)
-	if isAuth == false {
-		ErrResponse(res, http.StatusBadRequest, "not authorized")
-
-		return
-	}
 
 	id := req.Context().Value("userID").(int64)
 	u, err := user.GetUserById(id)
 	if err != nil {
+		// проверка на невалидный айди юзера
 		currentSession, err := req.Cookie("token")
-		currentSession.Expires = time.Now().AddDate(0, 0, -1)
+		currentSession.Expires = time.Unix(0,0)
 		http.SetCookie(res, currentSession)
 
 		ErrResponse(res, http.StatusBadRequest, "error")
-		log.Println(errors.Wrap(err, "user have invalid id, his cookie set expired"))
+		log.Println(errors.Wrap(err, "user have invalid id"))
+
 		return
 	}
 
@@ -129,4 +120,9 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 		Score:      u.Score,
 		AvatarLink: u.AvatarLink,
 	})
+}
+
+func IsSessionValid(res http.ResponseWriter, req *http.Request) {
+
+	OkResponse(res, "session is valid")
 }
