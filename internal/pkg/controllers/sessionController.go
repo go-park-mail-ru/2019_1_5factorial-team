@@ -105,7 +105,7 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		// проверка на невалидный айди юзера
 		currentSession, err := req.Cookie("token")
-		currentSession.Expires = time.Unix(0,0)
+		currentSession.Expires = time.Unix(0, 0)
 		http.SetCookie(res, currentSession)
 
 		ErrResponse(res, http.StatusBadRequest, "error")
