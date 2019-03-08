@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
+	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // 'Content-Type': 'application/json; charset=utf-8'
@@ -79,4 +81,45 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 
 	http.SetCookie(res, &cookie)
 	OkResponse(res, "signUp ok")
+}
+
+func GetUser(res http.ResponseWriter, req *http.Request) {
+	requestVariables := mux.Vars(req)
+	if requestVariables == nil {
+		ErrResponse(res, http.StatusBadRequest, "user id not provided")
+
+		log.Println(errors.New("no vars found"))
+		return
+	}
+
+	searchingID, ok := requestVariables["id"]
+	if !ok {
+		ErrResponse(res, http.StatusInternalServerError, "error")
+
+		log.Println(errors.New("vars found, but cant found id"))
+		return
+	}
+
+	intID, err := strconv.ParseInt(searchingID, 10, 64)
+	if err != nil {
+		ErrResponse(res, http.StatusInternalServerError, "bad id")
+
+		log.Println(errors.New("cannot convert id from string"))
+		return
+	}
+
+	searchingUser, err := user.GetUserById(intID)
+	if err != nil {
+		ErrResponse(res, http.StatusNotFound, "user with this id not found")
+
+		log.Println(errors.Wrap(err, "404 error"))
+		return
+	}
+
+	OkResponse(res, UserInfoResponse{
+		Email: searchingUser.Email,
+		Nickname: searchingUser.Nickname,
+		Score: searchingUser.Score,
+		AvatarLink: searchingUser.AvatarLink,
+	})
 }

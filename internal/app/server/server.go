@@ -18,6 +18,7 @@ func Run(port string) error {
 	router.HandleFunc("/hello", controllers.HW).Methods("GET")
 	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST")
 	router.HandleFunc("/api/session", controllers.SignIn).Methods("POST")
+	router.HandleFunc("/api/user/{id:[0-9]+}", controllers.GetUser).Methods("GET")
 
 	routerLoginRequired := router.PathPrefix("").Subrouter()
 
