@@ -12,19 +12,20 @@ func Run(port string) error {
 	address := ":" + port
 	router := mux.NewRouter()
 
-	// TODO: CORS, panic and auth middleware
+	// TODO: CORS, panic
 	router.Use(middleware.AuthMiddleware)
 
 	router.HandleFunc("/hello", controllers.HW).Methods("GET")
 	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST")
+	router.HandleFunc("/api/users/{id:[0-9]+}", controllers.GetUser).Methods("GET")
 	router.HandleFunc("/api/session", controllers.SignIn).Methods("POST")
-	router.HandleFunc("/api/user/{id:[0-9]+}", controllers.GetUser).Methods("GET")
 
 	routerLoginRequired := router.PathPrefix("").Subrouter()
 
 	routerLoginRequired.Use(middleware.CheckLoginMiddleware)
 
 	routerLoginRequired.HandleFunc("/api/user", controllers.GetUserFromSession).Methods("GET")
+	routerLoginRequired.HandleFunc("/api/user", controllers.UpdateProfile).Methods("PUT")
 	routerLoginRequired.HandleFunc("/api/session", controllers.IsSessionValid).Methods("GET")
 	routerLoginRequired.HandleFunc("/api/session", controllers.SignOut).Methods("DELETE")
 
