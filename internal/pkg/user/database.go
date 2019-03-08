@@ -58,7 +58,7 @@ func getUser(login string) (DatabaseUser, error) {
 	}
 }
 
-func GetUserById(id int64) (DatabaseUser, error) {
+func findUserById(id int64) (DatabaseUser, error) {
 	defer mu.Unlock()
 
 	mu.Lock()

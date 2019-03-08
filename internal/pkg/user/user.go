@@ -9,6 +9,8 @@ type User struct {
 	Email        string
 	Nickname     string
 	HashPassword string
+	Score        int
+	AvatarLink   string
 }
 
 func CreateUser(nickname string, email string, password string) (User, error) {
@@ -56,5 +58,20 @@ func IdentifyUser(login string, password string) (User, error) {
 		Id:       u.Id,
 		Email:    u.Email,
 		Nickname: u.Nickname,
+	}, nil
+}
+
+func GetUserById(id int64) (User, error) {
+	u, err := findUserById(id)
+	if err != nil {
+		return User{}, errors.Wrap(err, "can't find user")
+	}
+
+	return User{
+		Id: u.Id,
+		Email: u.Email,
+		Nickname: u.Nickname,
+		Score: u.Score,
+		AvatarLink: u.AvatarLink,
 	}, nil
 }
