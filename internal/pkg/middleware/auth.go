@@ -3,12 +3,14 @@ package middleware
 import (
 	"context"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
+	"log"
 	"net/http"
 	"time"
 )
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		log.Println(req.URL, "AuthMiddleware")
 
 		ctx := req.Context()
 
@@ -54,7 +56,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 func CheckLoginMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-
+		log.Println(req.URL, "CheckLoginMiddleware")
 		// request has context, bcs its coming after AuthMiddleware
 		if req.Context().Value("authorized").(bool) == false {
 			http.Error(res, "unauthorized, login please", http.StatusUnauthorized)

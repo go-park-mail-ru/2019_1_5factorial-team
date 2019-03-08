@@ -117,9 +117,63 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 	}
 
 	OkResponse(res, UserInfoResponse{
-		Email: searchingUser.Email,
-		Nickname: searchingUser.Nickname,
-		Score: searchingUser.Score,
+		Email:      searchingUser.Email,
+		Nickname:   searchingUser.Nickname,
+		Score:      searchingUser.Score,
 		AvatarLink: searchingUser.AvatarLink,
+	})
+}
+
+// 'Content-Type': 'application/json; charset=utf-8'
+// 	"avatar":
+//	"old_password":
+// 	"new_password":
+type ProfileUpdateRequest struct {
+	Avatar      string `json:"avatar"`
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
+}
+
+type ProfileUpdateResponse struct {
+	Email      string `json:"email"`
+	Nickname   string `json:"nickname"`
+	Score      int    `json:"score"`
+	AvatarLink string `json:"avatar_link"`
+}
+
+func UpdateProfile(res http.ResponseWriter, req *http.Request) {
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		ErrResponse(res, http.StatusInternalServerError, "body parsing error")
+
+		log.Println(errors.Wrap(err, "body parsing error"))
+		return
+	}
+
+	fmt.Println()
+	data := ProfileUpdateRequest{}
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		ErrResponse(res, http.StatusInternalServerError, "json parsing error")
+
+		log.Println(errors.Wrap(err, "json parsing error"))
+		return
+	}
+
+	err = user.UpdateUser(req.Context().Value("userID").(int64), data.Avatar, data.NewPassword, data.OldPassword)
+	if err != nil {
+		ErrResponse(res, http.StatusBadRequest, err.Error())
+
+		log.Println(errors.Wrap(err, "UpdateUser error"))
+		return
+	}
+
+	u, _ := user.GetUserById(req.Context().Value("userID").(int64))
+
+	OkResponse(res, ProfileUpdateResponse{
+		Email:      u.Email,
+		Nickname:   u.Nickname,
+		Score:      u.Score,
+		AvatarLink: u.AvatarLink,
 	})
 }

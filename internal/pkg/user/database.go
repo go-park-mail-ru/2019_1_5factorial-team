@@ -98,3 +98,15 @@ func getNextId() int64 {
 
 	return currentId
 }
+
+func updateDBUser(user DatabaseUser) error {
+	defer mu.Unlock()
+
+	mu.Lock()
+	if _, ok := users[user.Nickname]; !ok {
+		return errors.New("cannot find user")
+	}
+
+	users[user.Nickname] = user
+	return nil
+}

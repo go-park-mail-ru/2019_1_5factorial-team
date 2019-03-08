@@ -68,10 +68,57 @@ func GetUserById(id int64) (User, error) {
 	}
 
 	return User{
-		Id: u.Id,
-		Email: u.Email,
-		Nickname: u.Nickname,
-		Score: u.Score,
+		Id:         u.Id,
+		Email:      u.Email,
+		Nickname:   u.Nickname,
+		Score:      u.Score,
 		AvatarLink: u.AvatarLink,
 	}, nil
+}
+
+func UpdateUser(id int64, newAvatar string, oldPassword string, newPassword string) error {
+	u, err := findUserById(id)
+	if err != nil {
+		return errors.Wrap(err, "update user error")
+	}
+
+	if newAvatar != "" {
+		u.AvatarLink = newAvatar
+		err := updateDBUser(u)
+		if err != nil {
+			return errors.Wrap(err, "cant update avatar")
+		}
+
+		return nil
+	}
+
+	if newPassword != "" {
+		if oldPassword == "" {
+			return errors.New("please input old password")
+		}
+
+		err = comparePassword(newPassword, u.HashPassword)
+		if err == nil {
+			return errors.New("old and new password are same")
+		}
+
+		err = comparePassword(oldPassword, u.HashPassword)
+		if err != nil {
+			return errors.Wrap(err, "invalid old password")
+		}
+
+		newHashPassword, err := getPasswordHash(newPassword)
+		if err != nil {
+			return errors.Wrap(err, "some password error")
+		}
+
+		u.HashPassword = newHashPassword
+		err = updateDBUser(u)
+		if err != nil {
+			return errors.Wrap(err, "cant update avatar")
+		}
+		return nil
+	}
+
+	return errors.New("nothing to update")
 }
