@@ -142,6 +142,7 @@ type ProfileUpdateResponse struct {
 }
 
 func UpdateProfile(res http.ResponseWriter, req *http.Request) {
+	// TODO(): неправильный ответ на изменение только аватарки
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, "body parsing error")

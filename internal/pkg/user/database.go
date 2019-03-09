@@ -27,7 +27,7 @@ func init() {
 		users = make(map[string]DatabaseUser)
 
 		hash, _ := getPasswordHash("password")
-		users["kek"] = DatabaseUser{
+		users["kekkekkek"] = DatabaseUser{
 			Id:           0,
 			Email:        "kek.k.ek",
 			Nickname:     "kek",

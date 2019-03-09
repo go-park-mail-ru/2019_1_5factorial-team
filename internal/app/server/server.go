@@ -14,11 +14,12 @@ func Run(port string) error {
 
 	// TODO: CORS, panic
 	router.Use(middleware.AuthMiddleware)
+	router.Use(middleware.CORSMiddleware)
 
 	router.HandleFunc("/hello", controllers.HW).Methods("GET")
 	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST")
 	router.HandleFunc("/api/users/{id:[0-9]+}", controllers.GetUser).Methods("GET")
-	router.HandleFunc("/api/session", controllers.SignIn).Methods("POST")
+	router.HandleFunc("/api/session", controllers.SignIn).Methods("POST", "OPTIONS")
 
 	routerLoginRequired := router.PathPrefix("").Subrouter()
 

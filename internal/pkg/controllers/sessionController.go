@@ -16,7 +16,7 @@ import (
 // 	"login":
 // 	"password":
 type signInRequest struct {
-	Login    string `json:"login"`
+	Login    string `json:"loginOrEmail"`
 	Password string `json:"password"`
 }
 
@@ -35,6 +35,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 		log.Println(errors.Wrap(err, "body parsing error"))
 		return
 	}
+	defer req.Body.Close()
 
 	data := signInRequest{}
 	err = json.Unmarshal(body, &data)
