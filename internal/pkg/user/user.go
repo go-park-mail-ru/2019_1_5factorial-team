@@ -88,8 +88,6 @@ func UpdateUser(id int64, newAvatar string, oldPassword string, newPassword stri
 		if err != nil {
 			return errors.Wrap(err, "cant update avatar")
 		}
-
-		return nil
 	}
 
 	if newPassword != "" {
