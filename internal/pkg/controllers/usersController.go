@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 // 'Content-Type': 'application/json; charset=utf-8'
@@ -41,6 +42,20 @@ func ParseRequestIntoStruct(auth bool, req *http.Request, requestStruct interfac
 	if err != nil {
 		return http.StatusInternalServerError, errors.Wrap(err, "json parsing error")
 	}
+
+	return 0, nil
+}
+
+func DropUserCookie(res http.ResponseWriter, req *http.Request) (int, error) {
+	currentSession, err := req.Cookie(session.CookieName)
+	if err == http.ErrNoCookie {
+		// бесполезная проверка, так кука валидна, но по гостайлу нужна
+
+		return http.StatusUnauthorized, errors.Wrap(err, "not authorized")
+	}
+
+	currentSession.Expires = time.Unix(0, 0)
+	http.SetCookie(res, currentSession)
 
 	return 0, nil
 }

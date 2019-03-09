@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 	"log"
 	"net/http"
-	"time"
 )
 
 // 'Content-Type': 'application/json; charset=utf-8'
@@ -53,7 +52,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 
 func SignOut(res http.ResponseWriter, req *http.Request) {
 
-	currentSession, err := req.Cookie("token")
+	currentSession, err := req.Cookie(session.CookieName)
 	if err == http.ErrNoCookie {
 		// бесполезная проверка, так кука валидна, но по гостайлу нужна
 		ErrResponse(res, http.StatusUnauthorized, "not authorized")
@@ -69,8 +68,13 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 
 	// on other errors -> not logout, just answer ErrResponse
 
-	currentSession.Expires = time.Unix(0, 0)
-	http.SetCookie(res, currentSession)
+	status, err := DropUserCookie(res, req)
+	if err != nil {
+		ErrResponse(res, status, err.Error())
+
+		log.Println(errors.Wrap(err, "cannot drop user cookie"))
+		return
+	}
 
 	OkResponse(res, "ok logout")
 }
@@ -88,13 +92,17 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 	u, err := user.GetUserById(id)
 	if err != nil {
 		// проверка на невалидный айди юзера
-		currentSession, err := req.Cookie("token")
-		currentSession.Expires = time.Unix(0, 0)
-		http.SetCookie(res, currentSession)
+		status, err := DropUserCookie(res, req)
+		if err != nil {
+			ErrResponse(res, status, err.Error())
+
+			log.Println(errors.Wrap(err, "cannot drop user cookie"))
+			return
+		}
 
 		ErrResponse(res, http.StatusBadRequest, "error")
-		log.Println(errors.Wrap(err, "user have invalid id"))
 
+		log.Println(errors.Wrap(err, "user have invalid id"))
 		return
 	}
 
