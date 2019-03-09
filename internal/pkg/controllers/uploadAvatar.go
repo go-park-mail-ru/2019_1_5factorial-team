@@ -10,9 +10,6 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/fileproc"
 )
 
-//const maxUploadSize = 2 * 1024 * 1024 // 2 mb
-// const uploadPath = "../../src/avatars"
-
 type ProfileUpdateResponse struct {
 	Email      string `json:"email"`
 	Nickname   string `json:"nickname"`

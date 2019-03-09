@@ -6,7 +6,7 @@ import (
 )
 
 const MaxUploadSize = 2 * 1024 * 1024 // 2 mb
-const UploadPath = "../../src/avatars"
+const UploadPath = "/var/www/media/factorial"
 
 // func UploadPath() string {
 // 	return "../../src/avatars"
