@@ -1,6 +1,7 @@
 package session
 
-const CookieName = "token"
-const HttpOnly bool = true
-
-const cookieTimeHours = 10
+const (
+	CookieName      string = "token"
+	HttpOnly        bool   = true
+	CookieTimeHours        = 10
+)
