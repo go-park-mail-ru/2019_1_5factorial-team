@@ -17,7 +17,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 			ctx = context.WithValue(ctx, "userID", -1)
 			ctx = context.WithValue(ctx, "authorized", false)
-			ctx = context.WithValue(ctx, "token", "")
 		} else {
 
 			uId, err := session.GetId(cookie.Value)
@@ -25,7 +24,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			if err != nil {
 				ctx = context.WithValue(ctx, "userID", -1)
 				ctx = context.WithValue(ctx, "authorized", false)
-				ctx = context.WithValue(ctx, "token", "")
 
 				cookie.Expires = time.Unix(0, 0)
 				http.SetCookie(res, cookie)
@@ -33,7 +31,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			} else {
 				ctx = context.WithValue(ctx, "userID", uId)
 				ctx = context.WithValue(ctx, "authorized", true)
-				ctx = context.WithValue(ctx, "token", cookie.Value)
 
 				// сетим новое время куки
 				// и обновляем время токена
