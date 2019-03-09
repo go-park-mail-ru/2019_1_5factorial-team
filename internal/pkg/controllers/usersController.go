@@ -28,8 +28,8 @@ type SignUpResponse struct {
 func SignUp(res http.ResponseWriter, req *http.Request) {
 	fmt.Println("createUser")
 
-	id := req.Context().Value("authorized").(bool)
-	if id == true {
+	isAuth := req.Context().Value("authorized").(bool)
+	if isAuth == true {
 		ErrResponse(res, http.StatusBadRequest, "already auth")
 
 		return

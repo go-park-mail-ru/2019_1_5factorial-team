@@ -9,7 +9,7 @@ import (
 
 type DatabaseToken struct {
 	UserId            int64
-	CookieIssuedTime  time.Time
+	//CookieIssuedTime  time.Time
 	CookieExpiredTime time.Time
 }
 
@@ -44,7 +44,7 @@ LOOP:
 	now := time.Now()
 	tokens[token] = DatabaseToken{
 		UserId:            id,
-		CookieIssuedTime:  now,
+		//CookieIssuedTime:  now,
 		CookieExpiredTime: now.Add(cookieTimeHours * time.Hour),
 	}
 
@@ -58,7 +58,7 @@ func UpdateToken(token string) (DatabaseToken, error) {
 
 	// updating values in map not via ptrs
 	tmpToken := tokens[token]
-	tmpToken.CookieExpiredTime = time.Now().Add(cookieTimeHours * time.Minute)
+	tmpToken.CookieExpiredTime = time.Now().Add(cookieTimeHours * time.Hour)
 	tokens[token] = tmpToken
 
 	return tokens[token], nil
