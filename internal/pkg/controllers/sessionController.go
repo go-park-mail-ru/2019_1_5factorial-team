@@ -61,9 +61,14 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 	}
 
 	err = session.DeleteToken(currentSession.Value)
-	if err != nil {
+	if err.Error() == session.NoTokenFound {
 		// bad token
-		log.Println(errors.Wrap(err, "cannot delete token from current session, user cookie set expired"))
+		log.Println(errors.Wrap(err, "cannot delete token from current session, user cookie will set expired"))
+	} else if err != nil {
+		ErrResponse(res, http.StatusInternalServerError , err.Error())
+
+		log.Println(errors.Wrap(err, "delete token error"))
+		return
 	}
 
 	// on other errors -> not logout, just answer ErrResponse

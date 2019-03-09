@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const NoTokenFound string = "token not found"
+
 type DatabaseToken struct {
 	UserId            int64
 	CookieExpiredTime time.Time
@@ -70,7 +72,7 @@ func GetId(token string) (int64, error) {
 	mu.Lock()
 
 	if i, ok := tokens[token]; !ok {
-		return 0, errors.New("token not found")
+		return 0, errors.New(NoTokenFound)
 	} else {
 		if i.CookieExpiredTime.Unix() < time.Now().Unix() {
 			return 0, errors.New("your's session has been expired, relogin please")
@@ -85,7 +87,7 @@ func DeleteToken(token string) error {
 	mu.Lock()
 
 	if _, ok := tokens[token]; !ok {
-		return errors.New("token not found")
+		return errors.New(NoTokenFound)
 	}
 
 	delete(tokens, token)
