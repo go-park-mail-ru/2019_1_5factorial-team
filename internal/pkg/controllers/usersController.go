@@ -25,33 +25,37 @@ type SignUpResponse struct {
 	Id int64 `json:"id"`
 }
 
-func SignUp(res http.ResponseWriter, req *http.Request) {
-	fmt.Println("createUser")
+func ParseRequestIntoStruct(auth bool, req *http.Request, requestStruct interface{}) (int, error) {
 
 	isAuth := req.Context().Value("authorized").(bool)
-	if isAuth == true {
-		ErrResponse(res, http.StatusBadRequest, "already auth")
-
-		return
+	if isAuth == auth {
+		return http.StatusBadRequest, errors.New("already auth")
 	}
 
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, "body parsing error")
-
-		log.Println(errors.Wrap(err, "body parsing error"))
-		return
+		return http.StatusInternalServerError, errors.Wrap(err, "body parsing error")
 	}
 
-	fmt.Println()
-	data := SingUpRequest{}
-	err = json.Unmarshal(body, &data)
+	err = json.Unmarshal(body, &requestStruct)
 	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, "json parsing error")
+		return http.StatusInternalServerError, errors.Wrap(err, "json parsing error")
+	}
 
-		log.Println(errors.Wrap(err, "json parsing error"))
+	return 0, nil
+}
+
+func SignUp(res http.ResponseWriter, req *http.Request) {
+
+	data := SingUpRequest{}
+	status, err := ParseRequestIntoStruct(true, req, &data)
+	if err != nil {
+		ErrResponse(res, status, err.Error())
+
+		log.Println(errors.Wrap(err, "ParseRequestIntoStruct error"))
 		return
 	}
+
 	// TODO(smet1): валидация на данные, правда ли мыло - мыло, а самолет - вертолет?
 	fmt.Println(data)
 

@@ -1,12 +1,10 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/pkg/errors"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
@@ -21,27 +19,13 @@ type signInRequest struct {
 }
 
 func SignIn(res http.ResponseWriter, req *http.Request) {
-	isAuth := req.Context().Value("authorized").(bool)
-	if isAuth == true {
-		ErrResponse(res, http.StatusBadRequest, "already auth")
-
-		return
-	}
-
-	body, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, "body parsing error")
-
-		log.Println(errors.Wrap(err, "body parsing error"))
-		return
-	}
 
 	data := signInRequest{}
-	err = json.Unmarshal(body, &data)
+	status, err := ParseRequestIntoStruct(true, req, &data)
 	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, "json parsing error")
+		ErrResponse(res, status, err.Error())
 
-		log.Println(errors.Wrap(err, "json parsing error"))
+		log.Println(errors.Wrap(err, "ParseRequestIntoStruct error"))
 		return
 	}
 
