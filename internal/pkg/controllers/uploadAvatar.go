@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/pkg/fileproc"
+)
 )
 
 // const maxUploadSize = 2 * 1024 * 1024 // 2 mb
@@ -14,8 +16,8 @@ import (
 func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 
 	// проверка на максимально допустимый размер
-	req.Body = http.MaxBytesReader(res, req.Body, maxUploadSize)
-	if err := req.ParseMultipartForm(maxUploadSize); err != nil {
+	req.Body = http.MaxBytesReader(res, req.Body, fileproc.maxUploadSize())
+	if err := req.ParseMultipartForm(fileproc.maxUploadSize()); err != nil {
 		ErrResponse(res, http.StatusBadRequest, "FILE_TOO_BIG")
 
 		return
@@ -39,21 +41,20 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	//  я забыл какие у нас типы если что можно изи добавить
 
 	filetype := http.DetectContentType(fileBytes)
-
-	if !checkFileType(filetype) {
+	if !fileproc.checkFileType(filetype) {
 		ErrResponse(res, http.StatusBadRequest, "INVALID_FILE_TYPE")
 		return
 	}
 
 	//  забиваю на имя фала генерю новое
-	fileName := randToken(12)
+	fileName := fileproc.randToken(12)
 	fileEndings := filepath.Ext(headers.Filename)
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, "CANT_READ_FILE_TYPE")
 
 		return
 	}
-	newPath := filepath.Join(uploadPath, fileName+fileEndings)
+	newPath := filepath.Join(fileproc.uploadPath(), fileName+fileEndings)
 	fmt.Printf("FileType: %s, File: %s\n", filetype, newPath)
 
 	// записываем файл
