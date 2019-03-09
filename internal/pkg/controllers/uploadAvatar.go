@@ -13,6 +13,13 @@ import (
 //const maxUploadSize = 2 * 1024 * 1024 // 2 mb
 // const uploadPath = "../../src/avatars"
 
+type ProfileUpdateResponse struct {
+	Email      string `json:"email"`
+	Nickname   string `json:"nickname"`
+	Score      int    `json:"score"`
+	AvatarLink string `json:"avatar_link"`
+}
+
 func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 
 	// проверка на максимально допустимый размер
@@ -70,6 +77,12 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 
 		return
 	}
-	res.Write([]byte("SUCCESS"))
+	OkResponse(res, ProfileUpdateResponse{
+		Email:      "Email",
+		Nickname:   "Nickname",
+		Score:      0,
+		AvatarLink: fileName + fileEndings,
+	})
+	// res.Write([]byte("SUCCESS"))
 
 }
