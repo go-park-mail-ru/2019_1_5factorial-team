@@ -84,17 +84,9 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	}
 	user.PrintUsers()
 
-	// TODO(smet1): сразу его логинить или нет????
-	randToken := session.GenerateToken()
-
 	randToken, expiration, err := session.SetToken(u.Id)
 
-	cookie := http.Cookie{
-		Name:     session.CookieName,
-		Value:    randToken,
-		Expires:  expiration,
-		HttpOnly: session.HttpOnly,
-	}
+	cookie := session.CreateHttpCookie(randToken, expiration)
 
 	http.SetCookie(res, &cookie)
 	OkResponse(res, "signUp ok")
