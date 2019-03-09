@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"sync"
+	"sync/atomic"
 )
 
 type DatabaseUser struct {
@@ -16,8 +17,8 @@ type DatabaseUser struct {
 }
 
 var once sync.Once
-var users map[string]DatabaseUser
 var mu *sync.Mutex
+var users map[string]DatabaseUser
 var currentId int64
 
 func init() {
@@ -42,7 +43,9 @@ func init() {
 }
 
 func getUsers() map[string]DatabaseUser {
+	mu.Lock()
 	fmt.Println(users)
+	mu.Unlock()
 
 	return users
 }
@@ -85,16 +88,18 @@ func addUser(in DatabaseUser) error {
 }
 
 func PrintUsers() {
+	mu.Lock()
+
 	for i, val := range users {
 		fmt.Println("\t", i, val)
 	}
 	fmt.Println("----end----")
+
+	mu.Unlock()
 }
 
 func getNextId() int64 {
-	defer mu.Unlock()
-	mu.Lock()
-	currentId++
+	atomic.AddInt64(&currentId, 1)
 
 	return currentId
 }
