@@ -8,12 +8,12 @@ import (
 )
 
 type DatabaseUser struct {
-	Id int64
-	Email string
-	Nickname string
+	Id           int64
+	Email        string
+	Nickname     string
 	HashPassword string
-	Score int64
-	AvatarLink string
+	Score        int
+	AvatarLink   string
 }
 
 var once sync.Once
@@ -29,12 +29,13 @@ func init() {
 
 		hash, _ := getPasswordHash("password")
 		users["kek"] = DatabaseUser{
-			Id: 0,
-			Email: "kek.k.ek",
-			Nickname: "kek",
+			Id:           0,
+			Email:        "kek.k.ek",
+			Nickname:     "kek",
 			HashPassword: hash,
-			Score: 100500,
-			AvatarLink: "./avatars/default.jpg"}
+			Score:        100500,
+			AvatarLink:   "./avatars/default.jpg",
+		}
 
 		mu = &sync.Mutex{}
 		currentId = 0
@@ -47,6 +48,30 @@ func getUsers() map[string]DatabaseUser {
 	mu.Unlock()
 
 	return users
+}
+
+func getUser(login string) (DatabaseUser, error) {
+	defer mu.Unlock()
+
+	mu.Lock()
+	if _, ok := users[login]; !ok {
+		return DatabaseUser{}, errors.New("Invalid login")
+	} else {
+		return users[login], nil
+	}
+}
+
+func GetUserById(id int64) (DatabaseUser, error) {
+	defer mu.Unlock()
+
+	mu.Lock()
+	for _, val := range users {
+		if val.Id == id {
+			return val, nil
+		}
+	}
+
+	return DatabaseUser{}, errors.New("user with this id not found")
 }
 
 func addUser(in DatabaseUser) error {

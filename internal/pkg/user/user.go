@@ -5,9 +5,9 @@ import (
 )
 
 type User struct {
-	Id int64
-	Email string
-	Nickname string
+	Id           int64
+	Email        string
+	Nickname     string
 	HashPassword string
 }
 
@@ -21,9 +21,9 @@ func CreateUser(nickname string, email string, password string) (User, error) {
 	}
 
 	err = addUser(DatabaseUser{
-		Id: rid,
-		Email: email,
-		Nickname: nickname,
+		Id:           rid,
+		Email:        email,
+		Nickname:     nickname,
 		HashPassword: hashPassword,
 	})
 	if err != nil {
@@ -32,11 +32,29 @@ func CreateUser(nickname string, email string, password string) (User, error) {
 	}
 
 	u := User{
-		Id: rid,
-		Email: email,
-		Nickname: nickname,
+		Id:           rid,
+		Email:        email,
+		Nickname:     nickname,
 		HashPassword: hashPassword,
 	}
 
 	return u, nil
+}
+
+func IdentifyUser(login string, password string) (User, error) {
+	u, err := getUser(login)
+	if err != nil {
+		return User{}, errors.Wrap(err, "Can't find user")
+	}
+
+	err = comparePassword(password, u.HashPassword)
+	if err != nil {
+		return User{}, errors.Wrap(err, "Wrong password")
+	}
+
+	return User{
+		Id:       u.Id,
+		Email:    u.Email,
+		Nickname: u.Nickname,
+	}, nil
 }
