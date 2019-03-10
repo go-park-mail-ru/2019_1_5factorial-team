@@ -6,7 +6,6 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
 )
 
-
 func main() {
 	port := flag.String("port", "5051", "server will start on this port")
 	flag.Parse()
