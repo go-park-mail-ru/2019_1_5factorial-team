@@ -30,7 +30,7 @@ func init() {
 		users["kekkekkek"] = DatabaseUser{
 			Id:           0,
 			Email:        "kek.k.ek",
-			Nickname:     "kek",
+			Nickname:     "kekkekkek",
 			HashPassword: hash,
 			Score:        100500,
 			AvatarLink:   "./avatars/default.jpg",

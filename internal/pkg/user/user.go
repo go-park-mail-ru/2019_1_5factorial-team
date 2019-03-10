@@ -76,17 +76,29 @@ func GetUserById(id int64) (User, error) {
 	}, nil
 }
 
-func UpdateUser(id int64, oldPassword string, newPassword string) error {
+func UpdateUser(id int64, newAvatar string, oldPassword string, newPassword string) error {
+	
+	if newPassword == "" && newAvatar == "" {
+		return errors.New("nothing to update")
+	}
+	
 	u, err := findUserById(id)
 	if err != nil {
 		return errors.Wrap(err, "update user error")
 	}
 
-	// не будет вложенных ифов, пока не решим менять логин
-	if newPassword == "" {
-		return errors.New("nothing to update")
+	if newAvatar != "" {
+		u.AvatarLink = newAvatar
+		err := updateDBUser(u)
+		if err != nil {
+			return errors.Wrap(err, "cant update avatar")
+		}
 	}
-
+	
+	if newPassword == "" {
+		return nil
+	}
+	
 	err = validateChangingPasswords(oldPassword, newPassword, u.HashPassword)
 	if err != nil {
 		return errors.Wrap(err, "validate passwords error")

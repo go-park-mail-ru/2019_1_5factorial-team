@@ -124,6 +124,7 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 //	"old_password":
 // 	"new_password":
 type ProfileUpdateRequest struct {
+	Avatar      string `json:"avatar"`
 	OldPassword string `json:"old_password"`
 	NewPassword string `json:"new_password"`
 }
@@ -160,7 +161,7 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = user.UpdateUser(req.Context().Value("userID").(int64), data.NewPassword, data.OldPassword)
+	err = user.UpdateUser(req.Context().Value("userID").(int64), data.Avatar, data.NewPassword, data.OldPassword)
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, err.Error())
 
