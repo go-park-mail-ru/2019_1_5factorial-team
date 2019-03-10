@@ -19,6 +19,7 @@ type signInRequest struct {
 	Login    string `json:"loginOrEmail"`
 	Password string `json:"password"`
 }
+// пока только логин, без почты
 
 func SignIn(res http.ResponseWriter, req *http.Request) {
 	isAuth := req.Context().Value("authorized").(bool)

@@ -141,7 +141,6 @@ type ProfileUpdateResponse struct {
 }
 
 func UpdateProfile(res http.ResponseWriter, req *http.Request) {
-	// TODO(): неправильный ответ на изменение только аватарки
 	// TODO(): использовать метод из дева для заполнения структуры из запроса
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
