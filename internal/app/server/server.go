@@ -11,7 +11,6 @@ import (
 
 var fileServerDir = flag.String("fileServerDir", "/var/www/media/factorial", "way to static files")
 
-// var fileServerDir = flag.String("fileServerDir", "../../src", "way to static files")
 func Run(port string) error {
 
 	address := ":" + port

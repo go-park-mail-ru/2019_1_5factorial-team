@@ -5,9 +5,6 @@ import (
 	"fmt"
 )
 
-const MaxUploadSize = 2 * 1024 * 1024 // 2 mb
-const UploadPath = "/var/www/media/factorial"
-
 // func UploadPath() string {
 // 	return "../../src/avatars"
 // }
@@ -22,10 +19,10 @@ func RandToken(len int) string {
 	return fmt.Sprintf("%x", b)
 }
 
-func CheckFileType(a string) bool {
+func CheckFileType(getTypeFile string) bool {
 	arrayTypes := []string{"image/jpeg", "image/jpg", "image/png"}
-	for _, b := range arrayTypes {
-		if b == a {
+	for _, trueTypeFile := range arrayTypes {
+		if trueTypeFile == getTypeFile {
 			return true
 		}
 	}

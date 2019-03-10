@@ -1,19 +1,17 @@
 package controllers
 
 import (
-	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/fileproc"
+	"github.com/pkg/errors"
 )
 
-type ProfileUpdateResponse struct {
-	Email      string `json:"email"`
-	Nickname   string `json:"nickname"`
-	Score      int    `json:"score"`
+type AvatarLinkResponse struct {
 	AvatarLink string `json:"avatar_link"`
 }
 
@@ -22,14 +20,16 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	// проверка на максимально допустимый размер
 	req.Body = http.MaxBytesReader(res, req.Body, fileproc.MaxUploadSize)
 	if err := req.ParseMultipartForm(fileproc.MaxUploadSize); err != nil {
-		ErrResponse(res, http.StatusBadRequest, "FILE_TOO_BIG")
+		ErrResponse(res, http.StatusBadRequest, "file too big")
+		log.Println(errors.Wrap(err, "file too big"))
 
 		return
 	}
 
 	file, headers, err := req.FormFile("upload")
 	if err != nil {
-		ErrResponse(res, http.StatusBadRequest, "INVALID_FILE_IN_REQUEST")
+		ErrResponse(res, http.StatusBadRequest, "invalied file in request")
+		log.Println(errors.Wrap(err, "invalied file in request"))
 
 		return
 	}
@@ -37,48 +37,50 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	defer file.Close()
 	fileBytes, err := ioutil.ReadAll(file)
 	if err != nil {
-		ErrResponse(res, http.StatusBadRequest, "INVALID_FILE_CANT_READAll")
+		ErrResponse(res, http.StatusBadRequest, "invalied file cant readall")
+		log.Println(errors.Wrap(err, "invalied file cant readall"))
 
 		return
 	}
 
-	//  я забыл какие у нас типы если что можно изи добавить
-
 	filetype := http.DetectContentType(fileBytes)
 	if !fileproc.CheckFileType(filetype) {
-		ErrResponse(res, http.StatusBadRequest, "INVALID_FILE_TYPE")
+		ErrResponse(res, http.StatusBadRequest, "invalied file type")
+		log.Println(errors.Wrap(err, "invalied file type"))
+
 		return
 	}
 
 	//  забиваю на имя фала генерю новое
 	fileName := fileproc.RandToken(12)
-	fileEndings := filepath.Ext(headers.Filename)
+	fileExtension := filepath.Ext(headers.Filename)
 	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, "CANT_READ_FILE_TYPE")
+		ErrResponse(res, http.StatusInternalServerError, "cant read file type")
+		log.Println(errors.Wrap(err, "cant read file type"))
 
 		return
 	}
-	newPath := filepath.Join(fileproc.UploadPath, fileName+fileEndings)
-	fmt.Printf("FileType: %s, File: %s\n", filetype, newPath)
+	newPath := filepath.Join(fileproc.UploadPath, fileName+fileExtension)
+	log.Printf("filetype: %s, file: %s\n", filetype, newPath)
 
 	// записываем файл
 	newFile, err := os.Create(newPath)
 	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, "CANT_WRITE_FILE")
+		ErrResponse(res, http.StatusInternalServerError, "cant write file")
+		log.Println(errors.Wrap(err, "cant write file"))
 
 		return
 	}
+
 	defer newFile.Close() // idempotent, okay to call twice
 	if _, err := newFile.Write(fileBytes); err != nil || newFile.Close() != nil {
-		ErrResponse(res, http.StatusInternalServerError, "CANT_WRITE_FILE")
+		ErrResponse(res, http.StatusInternalServerError, "cant write file")
+		log.Println(errors.Wrap(err, "cant write file"))
 
 		return
 	}
-	OkResponse(res, ProfileUpdateResponse{
-		Email:      "Email",
-		Nickname:   "Nickname",
-		Score:      0,
-		AvatarLink: fileName + fileEndings,
+	OkResponse(res, AvatarLinkResponse{
+		AvatarLink: fileName + fileExtension,
 	})
 	// res.Write([]byte("SUCCESS"))
 

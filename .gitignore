@@ -143,4 +143,22 @@ Temporary Items
 # Ignore all local history of files
 .history
 
+# Scalable Vector Graphics
+*.svg
+*.svgz
+
+# Portable Network Graphics
+*.png
+
+# Graphics Interchange Format
+*.gif
+
+# JPEG
+*.jpg
+*.jpeg
+*.jpe
+*.jif
+*.jfif
+*.jfi
+
 # End of https://www.gitignore.io/api/go,macos,jetbrains+all,visualstudiocode
