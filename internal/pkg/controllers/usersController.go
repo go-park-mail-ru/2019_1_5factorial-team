@@ -178,3 +178,13 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		AvatarLink: u.AvatarLink,
 	})
 }
+
+type UsersCountInfoResponse struct {
+	Count int `json:"count"`
+}
+func UsersCountInfo(res http.ResponseWriter, req *http.Request) {
+	count := user.GetUsersCount()
+	OkResponse(res, UsersCountInfoResponse{
+		Count: count,
+	})
+}

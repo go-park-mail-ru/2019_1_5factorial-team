@@ -168,3 +168,7 @@ func GetUsersScores(limit int, offset int) ([]Scores, error) {
 
 	return page, nil
 }
+
+func GetUsersCount() int {
+	return getUsersCount()
+}
