@@ -92,6 +92,12 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 	OkResponse(res, "ok logout")
 }
 
+// 'Content-Type': 'application/json; charset=utf-8'
+// 	"email":
+// 	"nickname":
+// 	"score":
+// 	"avatar_link":
+
 type UserInfoResponse struct {
 	Email      string `json:"email"`
 	Nickname   string `json:"nickname"`

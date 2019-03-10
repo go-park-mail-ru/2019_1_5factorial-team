@@ -63,7 +63,6 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	}
 	user.PrintUsers()
 
-	// TODO(smet1): сразу его логинить или нет????
 	randToken := session.GenerateToken()
 
 	randToken, expiration, err := session.SetToken(u.Id)
@@ -130,6 +129,11 @@ type ProfileUpdateRequest struct {
 	NewPassword string `json:"new_password"`
 }
 
+// 'Content-Type': 'application/json; charset=utf-8'
+// 	"email":
+//	"nickname":
+// 	"score":
+//	"avatar_link":
 type ProfileUpdateResponse struct {
 	Email      string `json:"email"`
 	Nickname   string `json:"nickname"`
