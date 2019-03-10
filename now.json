@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "cmd/**/*.go",
+      "use": "@now/go@canary"
+    }
+  ],
+  "build": {
+    "env": {
+      "GO111MODULE": "on"
+    }
+  }
+}
