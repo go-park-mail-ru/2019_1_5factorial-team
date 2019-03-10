@@ -124,7 +124,6 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 //	"old_password":
 // 	"new_password":
 type ProfileUpdateRequest struct {
-	Avatar      string `json:"avatar"`
 	OldPassword string `json:"old_password"`
 	NewPassword string `json:"new_password"`
 }
@@ -143,6 +142,7 @@ type ProfileUpdateResponse struct {
 
 func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 	// TODO(): неправильный ответ на изменение только аватарки
+	// TODO(): использовать метод из дева для заполнения структуры из запроса
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, "body parsing error")
@@ -150,8 +150,8 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		log.Println(errors.Wrap(err, "body parsing error"))
 		return
 	}
+
 	// TODO(): аватарки должны будут обновлять по-другому, жду лелю
-	fmt.Println()
 	data := ProfileUpdateRequest{}
 	err = json.Unmarshal(body, &data)
 	if err != nil {
@@ -161,7 +161,7 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = user.UpdateUser(req.Context().Value("userID").(int64), data.Avatar, data.NewPassword, data.OldPassword)
+	err = user.UpdateUser(req.Context().Value("userID").(int64), data.NewPassword, data.OldPassword)
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, err.Error())
 

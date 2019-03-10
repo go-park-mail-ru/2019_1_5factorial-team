@@ -12,7 +12,7 @@ func Run(port string) error {
 	address := ":" + port
 	router := mux.NewRouter()
 
-	// TODO: CORS, panic
+	// TODO: panic
 	router.Use(middleware.AuthMiddleware)
 	router.Use(middleware.CORSMiddleware)
 

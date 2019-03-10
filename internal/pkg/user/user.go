@@ -76,33 +76,16 @@ func GetUserById(id int64) (User, error) {
 	}, nil
 }
 
-func UpdateUser(id int64, newAvatar string, oldPassword string, newPassword string) error {
+func UpdateUser(id int64, oldPassword string, newPassword string) error {
 	u, err := findUserById(id)
 	if err != nil {
 		return errors.Wrap(err, "update user error")
 	}
 
-	if newAvatar != "" {
-		u.AvatarLink = newAvatar
-		err := updateDBUser(u)
-		if err != nil {
-			return errors.Wrap(err, "cant update avatar")
-		}
-	}
-
 	if newPassword != "" {
-		if oldPassword == "" {
-			return errors.New("please input old password")
-		}
-
-		err = comparePassword(newPassword, u.HashPassword)
-		if err == nil {
-			return errors.New("old and new password are same")
-		}
-
-		err = comparePassword(oldPassword, u.HashPassword)
+		err = validateChangingPasswords(oldPassword, newPassword, u.HashPassword)
 		if err != nil {
-			return errors.Wrap(err, "invalid old password")
+			return errors.Wrap(err, "validate passwords error")
 		}
 
 		newHashPassword, err := getPasswordHash(newPassword)
@@ -119,4 +102,22 @@ func UpdateUser(id int64, newAvatar string, oldPassword string, newPassword stri
 	}
 
 	return errors.New("nothing to update")
+}
+
+func validateChangingPasswords(oldPassword string, newPassword string, currentHashPassword string) error {
+	if oldPassword == "" {
+		return errors.New("please input old password")
+	}
+
+	err := comparePassword(newPassword, currentHashPassword)
+	if err == nil {
+		return errors.New("old and new password are same")
+	}
+
+	err = comparePassword(oldPassword, currentHashPassword)
+	if err != nil {
+		return errors.Wrap(err, "invalid old password")
+	}
+
+	return nil
 }
