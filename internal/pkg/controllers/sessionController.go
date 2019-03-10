@@ -15,12 +15,23 @@ import (
 // 'Content-Type': 'application/json; charset=utf-8'
 // 	"login":
 // 	"password":
+// пока только логин, без почты
 type signInRequest struct {
 	Login    string `json:"loginOrEmail"`
 	Password string `json:"password"`
 }
-// пока только логин, без почты
 
+// SignIn godoc
+// @Title Sign In
+// @Summary Sign in with your account with email and password, set session cookie
+// @ID post-session
+// @Accept  json
+// @Produce  json
+// @Param AuthData body controllers.signInRequest true "user auth data"
+// @Success 200 {object} controllers.OkResponse
+// @Failure 400 {object} controllers.ErrResponse
+// @Failure 500 {object} controllers.ErrResponse
+// @Router /session [post]
 func SignIn(res http.ResponseWriter, req *http.Request) {
 	isAuth := req.Context().Value("authorized").(bool)
 	if isAuth == true {
@@ -69,6 +80,15 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	OkResponse(res, "ok auth")
 }
 
+// SignOut godoc
+// @Title Sign Out
+// @Summary Sign out from your account, expire cookie
+// @ID delete-session
+// @Produce  json
+// @Success 200 {object} controllers.OkResponse
+// @Failure 400 {object} controllers.ErrResponse
+// @Failure 401 {object} controllers.ErrResponse
+// @Router /session [post]
 func SignOut(res http.ResponseWriter, req *http.Request) {
 
 	currentSession, err := req.Cookie("token")
