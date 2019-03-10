@@ -82,26 +82,28 @@ func UpdateUser(id int64, oldPassword string, newPassword string) error {
 		return errors.Wrap(err, "update user error")
 	}
 
-	if newPassword != "" {
-		err = validateChangingPasswords(oldPassword, newPassword, u.HashPassword)
-		if err != nil {
-			return errors.Wrap(err, "validate passwords error")
-		}
-
-		newHashPassword, err := getPasswordHash(newPassword)
-		if err != nil {
-			return errors.Wrap(err, "some password error")
-		}
-
-		u.HashPassword = newHashPassword
-		err = updateDBUser(u)
-		if err != nil {
-			return errors.Wrap(err, "cant update avatar")
-		}
-		return nil
+	// не будет вложенных ифов, пока не решим менять логин
+	if newPassword == "" {
+		return errors.New("nothing to update")
 	}
 
-	return errors.New("nothing to update")
+	err = validateChangingPasswords(oldPassword, newPassword, u.HashPassword)
+	if err != nil {
+		return errors.Wrap(err, "validate passwords error")
+	}
+
+	newHashPassword, err := getPasswordHash(newPassword)
+	if err != nil {
+		return errors.Wrap(err, "some password error")
+	}
+
+	u.HashPassword = newHashPassword
+	err = updateDBUser(u)
+	if err != nil {
+		return errors.Wrap(err, "cant update avatar")
+	}
+
+	return nil
 }
 
 func validateChangingPasswords(oldPassword string, newPassword string, currentHashPassword string) error {
