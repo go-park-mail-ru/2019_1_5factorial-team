@@ -23,10 +23,6 @@ type SingUpRequest struct {
 	Password string `json:"password"`
 }
 
-type SignUpResponse struct {
-	Id int64 `json:"id"`
-}
-
 func SignUp(res http.ResponseWriter, req *http.Request) {
 	fmt.Println("createUser")
 
