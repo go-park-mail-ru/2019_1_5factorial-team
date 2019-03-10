@@ -17,18 +17,18 @@ func Run(port string) error {
 	router.Use(middleware.CORSMiddleware)
 
 	router.HandleFunc("/hello", controllers.HW).Methods("GET")
-	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST")
-	router.HandleFunc("/api/users/{id:[0-9]+}", controllers.GetUser).Methods("GET")
+	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST", "OPTIONS")
+	router.HandleFunc("/api/users/{id:[0-9]+}", controllers.GetUser).Methods("GET", "OPTIONS")
 	router.HandleFunc("/api/session", controllers.SignIn).Methods("POST", "OPTIONS")
 
 	routerLoginRequired := router.PathPrefix("").Subrouter()
 
 	routerLoginRequired.Use(middleware.CheckLoginMiddleware)
 
-	routerLoginRequired.HandleFunc("/api/user", controllers.GetUserFromSession).Methods("GET")
-	routerLoginRequired.HandleFunc("/api/user", controllers.UpdateProfile).Methods("PUT")
-	routerLoginRequired.HandleFunc("/api/session", controllers.IsSessionValid).Methods("GET")
-	routerLoginRequired.HandleFunc("/api/session", controllers.SignOut).Methods("DELETE")
+	routerLoginRequired.HandleFunc("/api/user", controllers.GetUserFromSession).Methods("GET", "OPTIONS")
+	routerLoginRequired.HandleFunc("/api/user", controllers.UpdateProfile).Methods("PUT", "OPTIONS")
+	routerLoginRequired.HandleFunc("/api/session", controllers.IsSessionValid).Methods("GET", "OPTIONS")
+	routerLoginRequired.HandleFunc("/api/session", controllers.SignOut).Methods("DELETE", "OPTIONS")
 
 	err := http.ListenAndServe(address, router)
 	if err != nil {
