@@ -144,21 +144,24 @@ Temporary Items
 .history
 
 # Scalable Vector Graphics
-*.svg
-*.svgz
+**/*.svg
+**/*.svgz
+!/src/static/*.svg
+!/src/static/*.svgz
 
 # Portable Network Graphics
-*.png
+**/*.png
+!/src/static/*.png
 
 # Graphics Interchange Format
-*.gif
+**/*.gif
+!/src/static/*.gif
 
 # JPEG
-*.jpg
-*.jpeg
-*.jpe
-*.jif
-*.jfif
-*.jfi
+**/*.jpeg
+**/*.jpg
+!/src/static/*.jpg
+!/src/static/*.jpeg
+
 
 # End of https://www.gitignore.io/api/go,macos,jetbrains+all,visualstudiocode
