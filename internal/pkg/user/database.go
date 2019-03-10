@@ -3,6 +3,7 @@ package user
 import (
 	"fmt"
 	"github.com/pkg/errors"
+	"sort"
 	"sync"
 )
 
@@ -109,4 +110,27 @@ func updateDBUser(user DatabaseUser) error {
 
 	users[user.Nickname] = user
 	return nil
+}
+
+type ByNameScore []DatabaseUser
+
+func (a ByNameScore) Len() int			 { return len(a) }
+func (a ByNameScore) Less(i, j int) bool { return a[i].Score < a[j].Score }
+func (a ByNameScore) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+func getScores() []DatabaseUser {
+	mu.Lock()
+	result := make([]DatabaseUser, 0, 1)
+	for _, val := range users {
+		result = append(result, val)
+	}
+
+	sort.Sort(ByNameScore(result))
+
+	mu.Unlock()
+	return result
+}
+
+func getUsersCount() int {
+	return len(users)
 }

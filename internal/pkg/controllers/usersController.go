@@ -30,6 +30,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	if id == true {
 		ErrResponse(res, http.StatusBadRequest, "already auth")
 
+		log.Println(errors.New("already auth"))
 		return
 	}
 
@@ -55,7 +56,6 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 
 	u, err := user.CreateUser(data.Login, data.Email, data.Password)
 	if err != nil {
-		// TODO(smet1): указать точную ошибку
 		ErrResponse(res, http.StatusBadRequest, err.Error())
 
 		log.Println(errors.Wrap(err, "err in user data"))

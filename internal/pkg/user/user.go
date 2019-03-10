@@ -135,3 +135,36 @@ func validateChangingPasswords(oldPassword string, newPassword string, currentHa
 
 	return nil
 }
+
+type Scores struct {
+	Nickname string `json:"nickname"`
+	Score int `json:"score"`
+}
+
+func GetUsersScores(limit int, offset int) ([]Scores, error) {
+	begin := limit * (offset - 1)
+	end := limit * offset
+
+	usersCount := getUsersCount()
+
+	if begin > usersCount {
+		return nil, errors.New("limit * (offset - 1) > users count")
+	}
+
+	if end > usersCount {
+		end = usersCount
+	}
+
+	page := make([]Scores, 0, 1)
+
+	databaseScores := getScores()
+
+	for i := begin; i < end; i++ {
+		page = append(page, Scores{
+			Nickname: databaseScores[i].Nickname,
+			Score: databaseScores[i].Score,
+		})
+	}
+
+	return page, nil
+}
