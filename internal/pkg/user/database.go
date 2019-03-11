@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-const DefaultAvatarLink = "../../avatars/default.png"
+const DefaultAvatarLink = "../../../avatars/default.png"
 
 type DatabaseUser struct {
 	Id           int64
