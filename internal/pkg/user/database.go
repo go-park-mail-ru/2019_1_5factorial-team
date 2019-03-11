@@ -3,8 +3,10 @@ package user
 import (
 	"fmt"
 	"github.com/pkg/errors"
+	"math/rand"
 	"sort"
 	"sync"
+	"github.com/manveru/faker"
 )
 
 type DatabaseUser struct {
@@ -25,6 +27,9 @@ func init() {
 	once.Do(func() {
 		fmt.Println("init users map")
 
+		fake, _ := faker.New("en")
+		fake.Rand = rand.New(rand.NewSource(42))
+
 		users = make(map[string]DatabaseUser)
 
 		hash, _ := getPasswordHash("password")
@@ -35,6 +40,22 @@ func init() {
 			HashPassword: hash,
 			Score:        100500,
 			AvatarLink:   "./avatars/default.jpg",
+		}
+
+		for i := 0; i < 20; i++ {
+			nick := fake.Name()
+			hash, _ := getPasswordHash(nick)
+
+			fmt.Println("nickname:", nick, "password:", nick)
+
+			users[nick] = DatabaseUser{
+				Id:           0,
+				Email:        fake.Email(),
+				Nickname:     nick,
+				HashPassword: hash,
+				Score:        rand.Int(),
+				AvatarLink:   "./avatars/default.jpg",
+			}
 		}
 
 		mu = &sync.Mutex{}
