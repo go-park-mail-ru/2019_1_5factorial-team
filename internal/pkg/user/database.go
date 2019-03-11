@@ -2,11 +2,11 @@ package user
 
 import (
 	"fmt"
+	"github.com/manveru/faker"
 	"github.com/pkg/errors"
 	"math/rand"
 	"sort"
 	"sync"
-	"github.com/manveru/faker"
 )
 
 type DatabaseUser struct {
@@ -42,20 +42,23 @@ func init() {
 			AvatarLink:   "./avatars/default.jpg",
 		}
 
+		var id int64 = 1
 		for i := 0; i < 20; i++ {
 			nick := fake.Name()
 			hash, _ := getPasswordHash(nick)
 
-			fmt.Println("nickname:", nick, "password:", nick)
+			fmt.Println("id:", id, ", Nick:", nick, ", Password:", nick)
 
 			users[nick] = DatabaseUser{
-				Id:           0,
+				Id:           id,
 				Email:        fake.Email(),
 				Nickname:     nick,
 				HashPassword: hash,
 				Score:        rand.Int(),
 				AvatarLink:   "./avatars/default.jpg",
 			}
+
+			id++
 		}
 
 		mu = &sync.Mutex{}
@@ -135,7 +138,7 @@ func updateDBUser(user DatabaseUser) error {
 
 type ByNameScore []DatabaseUser
 
-func (a ByNameScore) Len() int			 { return len(a) }
+func (a ByNameScore) Len() int           { return len(a) }
 func (a ByNameScore) Less(i, j int) bool { return a[i].Score < a[j].Score }
 func (a ByNameScore) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 

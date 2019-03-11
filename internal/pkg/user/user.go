@@ -77,11 +77,11 @@ func GetUserById(id int64) (User, error) {
 }
 
 func UpdateUser(id int64, newAvatar string, oldPassword string, newPassword string) error {
-	
+
 	if newPassword == "" && newAvatar == "" {
 		return errors.New("nothing to update")
 	}
-	
+
 	u, err := findUserById(id)
 	if err != nil {
 		return errors.Wrap(err, "update user error")
@@ -94,11 +94,11 @@ func UpdateUser(id int64, newAvatar string, oldPassword string, newPassword stri
 			return errors.Wrap(err, "cant update avatar")
 		}
 	}
-	
+
 	if newPassword == "" {
 		return nil
 	}
-	
+
 	err = validateChangingPasswords(oldPassword, newPassword, u.HashPassword)
 	if err != nil {
 		return errors.Wrap(err, "validate passwords error")
@@ -138,7 +138,7 @@ func validateChangingPasswords(oldPassword string, newPassword string, currentHa
 
 type Scores struct {
 	Nickname string `json:"nickname"`
-	Score int `json:"score"`
+	Score    int    `json:"score"`
 }
 
 func GetUsersScores(limit int, offset int) ([]Scores, error) {
@@ -162,7 +162,7 @@ func GetUsersScores(limit int, offset int) ([]Scores, error) {
 	for i := begin; i < end; i++ {
 		page = append(page, Scores{
 			Nickname: databaseScores[i].Nickname,
-			Score: databaseScores[i].Score,
+			Score:    databaseScores[i].Score,
 		})
 	}
 
