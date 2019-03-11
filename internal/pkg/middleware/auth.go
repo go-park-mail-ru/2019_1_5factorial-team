@@ -13,43 +13,42 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		log.Println(req.URL, "AuthMiddleware")
 
 		ctx := req.Context()
+		var userId int64 = -1
+		authorized := false
+
+		defer func() {
+			ctx = context.WithValue(ctx, "userID", userId)
+			ctx = context.WithValue(ctx, "authorized", authorized)
+
+			next.ServeHTTP(res, req.WithContext(ctx))
+		}()
 
 		cookie, err := req.Cookie(session.CookieName)
 		if err != nil {
-
-			ctx = context.WithValue(ctx, "userID", -1)
-			ctx = context.WithValue(ctx, "authorized", false)
-			ctx = context.WithValue(ctx, "token", "")
-		} else {
-
-			uId, err := session.GetId(cookie.Value)
-
-			if err != nil {
-				ctx = context.WithValue(ctx, "userID", -1)
-				ctx = context.WithValue(ctx, "authorized", false)
-				ctx = context.WithValue(ctx, "token", "")
-
-				cookie.Expires = time.Unix(0, 0)
-				http.SetCookie(res, cookie)
-
-			} else {
-				ctx = context.WithValue(ctx, "userID", uId)
-				ctx = context.WithValue(ctx, "authorized", true)
-				ctx = context.WithValue(ctx, "token", cookie.Value)
-
-				// сетим новое время куки
-				// и обновляем время токена
-				updatedToken, err := session.UpdateToken(cookie.Value)
-				if err != nil {
-					http.Error(res, "relogin, please", http.StatusInternalServerError)
-				}
-
-				cookie.Expires = updatedToken.CookieExpiredTime
-				http.SetCookie(res, cookie)
-			}
+			log.Println("no cookie found, user unauthorized")
+			return
 		}
 
-		next.ServeHTTP(res, req.WithContext(ctx))
+		uId, err := session.GetId(cookie.Value)
+
+		if err != nil {
+			cookie.Expires = time.Unix(0, 0)
+
+		} else {
+			userId = uId
+			authorized = true
+
+			// сетим новое время куки
+			// и обновляем время токена
+			updatedToken, err := session.UpdateToken(cookie.Value)
+			if err != nil {
+				http.Error(res, "relogin, please", http.StatusInternalServerError)
+			}
+
+			cookie.Expires = updatedToken.CookieExpiredTime
+		}
+
+		http.SetCookie(res, cookie)
 	})
 
 }

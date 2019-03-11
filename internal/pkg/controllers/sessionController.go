@@ -1,15 +1,12 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/pkg/errors"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 )
 
 // 'Content-Type': 'application/json; charset=utf-8'
@@ -33,28 +30,13 @@ type signInRequest struct {
 // @Failure 500 {object} controllers.ErrResponse
 // @Router /session [post]
 func SignIn(res http.ResponseWriter, req *http.Request) {
-	isAuth := req.Context().Value("authorized").(bool)
-	if isAuth == true {
-		ErrResponse(res, http.StatusBadRequest, "already auth")
-
-		return
-	}
-
-	body, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, "body parsing error")
-
-		log.Println(errors.Wrap(err, "body parsing error"))
-		return
-	}
-	defer req.Body.Close()
 
 	data := signInRequest{}
-	err = json.Unmarshal(body, &data)
+	status, err := ParseRequestIntoStruct(true, req, &data)
 	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, "json parsing error")
+		ErrResponse(res, status, err.Error())
 
-		log.Println(errors.Wrap(err, "json parsing error"))
+		log.Println(errors.Wrap(err, "ParseRequestIntoStruct error"))
 		return
 	}
 
@@ -69,12 +51,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 
 	randToken, expiration, err := session.SetToken(u.Id)
 
-	cookie := http.Cookie{
-		Name:     session.CookieName,
-		Value:    randToken,
-		Expires:  expiration,
-		HttpOnly: session.HttpOnly,
-	}
+	cookie := session.CreateHttpCookie(randToken, expiration)
 
 	http.SetCookie(res, &cookie)
 	OkResponse(res, "ok auth")
@@ -91,7 +68,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 // @Router /session [post]
 func SignOut(res http.ResponseWriter, req *http.Request) {
 
-	currentSession, err := req.Cookie("token")
+	currentSession, err := req.Cookie(session.CookieName)
 	if err == http.ErrNoCookie {
 		// бесполезная проверка, так кука валидна, но по гостайлу нужна
 		ErrResponse(res, http.StatusUnauthorized, "not authorized")
@@ -99,14 +76,24 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	currentSession.Expires = time.Unix(0, 0)
-	http.SetCookie(res, currentSession)
-
 	err = session.DeleteToken(currentSession.Value)
-	if err != nil {
-		ErrResponse(res, http.StatusBadRequest, "error")
-		log.Println(errors.Wrap(err, "cannot delete token from current session, user cookie set expired"))
+	if err != nil && err.Error() == session.NoTokenFound {
+		// bad token
+		log.Println(errors.Wrap(err, "cannot delete token from current session, user cookie will set expired"))
+	} else if err != nil {
+		ErrResponse(res, http.StatusInternalServerError, err.Error())
 
+		log.Println(errors.Wrap(err, "delete token error"))
+		return
+	}
+
+	// on other errors -> not logout, just answer ErrResponse
+
+	status, err := DropUserCookie(res, req)
+	if err != nil {
+		ErrResponse(res, status, err.Error())
+
+		log.Println(errors.Wrap(err, "cannot drop user cookie"))
 		return
 	}
 
@@ -132,13 +119,17 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 	u, err := user.GetUserById(id)
 	if err != nil {
 		// проверка на невалидный айди юзера
-		currentSession, err := req.Cookie("token")
-		currentSession.Expires = time.Unix(0, 0)
-		http.SetCookie(res, currentSession)
+		status, err := DropUserCookie(res, req)
+		if err != nil {
+			ErrResponse(res, status, err.Error())
+
+			log.Println(errors.Wrap(err, "cannot drop user cookie"))
+			return
+		}
 
 		ErrResponse(res, http.StatusBadRequest, "error")
-		log.Println(errors.Wrap(err, "user have invalid id"))
 
+		log.Println(errors.Wrap(err, "user have invalid id"))
 		return
 	}
 

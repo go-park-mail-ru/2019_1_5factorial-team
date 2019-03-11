@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 // 'Content-Type': 'application/json; charset=utf-8'
@@ -23,34 +24,55 @@ type SingUpRequest struct {
 	Password string `json:"password"`
 }
 
-func SignUp(res http.ResponseWriter, req *http.Request) {
-	fmt.Println("createUser")
+type SignUpResponse struct {
+	Id int64 `json:"id"`
+}
 
-	id := req.Context().Value("authorized").(bool)
-	if id == true {
-		ErrResponse(res, http.StatusBadRequest, "already auth")
+func ParseRequestIntoStruct(auth bool, req *http.Request, requestStruct interface{}) (int, error) {
 
-		log.Println(errors.New("already auth"))
-		return
+	isAuth := req.Context().Value("authorized").(bool)
+	if isAuth == auth {
+		return http.StatusBadRequest, errors.New("already auth")
 	}
 
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, "body parsing error")
-
-		log.Println(errors.Wrap(err, "body parsing error"))
-		return
+		return http.StatusInternalServerError, errors.Wrap(err, "body parsing error")
 	}
 
-	fmt.Println()
-	data := SingUpRequest{}
-	err = json.Unmarshal(body, &data)
+	err = json.Unmarshal(body, &requestStruct)
 	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, "json parsing error")
+		return http.StatusInternalServerError, errors.Wrap(err, "json parsing error")
+	}
 
-		log.Println(errors.Wrap(err, "json parsing error"))
+	return 0, nil
+}
+
+func DropUserCookie(res http.ResponseWriter, req *http.Request) (int, error) {
+	currentSession, err := req.Cookie(session.CookieName)
+	if err == http.ErrNoCookie {
+		// бесполезная проверка, так кука валидна, но по гостайлу нужна
+
+		return http.StatusUnauthorized, errors.Wrap(err, "not authorized")
+	}
+
+	currentSession.Expires = time.Unix(0, 0)
+	http.SetCookie(res, currentSession)
+
+	return 0, nil
+}
+
+func SignUp(res http.ResponseWriter, req *http.Request) {
+
+	data := SingUpRequest{}
+	status, err := ParseRequestIntoStruct(true, req, &data)
+	if err != nil {
+		ErrResponse(res, status, err.Error())
+
+		log.Println(errors.Wrap(err, "ParseRequestIntoStruct error"))
 		return
 	}
+
 	// TODO(smet1): валидация на данные, правда ли мыло - мыло, а самолет - вертолет?
 	fmt.Println(data)
 
@@ -63,16 +85,9 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	}
 	user.PrintUsers()
 
-	randToken := session.GenerateToken()
-
 	randToken, expiration, err := session.SetToken(u.Id)
 
-	cookie := http.Cookie{
-		Name:     session.CookieName,
-		Value:    randToken,
-		Expires:  expiration,
-		HttpOnly: session.HttpOnly,
-	}
+	cookie := session.CreateHttpCookie(randToken, expiration)
 
 	http.SetCookie(res, &cookie)
 	OkResponse(res, "signUp ok")

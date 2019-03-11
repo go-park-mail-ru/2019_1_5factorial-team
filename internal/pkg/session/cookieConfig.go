@@ -1,6 +1,21 @@
 package session
 
-const CookieName = "token"
-const HttpOnly bool = true
+import (
+	"net/http"
+	"time"
+)
 
-const cookieTimeHours = 10
+const (
+	CookieName      string = "token"
+	HttpOnly        bool   = true
+	CookieTimeHours        = 10
+)
+
+func CreateHttpCookie(value string, expiration time.Time) http.Cookie {
+	return http.Cookie{
+		Name:     CookieName,
+		Value:    value,
+		Expires:  expiration,
+		HttpOnly: HttpOnly,
+	}
+}

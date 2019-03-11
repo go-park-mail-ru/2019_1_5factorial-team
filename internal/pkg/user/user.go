@@ -27,8 +27,8 @@ func CreateUser(nickname string, email string, password string) (User, error) {
 		Email:        email,
 		Nickname:     nickname,
 		HashPassword: hashPassword,
-		Score: 0,
-		AvatarLink: DefaultAvatarLink,
+		Score:        0,
+		AvatarLink:   DefaultAvatarLink,
 	})
 	if err != nil {
 		err = errors.Wrap(err, "Cannot create user")
@@ -40,8 +40,8 @@ func CreateUser(nickname string, email string, password string) (User, error) {
 		Email:        email,
 		Nickname:     nickname,
 		HashPassword: hashPassword,
-		Score: 0,
-		AvatarLink: DefaultAvatarLink,
+		Score:        0,
+		AvatarLink:   DefaultAvatarLink,
 	}
 
 	return u, nil
