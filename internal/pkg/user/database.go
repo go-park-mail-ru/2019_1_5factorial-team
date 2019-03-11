@@ -9,6 +9,8 @@ import (
 	"sync"
 )
 
+const DefaultAvatarLink = "../../avatars/default.png"
+
 type DatabaseUser struct {
 	Id           int64
 	Email        string
@@ -39,7 +41,7 @@ func init() {
 			Nickname:     "kekkekkek",
 			HashPassword: hash,
 			Score:        100500,
-			AvatarLink:   "./avatars/default.jpg",
+			AvatarLink:   DefaultAvatarLink,
 		}
 		mu = &sync.Mutex{}
 		currentId = 0
@@ -58,7 +60,7 @@ func init() {
 				Nickname:     nick,
 				HashPassword: hash,
 				Score:        rand.Int(),
-				AvatarLink:   "./avatars/default.jpg",
+				AvatarLink:   DefaultAvatarLink,
 			}
 
 			id = getNextId()
