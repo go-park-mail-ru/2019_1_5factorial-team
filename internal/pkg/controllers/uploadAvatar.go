@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/fileproc"
@@ -60,28 +59,17 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 
 		return
 	}
-	newPath := filepath.Join(fileproc.UploadPath, fileName+fileExtension)
-	log.Printf("filetype: %s, file: %s\n", filetype, newPath)
 
 	// записываем файл
-	newFile, err := os.Create(newPath)
+	resultFile, err := fileproc.CreateResultFile(fileName, fileExtension, filetype, fileBytes)
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, "cant write file")
 		log.Println(errors.Wrap(err, "cant write file"))
 
 		return
 	}
-
-	defer newFile.Close() // idempotent, okay to call twice
-	if _, err := newFile.Write(fileBytes); err != nil || newFile.Close() != nil {
-		ErrResponse(res, http.StatusInternalServerError, "cant write file")
-		log.Println(errors.Wrap(err, "cant write file"))
-
-		return
-	}
 	OkResponse(res, AvatarLinkResponse{
-		AvatarLink: fileName + fileExtension,
+		AvatarLink: resultFile,
 	})
-	// res.Write([]byte("SUCCESS"))
 
 }

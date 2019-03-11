@@ -144,25 +144,6 @@ Temporary Items
 # Ignore all local history of files
 .history
 
-# Scalable Vector Graphics
-**/*.svg
-**/*.svgz
-!/src/static/*.svg
-!/src/static/*.svgz
-
-# Portable Network Graphics
-**/*.png
-!/src/static/*.png
-
-# Graphics Interchange Format
-**/*.gif
-!/src/static/*.gif
-
-# JPEG
-**/*.jpeg
-**/*.jpg
-!/src/static/*.jpg
-!/src/static/*.jpeg
 
 ./src
 

@@ -1,16 +1,14 @@
 package server
 
 import (
-	"flag"
 	"net/http"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/fileproc"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 )
-
-var fileServerDir = flag.String("fileServerDir", "/var/www/media/factorial", "way to static files")
 
 func Run(port string) error {
 
@@ -22,7 +20,7 @@ func Run(port string) error {
 
 	router.HandleFunc("/hello", controllers.HelloWorld).Methods("GET")
 	router.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST")
-	router.PathPrefix("/static").Handler(http.FileServer(http.Dir(*fileServerDir)))
+	router.PathPrefix("/static").Handler(http.FileServer(http.Dir(fileproc.UploadPath)))
 	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST")
 	router.HandleFunc("/api/session", controllers.SignIn).Methods("POST")
 
