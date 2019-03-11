@@ -44,7 +44,7 @@ func init() {
 
 		var id int64 = 1
 		for i := 0; i < 20; i++ {
-			nick := fake.Name()
+			nick := fake.FirstName()
 			hash, _ := getPasswordHash(nick)
 
 			fmt.Println("id:", id, ", Nick:", nick, ", Password:", nick)
