@@ -89,7 +89,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 
 	cookie := session.CreateHttpCookie(randToken, expiration)
 
-	http.SetCookie(res, &cookie)
+	http.SetCookie(res, cookie)
 	OkResponse(res, "signUp ok")
 }
 

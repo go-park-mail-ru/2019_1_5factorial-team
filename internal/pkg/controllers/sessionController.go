@@ -43,6 +43,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	u, err := user.IdentifyUser(data.Login, data.Password)
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, "Wrong password or login")
+
 		log.Println(errors.Wrap(err, "Wrong password or login"))
 		return
 	}
@@ -53,7 +54,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 
 	cookie := session.CreateHttpCookie(randToken, expiration)
 
-	http.SetCookie(res, &cookie)
+	http.SetCookie(res, cookie)
 	OkResponse(res, "ok auth")
 }
 
@@ -65,7 +66,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 // @Success 200 {object} controllers.OkResponse
 // @Failure 400 {object} controllers.ErrResponse
 // @Failure 401 {object} controllers.ErrResponse
-// @Router /session [post]
+// @Router /session [delete]
 func SignOut(res http.ResponseWriter, req *http.Request) {
 
 	currentSession, err := req.Cookie(session.CookieName)

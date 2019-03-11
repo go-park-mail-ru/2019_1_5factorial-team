@@ -45,7 +45,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				http.Error(res, "relogin, please", http.StatusInternalServerError)
 			}
 
-			cookie.Expires = updatedToken.CookieExpiredTime
+			session.UpdateHttpCookie(cookie, updatedToken.CookieExpiredTime)
 		}
 
 		http.SetCookie(res, cookie)
