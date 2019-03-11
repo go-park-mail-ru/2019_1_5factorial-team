@@ -41,8 +41,11 @@ func init() {
 			Score:        100500,
 			AvatarLink:   "./avatars/default.jpg",
 		}
+		mu = &sync.Mutex{}
+		currentId = 0
 
-		var id int64 = 1
+		id := getNextId()
+		// TODO(smet1): generate fake accs in func
 		for i := 0; i < 20; i++ {
 			nick := fake.FirstName()
 			hash, _ := getPasswordHash(nick)
@@ -58,11 +61,9 @@ func init() {
 				AvatarLink:   "./avatars/default.jpg",
 			}
 
-			id++
+			id = getNextId()
 		}
 
-		mu = &sync.Mutex{}
-		currentId = 0
 	})
 }
 
