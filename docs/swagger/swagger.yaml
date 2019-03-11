@@ -1,0 +1,65 @@
+definitions:
+  controllers.signInRequest:
+    properties:
+      loginOrEmail:
+        type: string
+      password:
+        type: string
+    type: object
+info:
+  contact: {}
+  license: {}
+paths:
+  /session:
+    delete:
+      operationId: delete-session
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/OkResponse'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrResponse'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrResponse'
+            type: object
+      summary: Sign out from your account, expire cookie
+    post:
+      consumes:
+      - application/json
+      operationId: post-session
+      parameters:
+      - description: user auth data
+        in: body
+        name: AuthData
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.signInRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/OkResponse'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrResponse'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrResponse'
+            type: object
+      summary: Sign in with your account with email and password, set session cookie

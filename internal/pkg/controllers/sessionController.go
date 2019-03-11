@@ -25,9 +25,9 @@ type signInRequest struct {
 // @Accept  json
 // @Produce  json
 // @Param AuthData body controllers.signInRequest true "user auth data"
-// @Success 200 {object} controllers.OkResponse
-// @Failure 400 {object} controllers.ErrResponse
-// @Failure 500 {object} controllers.ErrResponse
+// @Success 200 {object} OkResponse
+// @Failure 400 {object} ErrResponse
+// @Failure 500 {object} ErrResponse
 // @Router /session [post]
 func SignIn(res http.ResponseWriter, req *http.Request) {
 
@@ -63,9 +63,9 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 // @Summary Sign out from your account, expire cookie
 // @ID delete-session
 // @Produce  json
-// @Success 200 {object} controllers.OkResponse
-// @Failure 400 {object} controllers.ErrResponse
-// @Failure 401 {object} controllers.ErrResponse
+// @Success 200 {object} OkResponse
+// @Failure 400 {object} ErrResponse
+// @Failure 401 {object} ErrResponse
 // @Router /session [delete]
 func SignOut(res http.ResponseWriter, req *http.Request) {
 

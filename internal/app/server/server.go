@@ -1,6 +1,8 @@
 package server
 
 import (
+	_ "github.com/go-park-mail-ru/2019_1_5factorial-team/docs"
+
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
 	"github.com/gorilla/mux"
@@ -33,7 +35,7 @@ func Run(port string) error {
 	routerLoginRequired.HandleFunc("/api/session", controllers.IsSessionValid).Methods("GET", "OPTIONS")
 	routerLoginRequired.HandleFunc("/api/session", controllers.SignOut).Methods("DELETE", "OPTIONS")
 
-	router.HandleFunc("/api/docs", httpSwagger.WrapHandler)
+	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	err := http.ListenAndServe(address, router)
 	if err != nil {
