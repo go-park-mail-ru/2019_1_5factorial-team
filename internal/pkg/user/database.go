@@ -46,9 +46,10 @@ func init() {
 		mu = &sync.Mutex{}
 		currentId = 0
 
-		id := getNextId()
+		var id int64
 		// TODO(smet1): generate fake accs in func
 		for i := 0; i < 20; i++ {
+			id = getNextId()
 			nick := fake.FirstName()
 			hash, _ := getPasswordHash(nick)
 
@@ -63,7 +64,6 @@ func init() {
 				AvatarLink:   DefaultAvatarLink,
 			}
 
-			id = getNextId()
 		}
 
 	})
