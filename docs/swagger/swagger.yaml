@@ -161,7 +161,36 @@ paths:
             $ref: '#/definitions/controllers.errorResponse'
             type: object
       summary: Update current profile (only avatar, only password or both)
-  /api/user/{id: {}
+  /api/user/{id}:
+    get:
+      consumes:
+      - application/json
+      operationId: get-user
+      parameters:
+      - description: user id
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.UserInfoResponse'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.errorResponse'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.errorResponse'
+            type: object
+      summary: Get user by id
   /api/user/count:
     get:
       operationId: get-users-count

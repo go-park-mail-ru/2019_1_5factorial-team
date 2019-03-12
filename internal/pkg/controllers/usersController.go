@@ -113,7 +113,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 // @Success 200 {object} controllers.UserInfoResponse
 // @Failure 400 {object} controllers.errorResponse
 // @Failure 500 {object} controllers.errorResponse
-// @Router /api/user/{id:[0-9]+} [get]
+// @Router /api/user/{id} [get]
 func GetUser(res http.ResponseWriter, req *http.Request) {
 	requestVariables := mux.Vars(req)
 	if requestVariables == nil {
