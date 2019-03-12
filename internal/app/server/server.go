@@ -8,7 +8,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-  
+
 	"github.com/swaggo/http-swagger"
 	"net/http"
 )
@@ -28,7 +28,7 @@ func Run(port string) error {
 	router.HandleFunc("/api/user/score", controllers.GetLeaderboard).Methods("GET", "OPTIONS")
 	router.HandleFunc("/api/user/count", controllers.UsersCountInfo).Methods("GET", "OPTIONS")
 	router.HandleFunc("/api/session", controllers.SignIn).Methods("POST", "OPTIONS")
-  
+
 	router.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST")
 
 	imgServer := http.FileServer(http.Dir(fileproc.UploadPath))

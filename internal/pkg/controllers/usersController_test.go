@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -15,7 +16,7 @@ type TestCases struct {
 	urlValues      string
 	expectedRes    string
 	expectedStatus int
-	authCtx bool
+	authCtx        bool
 }
 
 var testsGetUser = []TestCases{
@@ -66,7 +67,7 @@ var testsSignUp = []TestCases{
 		urlValues:      "",
 		expectedRes:    `{{"error":"json parsing error: invalid character '}' looking for beginning of object key string"}`,
 		expectedStatus: http.StatusInternalServerError,
-		authCtx:false,
+		authCtx:        false,
 	},
 }
 
@@ -82,6 +83,10 @@ func TestSignUp(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(SignUp)
+
+		ctx := req.Context()
+		ctx = context.WithValue(ctx, "authorized", val.authCtx)
+		req = req.WithContext(ctx)
 
 		handler.ServeHTTP(rr, req)
 
