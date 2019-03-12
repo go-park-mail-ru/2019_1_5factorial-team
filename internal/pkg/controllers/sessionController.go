@@ -12,11 +12,23 @@ import (
 // 'Content-Type': 'application/json; charset=utf-8'
 // 	"login":
 // 	"password":
+// пока только логин, без почты
 type signInRequest struct {
-	Login    string `json:"login"`
+	Login    string `json:"loginOrEmail"`
 	Password string `json:"password"`
 }
 
+// SignIn godoc
+// @Title Sign In
+// @Summary Sign in with your account with email and password, set session cookie
+// @ID post-session
+// @Accept  json
+// @Produce  json
+// @Param AuthData body controllers.signInRequest true "user auth data"
+// @Success 200 {string} ok response
+// @Failure 400 {object} controllers.errorResponse
+// @Failure 500 {object} controllers.errorResponse
+// @Router /session [post]
 func SignIn(res http.ResponseWriter, req *http.Request) {
 
 	data := signInRequest{}
@@ -31,6 +43,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	u, err := user.IdentifyUser(data.Login, data.Password)
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, "Wrong password or login")
+
 		log.Println(errors.Wrap(err, "Wrong password or login"))
 		return
 	}
@@ -41,10 +54,19 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 
 	cookie := session.CreateHttpCookie(randToken, expiration)
 
-	http.SetCookie(res, &cookie)
+	http.SetCookie(res, cookie)
 	OkResponse(res, "ok auth")
 }
 
+// SignOut godoc
+// @Title Sign Out
+// @Summary Sign out from your account, expire cookie
+// @ID delete-session
+// @Produce  json
+// @Success 200 {string} ok response
+// @Failure 400 {object} controllers.errorResponse
+// @Failure 401 {object} controllers.errorResponse
+// @Router /session [delete]
 func SignOut(res http.ResponseWriter, req *http.Request) {
 
 	currentSession, err := req.Cookie(session.CookieName)
@@ -79,6 +101,12 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 	OkResponse(res, "ok logout")
 }
 
+// 'Content-Type': 'application/json; charset=utf-8'
+// 	"email":
+// 	"nickname":
+// 	"score":
+// 	"avatar_link":
+
 type UserInfoResponse struct {
 	Email      string `json:"email"`
 	Nickname   string `json:"nickname"`
@@ -86,6 +114,14 @@ type UserInfoResponse struct {
 	AvatarLink string `json:"avatar_link"`
 }
 
+// GetUserFromSession godoc
+// @Title get current user info
+// @Summary Current user info
+// @ID get-user-from-sesion
+// @Produce json
+// @Success 200 {object} controllers.UserInfoResponse
+// @Failure 401 {object} controllers.errorResponse
+// @Router /api/user [get]
 func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 
 	id := req.Context().Value("userID").(int64)
@@ -114,6 +150,13 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 	})
 }
 
+// IsSessionValid godoc
+// @Title check session
+// @Summary check session of current user
+// @ID is-session-valid
+// @Produce json
+// @Success 200 {string} ok message
+// @Router /api/session [get]
 func IsSessionValid(res http.ResponseWriter, req *http.Request) {
 
 	OkResponse(res, "session is valid")

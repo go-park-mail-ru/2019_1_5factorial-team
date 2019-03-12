@@ -10,6 +10,7 @@ import (
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		log.Println(req.URL, "AuthMiddleware")
 
 		ctx := req.Context()
 		var userId int64 = -1
@@ -44,7 +45,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				http.Error(res, "relogin, please", http.StatusInternalServerError)
 			}
 
-			cookie.Expires = updatedToken.CookieExpiredTime
+			session.UpdateHttpCookie(cookie, updatedToken.CookieExpiredTime)
 		}
 
 		http.SetCookie(res, cookie)
@@ -54,7 +55,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 func CheckLoginMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-
+		log.Println(req.URL, "CheckLoginMiddleware")
 		// request has context, bcs its coming after AuthMiddleware
 		if req.Context().Value("authorized").(bool) == false {
 			http.Error(res, "unauthorized, login please", http.StatusUnauthorized)
