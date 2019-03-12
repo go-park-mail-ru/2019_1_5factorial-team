@@ -10,10 +10,21 @@ import (
 	"github.com/pkg/errors"
 )
 
+// 'Content-Type': 'application/json; charset=utf-8'
+// 	"avatarlink":
 type AvatarLinkResponse struct {
 	AvatarLink string `json:"avatar_link"`
 }
 
+// UploadAvatar godoc
+// @Title Upload Avatar
+// @Summary upload avatar on server
+// @ID upload-avatar
+// @Accept png jpeg
+// @Produce json
+// @Success 200 {object} controllers.AvatarLinkResponse
+// @Failure 400 {object} controllers.errorResponse
+// @Router /api/upload_avatar [post]
 func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 
 	// проверка на максимально допустимый размер
