@@ -86,6 +86,6 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	log.Println("\t\tfileExtension:", fileExtension, ", filetype:", filetype)
 
 	OkResponse(res, AvatarLinkResponse{
-		AvatarLink: resultFile,
+		AvatarLink: "/static/" + resultFile,
 	})
 }
