@@ -94,6 +94,7 @@ fabric.properties
 
 .idea/
 
+
 # Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-249601023
 
 *.iml
@@ -142,5 +143,8 @@ Temporary Items
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
+
+
+./src
 
 # End of https://www.gitignore.io/api/go,macos,jetbrains+all,visualstudiocode
