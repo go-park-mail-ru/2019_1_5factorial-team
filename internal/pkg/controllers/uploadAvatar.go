@@ -20,7 +20,7 @@ type AvatarLinkResponse struct {
 // @Title Upload Avatar
 // @Summary upload avatar on server
 // @ID upload-avatar
-// @Accept png jpeg
+// @Accept json
 // @Produce json
 // @Success 200 {object} controllers.AvatarLinkResponse
 // @Failure 400 {object} controllers.errorResponse
