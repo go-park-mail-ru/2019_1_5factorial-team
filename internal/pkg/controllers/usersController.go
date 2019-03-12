@@ -62,6 +62,16 @@ func DropUserCookie(res http.ResponseWriter, req *http.Request) (int, error) {
 	return 0, nil
 }
 
+// SignUp godoc
+// @Title Sign Up
+// @Summary Create account in our perfect game
+// @ID sign-up
+// @Produce json
+// @Param AuthData body controllers.SingUpRequest true "user data to create"
+// @Success 200 {string} ok response
+// @Failure 400 {object} controllers.errorResponse
+// @Failure 500 {object} controllers.errorResponse
+// @Router /api/user [post]
 func SignUp(res http.ResponseWriter, req *http.Request) {
 
 	data := SingUpRequest{}
@@ -93,6 +103,17 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	OkResponse(res, "signUp ok")
 }
 
+// GetUser godoc
+// @Title get user
+// @Summary Get user by id
+// @ID get-user
+// @Accept json
+// @Produce json
+// @Param id query int true "user id"
+// @Success 200 {object} controllers.UserInfoResponse
+// @Failure 400 {object} controllers.errorResponse
+// @Failure 500 {object} controllers.errorResponse
+// @Router /api/user/{id:[0-9]+} [get]
 func GetUser(res http.ResponseWriter, req *http.Request) {
 	requestVariables := mux.Vars(req)
 	if requestVariables == nil {
@@ -156,23 +177,26 @@ type ProfileUpdateResponse struct {
 	AvatarLink string `json:"avatar_link"`
 }
 
+// UpdateProfile godoc
+// @Title Update profile
+// @Summary Update current profile (only avatar, only password or both)
+// @ID update-profile
+// @Accept json
+// @Produce json
+// @Param AuthData body controllers.ProfileUpdateRequest true "user data to update"
+// @Success 200 {object} controllers.ProfileUpdateResponse
+// @Failure 400 {object} controllers.errorResponse
+// @Failure 500 {object} controllers.errorResponse
+// @Router /api/user [put]
 func UpdateProfile(res http.ResponseWriter, req *http.Request) {
-	// TODO(): использовать метод из дева для заполнения структуры из запроса
-	body, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, "body parsing error")
-
-		log.Println(errors.Wrap(err, "body parsing error"))
-		return
-	}
 
 	// TODO(): аватарки должны будут обновлять по-другому, жду лелю
 	data := ProfileUpdateRequest{}
-	err = json.Unmarshal(body, &data)
+	status, err := ParseRequestIntoStruct(false, req, &data)
 	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, "json parsing error")
+		ErrResponse(res, status, err.Error())
 
-		log.Println(errors.Wrap(err, "json parsing error"))
+		log.Println(errors.Wrap(err, "ParseRequestIntoStruct error"))
 		return
 	}
 
@@ -198,6 +222,13 @@ type UsersCountInfoResponse struct {
 	Count int `json:"count"`
 }
 
+// UsersCountInfo godoc
+// @Title Get users count
+// @Summary get count of registered users
+// @ID get-users-count
+// @Produce json
+// @Success 200 {object} controllers.UsersCountInfoResponse
+// @Router /api/user/count [get]
 func UsersCountInfo(res http.ResponseWriter, req *http.Request) {
 	count := user.GetUsersCount()
 	OkResponse(res, UsersCountInfoResponse{

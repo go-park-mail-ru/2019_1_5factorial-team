@@ -25,9 +25,9 @@ type signInRequest struct {
 // @Accept  json
 // @Produce  json
 // @Param AuthData body controllers.signInRequest true "user auth data"
-// @Success 200 {object} OkResponse
-// @Failure 400 {object} ErrResponse
-// @Failure 500 {object} ErrResponse
+// @Success 200 {string} ok response
+// @Failure 400 {object} controllers.errorResponse
+// @Failure 500 {object} controllers.errorResponse
 // @Router /session [post]
 func SignIn(res http.ResponseWriter, req *http.Request) {
 
@@ -63,9 +63,9 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 // @Summary Sign out from your account, expire cookie
 // @ID delete-session
 // @Produce  json
-// @Success 200 {object} OkResponse
-// @Failure 400 {object} ErrResponse
-// @Failure 401 {object} ErrResponse
+// @Success 200 {string} ok response
+// @Failure 400 {object} controllers.errorResponse
+// @Failure 401 {object} controllers.errorResponse
 // @Router /session [delete]
 func SignOut(res http.ResponseWriter, req *http.Request) {
 
@@ -114,6 +114,14 @@ type UserInfoResponse struct {
 	AvatarLink string `json:"avatar_link"`
 }
 
+// GetUserFromSession godoc
+// @Title get current user info
+// @Summary Current user info
+// @ID get-user-from-sesion
+// @Produce json
+// @Success 200 {object} controllers.UserInfoResponse
+// @Failure 401 {object} controllers.errorResponse
+// @Router /api/user [get]
 func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 
 	id := req.Context().Value("userID").(int64)
@@ -142,6 +150,13 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 	})
 }
 
+// IsSessionValid godoc
+// @Title check session
+// @Summary check session of current user
+// @ID is-session-valid
+// @Produce json
+// @Success 200 {string} ok message
+// @Router /api/session [get]
 func IsSessionValid(res http.ResponseWriter, req *http.Request) {
 
 	OkResponse(res, "session is valid")

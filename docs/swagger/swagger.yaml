@@ -1,4 +1,61 @@
 definitions:
+  controllers.GetLeaderboardResponse:
+    properties:
+      scores:
+        items:
+          $ref: '#/definitions/user.Scores'
+        type: array
+    type: object
+  controllers.ProfileUpdateRequest:
+    properties:
+      avatar:
+        type: string
+      new_password:
+        type: string
+      old_password:
+        type: string
+    type: object
+  controllers.ProfileUpdateResponse:
+    properties:
+      avatar_link:
+        type: string
+      email:
+        type: string
+      nickname:
+        type: string
+      score:
+        type: integer
+    type: object
+  controllers.SingUpRequest:
+    properties:
+      email:
+        type: string
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  controllers.UserInfoResponse:
+    properties:
+      avatar_link:
+        type: string
+      email:
+        type: string
+      nickname:
+        type: string
+      score:
+        type: integer
+    type: object
+  controllers.UsersCountInfoResponse:
+    properties:
+      count:
+        type: integer
+    type: object
+  controllers.errorResponse:
+    properties:
+      error:
+        type: string
+    type: object
   controllers.signInRequest:
     properties:
       loginOrEmail:
@@ -6,10 +63,126 @@ definitions:
       password:
         type: string
     type: object
+  user.Scores:
+    properties:
+      nickname:
+        type: string
+      score:
+        type: integer
+    type: object
 info:
   contact: {}
   license: {}
 paths:
+  /api/session:
+    get:
+      operationId: is-session-valid
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: check session of current user
+  /api/user:
+    get:
+      operationId: get-user-from-sesion
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.UserInfoResponse'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.errorResponse'
+            type: object
+      summary: Current user info
+    post:
+      operationId: sign-up
+      parameters:
+      - description: user data to create
+        in: body
+        name: AuthData
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.SingUpRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.errorResponse'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.errorResponse'
+            type: object
+      summary: Create account in our perfect game
+    put:
+      consumes:
+      - application/json
+      operationId: update-profile
+      parameters:
+      - description: user data to update
+        in: body
+        name: AuthData
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.ProfileUpdateRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.ProfileUpdateResponse'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.errorResponse'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.errorResponse'
+            type: object
+      summary: Update current profile (only avatar, only password or both)
+  /api/user/{id: {}
+  /api/user/count:
+    get:
+      operationId: get-users-count
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.UsersCountInfoResponse'
+            type: object
+      summary: get count of registered users
+  /hello:
+    get:
+      operationId: hello-world
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: on hello returning world
   /session:
     delete:
       operationId: delete-session
@@ -19,17 +192,16 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/OkResponse'
-            type: object
+            type: string
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrResponse'
+            $ref: '#/definitions/controllers.errorResponse'
             type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/ErrResponse'
+            $ref: '#/definitions/controllers.errorResponse'
             type: object
       summary: Sign out from your account, expire cookie
     post:
@@ -50,16 +222,42 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/OkResponse'
-            type: object
+            type: string
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/ErrResponse'
+            $ref: '#/definitions/controllers.errorResponse'
             type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/ErrResponse'
+            $ref: '#/definitions/controllers.errorResponse'
             type: object
       summary: Sign in with your account with email and password, set session cookie
+  /user/score:
+    get:
+      operationId: get-leaderboard
+      parameters:
+      - description: 'default: 0'
+        in: query
+        name: offset
+        type: integer
+      - description: 'default: 10'
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.GetLeaderboardResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.errorResponse'
+            type: object
+      summary: return slice of Scores (Nickname + score)

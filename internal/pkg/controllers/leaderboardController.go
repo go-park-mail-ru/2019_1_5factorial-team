@@ -19,6 +19,16 @@ type GetLeaderboardResponse struct {
 	Scores []user.Scores `json:"scores"`
 }
 
+// GetLeaderboard godoc
+// @Title get leader board
+// @Summary return slice of Scores (Nickname + score)
+// @ID get-leaderboard
+// @Produce json
+// @Param offset query int false "default: 0"
+// @Param limit query int false "default: 10"
+// @Success 200 {array} controllers.GetLeaderboardResponse
+// @Failure 400 {object} controllers.errorResponse
+// @Router /user/score [get]
 func GetLeaderboard(res http.ResponseWriter, req *http.Request) {
 	query := req.URL.Query()
 	fmt.Println(query)
