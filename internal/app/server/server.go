@@ -1,14 +1,18 @@
 package server
 
 import (
+	"net/http"
+
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/fileproc"
+
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-	"net/http"
 )
 
 func Run(port string) error {
+
 	address := ":" + port
 	router := mux.NewRouter()
 
@@ -16,6 +20,11 @@ func Run(port string) error {
 	router.Use(middleware.AuthMiddleware)
 
 	router.HandleFunc("/hello", controllers.HelloWorld).Methods("GET")
+	router.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST")
+
+	imgServer := http.FileServer(http.Dir(fileproc.UploadPath))
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", imgServer))
+
 	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST")
 	router.HandleFunc("/api/session", controllers.SignIn).Methods("POST")
 
