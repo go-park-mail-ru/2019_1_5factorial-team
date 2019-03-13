@@ -66,6 +66,36 @@ func testHandler(funcToTest func(http.ResponseWriter, *http.Request), tests []Te
 	return nil
 }
 
+var testsGetLeaderboard = []TestCases{
+	{
+		routerPath:     "/api/user/score",
+		method:         "POST",
+		url:            "/api/user/score?limit=1&offset=1",
+		body:           nil,
+		urlValues:      "",
+		expectedRes:    `{"scores":[{"nickname":"kekkekkek","score":100500}]}`,
+		expectedStatus: http.StatusOK,
+		authCtx:        false,
+	},
+	{
+		routerPath:     "/api/user/score",
+		method:         "POST",
+		url:            "/api/user/score?limit=1000&offset=1000",
+		body:           nil,
+		urlValues:      "",
+		expectedRes:    `{"error":"limit * (offset - 1) \u003e users count"}`,
+		expectedStatus: http.StatusBadRequest,
+		authCtx:        false,
+	},
+}
+
+func TestGetLeaderboard(t *testing.T) {
+	err := testHandler(GetLeaderboard, testsGetLeaderboard)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
 var testsUsersCountInfo = []TestCases{
 	{
 		routerPath:     "/api/user/count",
@@ -183,13 +213,11 @@ func TestSignUp(t *testing.T) {
 	}
 }
 
-// get leaderboard
-
 var testsSignIn = []TestCases{
 	{
 		routerPath:     "/api/session",
 		method:         "POST",
-		url:            "/api/user",
+		url:            "/api/session",
 		body:           strings.NewReader(`{"loginOrEmail": "kek@email.kek"}`),
 		urlValues:      "",
 		expectedRes:    `{"error":"Wrong password or login"}`,
@@ -199,7 +227,7 @@ var testsSignIn = []TestCases{
 	{
 		routerPath:     "/api/session",
 		method:         "POST",
-		url:            "/api/user",
+		url:            "/api/session",
 		body:           strings.NewReader(`{"loginOrEmail": "kek@email.kek"},`),
 		urlValues:      "",
 		expectedRes:    `{"error":"json parsing error: invalid character ',' after top-level value"}`,
@@ -209,7 +237,7 @@ var testsSignIn = []TestCases{
 	{
 		routerPath:     "/api/session",
 		method:         "POST",
-		url:            "/api/user",
+		url:            "/api/session",
 		body:           strings.NewReader(`{"loginOrEmail": "kek@email.kek"}`),
 		urlValues:      "",
 		expectedRes:    `{"error":"already auth"}`,
@@ -219,7 +247,7 @@ var testsSignIn = []TestCases{
 	{
 		routerPath:     "/api/session",
 		method:         "POST",
-		url:            "/api/user",
+		url:            "/api/session",
 		body:           strings.NewReader(`{"loginOrEmail": "kekkekkek", "password": "kek"}`),
 		urlValues:      "",
 		expectedRes:    `{"error":"Wrong password or login"}`,
@@ -229,7 +257,7 @@ var testsSignIn = []TestCases{
 	{
 		routerPath:     "/api/session",
 		method:         "POST",
-		url:            "/api/user",
+		url:            "/api/session",
 		body:           strings.NewReader(`{"loginOrEmail": "kekkekkek", "password": "password"}`),
 		urlValues:      "",
 		expectedRes:    `"ok auth"`,
