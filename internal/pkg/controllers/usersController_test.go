@@ -1,57 +1,126 @@
 package controllers
 
 import (
-	"io"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"net/http"
-	"net/http/httptest"
+	"strconv"
+	"strings"
 	"testing"
 )
 
-type TestCases struct {
-	method         string
-	url            string
-	body           io.Reader
-	urlValues      string
-	expectedRes    string
-	expectedStatus int
-}
-
-var test = []TestCases{
+var testsUsersCountInfo = []TestCases{
 	{
+		routerPath:     "/api/user/count",
 		method:         "GET",
-		url:            "/api/user/",
+		url:            "/api/user/count",
 		body:           nil,
 		urlValues:      "",
-		expectedRes:    `{"error":"user id not provided"}`,
+		expectedRes:    `{"count":` + strconv.Itoa(user.GetUsersCount()) + `}`,
+		expectedStatus: http.StatusOK,
+		authCtx:        false,
+	},
+	{
+		routerPath:     "/api/user/count",
+		method:         "GET",
+		url:            "/api/user/count",
+		body:           nil,
+		urlValues:      "",
+		expectedRes:    `{"count":` + strconv.Itoa(user.GetUsersCount()) + `}`,
+		expectedStatus: http.StatusOK,
+		authCtx:        true,
+	},
+}
+
+func TestUsersCountInfo(t *testing.T) {
+	err := testHandler(UsersCountInfo, testsUsersCountInfo, t)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+var testsSignUp = []TestCases{
+	{
+		routerPath:     "/api/user",
+		method:         "POST",
+		url:            "/api/user",
+		body:           strings.NewReader(`{"email": "kek@email.kek",}`),
+		urlValues:      "",
+		expectedRes:    `{"error":"json parsing error: invalid character '}' looking for beginning of object key string"}`,
+		expectedStatus: http.StatusInternalServerError,
+		authCtx:        false,
+	},
+	{
+		routerPath:     "/api/user",
+		method:         "POST",
+		url:            "/api/user",
+		body:           strings.NewReader(`{"email": "kek@email.kek",}`),
+		urlValues:      "",
+		expectedRes:    `{"error":"already auth"}`,
 		expectedStatus: http.StatusBadRequest,
+		authCtx:        true,
+	},
+	{
+		routerPath:     "/api/user",
+		method:         "POST",
+		url:            "/api/user",
+		body:           strings.NewReader(`{"login": "kekkekkek", "email": "kek@email.kek","password": "password"}`),
+		urlValues:      "",
+		expectedRes:    `{"error":"Cannot create user: User with this nickname already exist"}`,
+		expectedStatus: http.StatusBadRequest,
+		authCtx:        false,
+	},
+	{
+		routerPath:     "/api/user",
+		method:         "POST",
+		url:            "/api/user",
+		body:           strings.NewReader(`{"login": "kekkekkek1", "email": "kek@email.kek","password": "password"}`),
+		urlValues:      "",
+		expectedRes:    `"signUp ok"`,
+		expectedStatus: http.StatusOK,
+		authCtx:        false,
 	},
 }
 
 func TestSignUp(t *testing.T) {
-	var req *http.Request
-	var err error
-	for _, val := range test {
+	err := testHandler(SignUp, testsSignUp, t)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+}
 
-		req, err = http.NewRequest(val.method, val.url, val.body)
-		if err != nil {
-			t.Fatal(err)
-		}
+var testsGetUser = []TestCases{
+	{
+		routerPath:     "/api/user/{id:[0-9]+}",
+		method:         "GET",
+		url:            "/api/user/0",
+		body:           nil,
+		urlValues:      "",
+		expectedRes:    `{"email":"kek.k.ek","nickname":"kekkekkek","score":100500,"avatar_link":"../../../img/default.jpg"}`,
+		expectedStatus: http.StatusOK,
+	},
+	{
+		routerPath:     "/api/user/{id:[0-9]+}",
+		method:         "GET",
+		url:            "/api/user/50",
+		body:           nil,
+		urlValues:      "",
+		expectedRes:    `{"error":"user with this id not found"}`,
+		expectedStatus: http.StatusNotFound,
+	},
+	{
+		routerPath:     "/api/user/{id:[0-9]+}",
+		method:         "GET",
+		url:            "/api/user/500000000000000000000000000000000000000000000000",
+		body:           nil,
+		urlValues:      "",
+		expectedRes:    `{"error":"bad id"}`,
+		expectedStatus: http.StatusInternalServerError,
+	},
+}
 
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(GetUser)
-
-		handler.ServeHTTP(rr, req)
-
-		// Check the status code is what we expect.
-		if status := rr.Code; status != val.expectedStatus {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				status, val.expectedStatus)
-		}
-
-		// Check the response body is what we expect.
-		if rr.Body.String() != val.expectedRes {
-			t.Errorf("handler returned unexpected body: got %v want %v",
-				rr.Body.String(), val.expectedRes)
-		}
+func TestGetUser(t *testing.T) {
+	err := testHandler(GetUser, testsGetUser, t)
+	if err != nil {
+		t.Errorf(err.Error())
 	}
 }

@@ -73,13 +73,14 @@ func DropUserCookie(res http.ResponseWriter, req *http.Request) (int, error) {
 // @Failure 500 {object} controllers.errorResponse
 // @Router /api/user [post]
 func SignUp(res http.ResponseWriter, req *http.Request) {
+	log.Println("================", req.URL, req.Method, "SignUp", "================")
 
 	data := SingUpRequest{}
 	status, err := ParseRequestIntoStruct(true, req, &data)
 	if err != nil {
 		ErrResponse(res, status, err.Error())
 
-		log.Println(errors.Wrap(err, "ParseRequestIntoStruct error"))
+		log.Println("\t", errors.Wrap(err, "ParseRequestIntoStruct error"))
 		return
 	}
 
@@ -90,10 +91,9 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, err.Error())
 
-		log.Println(errors.Wrap(err, "err in user data"))
+		log.Println("\t", errors.Wrap(err, "err in user data"))
 		return
 	}
-	user.PrintUsers()
 
 	randToken, expiration, err := session.SetToken(u.Id)
 
@@ -101,6 +101,11 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 
 	http.SetCookie(res, cookie)
 	OkResponse(res, "signUp ok")
+
+	log.Println("\t", "ok response SignUp")
+	log.Println("\t ok response SignUp, user:\n\t\t\t\t\t\t\tid =", u.Id, "\n\t\t\t\t\t\t\tnickname =",
+		u.Nickname, "\n\t\t\t\t\t\t\temail =", u.Email, "\n\t\t\t\t\t\t\tscore =", u.Score)
+	log.Println("\t ok set cookie", cookie)
 }
 
 // GetUser godoc
@@ -115,11 +120,13 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 // @Failure 500 {object} controllers.errorResponse
 // @Router /api/user/{id} [get]
 func GetUser(res http.ResponseWriter, req *http.Request) {
+	log.Println("================", req.URL, req.Method, "GetUser", "================")
+
 	requestVariables := mux.Vars(req)
 	if requestVariables == nil {
 		ErrResponse(res, http.StatusBadRequest, "user id not provided")
 
-		log.Println(errors.New("no vars found"))
+		log.Println("\t", errors.New("no vars found"))
 		return
 	}
 
@@ -127,7 +134,7 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 	if !ok {
 		ErrResponse(res, http.StatusInternalServerError, "error")
 
-		log.Println(errors.New("vars found, but cant found id"))
+		log.Println("\t", errors.New("vars found, but cant found id"))
 		return
 	}
 
@@ -135,7 +142,7 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, "bad id")
 
-		log.Println(errors.New("cannot convert id from string"))
+		log.Println("\t", errors.New("cannot convert id from string"))
 		return
 	}
 
@@ -143,11 +150,18 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		ErrResponse(res, http.StatusNotFound, "user with this id not found")
 
-		log.Println(errors.Wrap(err, "404 error"))
+		log.Println("\t", errors.Wrap(err, "404 error"))
 		return
 	}
 
 	OkResponse(res, UserInfoResponse{
+		Email:      searchingUser.Email,
+		Nickname:   searchingUser.Nickname,
+		Score:      searchingUser.Score,
+		AvatarLink: searchingUser.AvatarLink,
+	})
+
+	log.Println("\t", "ok response GetUser", UserInfoResponse{
 		Email:      searchingUser.Email,
 		Nickname:   searchingUser.Nickname,
 		Score:      searchingUser.Score,
@@ -189,14 +203,14 @@ type ProfileUpdateResponse struct {
 // @Failure 500 {object} controllers.errorResponse
 // @Router /api/user [put]
 func UpdateProfile(res http.ResponseWriter, req *http.Request) {
+	log.Println("================", req.URL, req.Method, "UpdateProfile", "================")
 
-	// TODO(): аватарки должны будут обновлять по-другому, жду лелю
 	data := ProfileUpdateRequest{}
 	status, err := ParseRequestIntoStruct(false, req, &data)
 	if err != nil {
 		ErrResponse(res, status, err.Error())
 
-		log.Println(errors.Wrap(err, "ParseRequestIntoStruct error"))
+		log.Println("\t", errors.Wrap(err, "ParseRequestIntoStruct error"))
 		return
 	}
 
@@ -204,13 +218,20 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, err.Error())
 
-		log.Println(errors.Wrap(err, "UpdateUser error"))
+		log.Println("\t", errors.Wrap(err, "UpdateUser error"))
 		return
 	}
 
 	u, _ := user.GetUserById(req.Context().Value("userID").(int64))
 
 	OkResponse(res, ProfileUpdateResponse{
+		Email:      u.Email,
+		Nickname:   u.Nickname,
+		Score:      u.Score,
+		AvatarLink: u.AvatarLink,
+	})
+
+	log.Println("\t", "ok response UpdateProfile", ProfileUpdateResponse{
 		Email:      u.Email,
 		Nickname:   u.Nickname,
 		Score:      u.Score,
@@ -230,8 +251,14 @@ type UsersCountInfoResponse struct {
 // @Success 200 {object} controllers.UsersCountInfoResponse
 // @Router /api/user/count [get]
 func UsersCountInfo(res http.ResponseWriter, req *http.Request) {
+	log.Println("================", req.URL, req.Method, "UsersCountInfo", "================")
+
 	count := user.GetUsersCount()
 	OkResponse(res, UsersCountInfoResponse{
+		Count: count,
+	})
+
+	log.Println("\t", "ok response UsersCountInfo", UsersCountInfoResponse{
 		Count: count,
 	})
 }
