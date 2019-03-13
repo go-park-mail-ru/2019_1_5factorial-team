@@ -29,7 +29,7 @@ func Run(port string) error {
 	router.HandleFunc("/api/user/count", controllers.UsersCountInfo).Methods("GET", "OPTIONS")
 	router.HandleFunc("/api/session", controllers.SignIn).Methods("POST", "OPTIONS")
 
-	router.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST")
+	router.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
 
 	imgServer := http.FileServer(http.Dir(fileproc.UploadPath))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", imgServer))

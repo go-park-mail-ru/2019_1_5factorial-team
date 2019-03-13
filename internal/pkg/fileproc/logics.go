@@ -3,7 +3,6 @@ package fileproc
 import (
 	"crypto/rand"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 )
@@ -27,7 +26,7 @@ func CheckFileType(receivedFileType string) bool {
 func CreateNewFile(fileName string, fileExtension string, filetype string) string {
 
 	newFile := filepath.Join(UploadPath, fileName+fileExtension)
-	log.Printf("filetype: %s, file: %s\n", filetype, newFile)
+	//log.Printf("filetype: %s, file: %s\n", filetype, newFile)
 	return newFile
 }
 func CreateResultFile(fileName string, fileExtension string, filetype string, fileBytes []byte) (string, error) {
