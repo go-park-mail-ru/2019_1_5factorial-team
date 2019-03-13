@@ -3,9 +3,9 @@ package controllers
 import (
 	"context"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
+	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"io"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -14,6 +14,7 @@ import (
 )
 
 type TestCases struct {
+	routerPath     string
 	method         string
 	url            string
 	body           io.Reader
@@ -21,17 +22,6 @@ type TestCases struct {
 	expectedRes    string
 	expectedStatus int
 	authCtx        bool
-}
-
-var testsGetUser = []TestCases{
-	{
-		method:         "GET",
-		url:            "/api/user/",
-		body:           nil,
-		urlValues:      "",
-		expectedRes:    `{"error":"user id not provided"}`,
-		expectedStatus: http.StatusBadRequest,
-	},
 }
 
 func testHandler(funcToTest func(http.ResponseWriter, *http.Request), tests []TestCases) error {
@@ -45,19 +35,21 @@ func testHandler(funcToTest func(http.ResponseWriter, *http.Request), tests []Te
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(funcToTest)
+
+		router := mux.NewRouter()
+		router.HandleFunc(val.routerPath, funcToTest).Methods(val.method)
 
 		ctx := req.Context()
 		ctx = context.WithValue(ctx, "authorized", val.authCtx)
 		req = req.WithContext(ctx)
 
-		handler.ServeHTTP(rr, req)
+		router.ServeHTTP(rr, req)
 
 		// try to check cookie, LOOKS LIKE HACK
-		kek := rr.Header()["Set-Cookie"]
-		if kek != nil {
-			log.Println(strings.Split(kek[0], ";"))
-		}
+		//kek := rr.Header()["Set-Cookie"]
+		//if kek != nil {
+		//	log.Println(strings.Split(kek[0], ";"))
+		//}
 
 		// Check the status code is what we expect.
 		if status := rr.Code; status != val.expectedStatus {
@@ -76,6 +68,7 @@ func testHandler(funcToTest func(http.ResponseWriter, *http.Request), tests []Te
 
 var testsUsersCountInfo = []TestCases{
 	{
+		routerPath:     "/api/user/count",
 		method:         "GET",
 		url:            "/api/user/count",
 		body:           nil,
@@ -85,11 +78,11 @@ var testsUsersCountInfo = []TestCases{
 		authCtx:        false,
 	},
 	{
+		routerPath:     "/api/user/count",
 		method:         "GET",
 		url:            "/api/user/count",
 		body:           nil,
 		urlValues:      "",
-		// сейчас 21, но хз сколько будет
 		expectedRes:    `{"count":` + strconv.Itoa(user.GetUsersCount()) + `}`,
 		expectedStatus: http.StatusOK,
 		authCtx:        true,
@@ -103,38 +96,46 @@ func TestUsersCountInfo(t *testing.T) {
 	}
 }
 
-// undone
+var testsGetUser = []TestCases{
+	{
+		routerPath:     "/api/user/{id:[0-9]+}",
+		method:         "GET",
+		url:            "/api/user/0",
+		body:           nil,
+		urlValues:      "",
+		expectedRes:    `{"email":"kek.k.ek","nickname":"kekkekkek","score":100500,"avatar_link":"../../../img/default.jpg"}`,
+		expectedStatus: http.StatusOK,
+	},
+	{
+		routerPath:     "/api/user/{id:[0-9]+}",
+		method:         "GET",
+		url:            "/api/user/50",
+		body:           nil,
+		urlValues:      "",
+		expectedRes:    `{"error":"user with this id not found"}`,
+		expectedStatus: http.StatusNotFound,
+	},
+	{
+		routerPath:     "/api/user/{id:[0-9]+}",
+		method:         "GET",
+		url:            "/api/user/500000000000000000000000000000000000000000000000",
+		body:           nil,
+		urlValues:      "",
+		expectedRes:    `{"error":"bad id"}`,
+		expectedStatus: http.StatusInternalServerError,
+	},
+}
+
 func TestGetUser(t *testing.T) {
-	var req *http.Request
-	var err error
-	for _, val := range testsGetUser {
-
-		req, err = http.NewRequest(val.method, val.url, val.body)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(GetUser)
-
-		handler.ServeHTTP(rr, req)
-
-		// Check the status code is what we expect.
-		if status := rr.Code; status != val.expectedStatus {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				status, val.expectedStatus)
-		}
-
-		// Check the response body is what we expect.
-		if rr.Body.String() != val.expectedRes {
-			t.Errorf("handler returned unexpected body: got %v want %v",
-				rr.Body.String(), val.expectedRes)
-		}
+	err := testHandler(GetUser, testsGetUser)
+	if err != nil {
+		t.Errorf(err.Error())
 	}
 }
 
 var testsSignUp = []TestCases{
 	{
+		routerPath:     "/api/user",
 		method:         "POST",
 		url:            "/api/user",
 		body:           strings.NewReader(`{"email": "kek@email.kek",}`),
@@ -144,6 +145,7 @@ var testsSignUp = []TestCases{
 		authCtx:        false,
 	},
 	{
+		routerPath:     "/api/user",
 		method:         "POST",
 		url:            "/api/user",
 		body:           strings.NewReader(`{"email": "kek@email.kek",}`),
@@ -153,6 +155,7 @@ var testsSignUp = []TestCases{
 		authCtx:        true,
 	},
 	{
+		routerPath:     "/api/user",
 		method:         "POST",
 		url:            "/api/user",
 		body:           strings.NewReader(`{"login": "kekkekkek", "email": "kek@email.kek","password": "password"}`),
@@ -162,6 +165,7 @@ var testsSignUp = []TestCases{
 		authCtx:        false,
 	},
 	{
+		routerPath:     "/api/user",
 		method:         "POST",
 		url:            "/api/user",
 		body:           strings.NewReader(`{"login": "kekkekkek1", "email": "kek@email.kek","password": "password"}`),
@@ -181,9 +185,9 @@ func TestSignUp(t *testing.T) {
 
 // get leaderboard
 
-
 var testsSignIn = []TestCases{
 	{
+		routerPath:     "/api/session",
 		method:         "POST",
 		url:            "/api/user",
 		body:           strings.NewReader(`{"loginOrEmail": "kek@email.kek"}`),
@@ -193,6 +197,7 @@ var testsSignIn = []TestCases{
 		authCtx:        false,
 	},
 	{
+		routerPath:     "/api/session",
 		method:         "POST",
 		url:            "/api/user",
 		body:           strings.NewReader(`{"loginOrEmail": "kek@email.kek"},`),
@@ -202,6 +207,7 @@ var testsSignIn = []TestCases{
 		authCtx:        false,
 	},
 	{
+		routerPath:     "/api/session",
 		method:         "POST",
 		url:            "/api/user",
 		body:           strings.NewReader(`{"loginOrEmail": "kek@email.kek"}`),
@@ -211,6 +217,7 @@ var testsSignIn = []TestCases{
 		authCtx:        true,
 	},
 	{
+		routerPath:     "/api/session",
 		method:         "POST",
 		url:            "/api/user",
 		body:           strings.NewReader(`{"loginOrEmail": "kekkekkek", "password": "kek"}`),
@@ -220,6 +227,7 @@ var testsSignIn = []TestCases{
 		authCtx:        false,
 	},
 	{
+		routerPath:     "/api/session",
 		method:         "POST",
 		url:            "/api/user",
 		body:           strings.NewReader(`{"loginOrEmail": "kekkekkek", "password": "password"}`),
