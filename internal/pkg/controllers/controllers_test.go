@@ -21,7 +21,7 @@ type TestCases struct {
 	userIDCtx      int64
 }
 
-var funcs = []func(*testing.T) {
+var funcs = []func(*testing.T){
 	TestGetUserFromSession,
 	TestGetLeaderboard,
 	TestUsersCountInfo,
