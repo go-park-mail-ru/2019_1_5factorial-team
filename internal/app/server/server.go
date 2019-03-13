@@ -23,8 +23,8 @@ func Run(port string) error {
 	router.Use(middleware.CORSMiddleware)
 
 	router.HandleFunc("/hello", controllers.HelloWorld).Methods("GET")
-	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST", "OPTIONS") //+
-	router.HandleFunc("/api/user/{id:[0-9]+}", controllers.GetUser).Methods("GET", "OPTIONS") //+
+	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST", "OPTIONS")              //+
+	router.HandleFunc("/api/user/{id:[0-9]+}", controllers.GetUser).Methods("GET", "OPTIONS")  //+
 	router.HandleFunc("/api/user/score", controllers.GetLeaderboard).Methods("GET", "OPTIONS") //+
 	router.HandleFunc("/api/user/count", controllers.UsersCountInfo).Methods("GET", "OPTIONS") //+
 	router.HandleFunc("/api/session", controllers.SignIn).Methods("POST", "OPTIONS")           //+
@@ -38,7 +38,7 @@ func Run(port string) error {
 
 	routerLoginRequired.Use(middleware.CheckLoginMiddleware)
 
-	routerLoginRequired.HandleFunc("/api/user", controllers.GetUserFromSession).Methods("GET", "OPTIONS")
+	routerLoginRequired.HandleFunc("/api/user", controllers.GetUserFromSession).Methods("GET", "OPTIONS") //+
 	routerLoginRequired.HandleFunc("/api/user", controllers.UpdateProfile).Methods("PUT", "OPTIONS")
 	routerLoginRequired.HandleFunc("/api/session", controllers.IsSessionValid).Methods("GET", "OPTIONS")
 	routerLoginRequired.HandleFunc("/api/session", controllers.SignOut).Methods("DELETE", "OPTIONS")

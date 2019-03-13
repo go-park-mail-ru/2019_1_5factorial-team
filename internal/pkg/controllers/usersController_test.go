@@ -22,6 +22,7 @@ type TestCases struct {
 	expectedRes    string
 	expectedStatus int
 	authCtx        bool
+	userIDCtx      int64
 }
 
 func testHandler(funcToTest func(http.ResponseWriter, *http.Request), tests []TestCases) error {
@@ -41,6 +42,7 @@ func testHandler(funcToTest func(http.ResponseWriter, *http.Request), tests []Te
 
 		ctx := req.Context()
 		ctx = context.WithValue(ctx, "authorized", val.authCtx)
+		ctx = context.WithValue(ctx, "userID", val.userIDCtx)
 		req = req.WithContext(ctx)
 
 		router.ServeHTTP(rr, req)
@@ -64,6 +66,38 @@ func testHandler(funcToTest func(http.ResponseWriter, *http.Request), tests []Te
 		}
 	}
 	return nil
+}
+
+var testsGetUserFromSession = []TestCases{
+	{
+		routerPath:     "/api/user",
+		method:         "GET",
+		url:            "/api/user",
+		body:           nil,
+		urlValues:      "",
+		expectedRes:    `{"email":"kek.k.ek","nickname":"kekkekkek","score":100500,"avatar_link":"../../../img/default.jpg"}`,
+		expectedStatus: http.StatusOK,
+		authCtx:        true,
+		userIDCtx:      0,
+	},
+	{
+		routerPath:     "/api/user",
+		method:         "GET",
+		url:            "/api/user",
+		body:           nil,
+		urlValues:      "",
+		expectedRes:    `{"error":"not authorized: http: named cookie not present"}`,
+		expectedStatus: http.StatusUnauthorized,
+		authCtx:        true,
+		userIDCtx:      -1,
+	},
+}
+
+func TestGetUserFromSession(t *testing.T) {
+	err := testHandler(GetUserFromSession, testsGetUserFromSession)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 }
 
 var testsGetLeaderboard = []TestCases{
