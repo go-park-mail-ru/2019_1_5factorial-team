@@ -21,6 +21,7 @@ func Run(port string) error {
 	// TODO: panic
 	router.Use(middleware.AuthMiddleware)
 	router.Use(middleware.CORSMiddleware)
+	router.Use(middleware.PanicMiddleware)
 
 	router.HandleFunc("/hello", controllers.HelloWorld).Methods("GET")
 	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST", "OPTIONS")
