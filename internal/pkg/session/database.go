@@ -46,11 +46,11 @@ LOOP:
 	now := time.Now()
 	tokens[token] = DatabaseToken{
 		UserId:            id,
-		CookieExpiredTime: now.Add(CookieTimeHours * time.Hour),
-		//CookieIssuedTime:  now,
+		CookieExpiredTime: now.Add(CookieConf.CookieTimeHours),
+		//CookieIssuedTime:  now
 	}
 
-	return token, now.Add(CookieTimeHours * time.Hour), nil
+	return token, now.Add(CookieConf.CookieTimeHours), nil
 }
 
 func UpdateToken(token string) (DatabaseToken, error) {
@@ -60,7 +60,7 @@ func UpdateToken(token string) (DatabaseToken, error) {
 
 	// updating values in map not via ptrs
 	tmpToken := tokens[token]
-	tmpToken.CookieExpiredTime = time.Now().Add(CookieTimeHours * time.Hour)
+	tmpToken.CookieExpiredTime = time.Now().Add(CookieConf.CookieTimeHours)
 	tokens[token] = tmpToken
 
 	return tokens[token], nil

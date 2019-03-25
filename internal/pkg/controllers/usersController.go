@@ -49,7 +49,7 @@ func ParseRequestIntoStruct(auth bool, req *http.Request, requestStruct interfac
 }
 
 func DropUserCookie(res http.ResponseWriter, req *http.Request) (int, error) {
-	currentSession, err := req.Cookie(session.CookieName)
+	currentSession, err := req.Cookie(session.CookieConf.CookieName)
 	if err == http.ErrNoCookie {
 		// бесполезная проверка, так кука валидна, но по гостайлу нужна
 

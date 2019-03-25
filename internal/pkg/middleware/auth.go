@@ -23,7 +23,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			next.ServeHTTP(res, req.WithContext(ctx))
 		}()
 
-		cookie, err := req.Cookie(session.CookieName)
+		cookie, err := req.Cookie(session.CookieConf.CookieName)
 		if err != nil {
 			log.Println("no cookie found, user unauthorized")
 			return

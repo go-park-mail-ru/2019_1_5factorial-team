@@ -17,10 +17,10 @@ type CORSConfig struct {
 	MaxAge      int      `json:"max-age"`
 }
 
-var config = CORSConfig{}
+var CorsConfig = CORSConfig{}
 
 func init() {
-	err := config_reader.ReadConfigFile("cors_config.json", &config)
+	err := config_reader.ReadConfigFile("cors_config.json", &CorsConfig)
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "error while reading CORS config"))
 	}
@@ -32,18 +32,20 @@ func CORSMiddleware(next http.Handler) http.Handler {
 
 		val, ok := req.Header["Origin"]
 		if ok {
-			if config.Origin == "*" {
+			if CorsConfig.Origin == "*" {
 				res.Header().Set("Access-Control-Allow-Origin", val[0]) // "*"
 			} else {
-				res.Header().Set("Access-Control-Allow-Origin", config.Origin)
+				res.Header().Set("Access-Control-Allow-Origin", CorsConfig.Origin)
 			}
-			res.Header().Set("Access-Control-Allow-Credentials", strconv.FormatBool(config.Credentials))
+			res.Header().Set("Access-Control-Allow-Credentials", strconv.FormatBool(CorsConfig.Credentials))
 		}
 
 		if req.Method == "OPTIONS" {
-			res.Header().Set("Access-Control-Allow-Methods", strings.Join(config.Methods, ","))
-			res.Header().Set("Access-Control-Allow-Headers", strings.Join(config.Headers, ","))
-			res.Header().Set("Access-Control-Max-Age", strconv.Itoa(config.MaxAge)) // 24 hours
+			res.Header().Set("Access-Control-Allow-Methods", strings.Join(CorsConfig.Methods, ","))
+			res.Header().Set("Access-Control-Allow-Headers", strings.Join(CorsConfig.Headers, ","))
+			res.Header().Set("Access-Control-Max-Age", strconv.Itoa(CorsConfig.MaxAge)) // 24 hours
+
+			log.Println("OPTIONS")
 			return
 		}
 
