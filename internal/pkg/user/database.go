@@ -61,7 +61,7 @@ func init() {
 				Email:        fake.Email(),
 				Nickname:     nick,
 				HashPassword: hash,
-				Score:        rand.Int(),
+				Score:        rand.Intn(250000),
 				AvatarLink:   DefaultAvatarLink,
 			}
 
