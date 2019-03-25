@@ -31,7 +31,7 @@ func Run(port string) error {
 
 	router.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
 
-	imgServer := http.FileServer(http.Dir(fileproc.UploadPath))
+	imgServer := http.FileServer(http.Dir(fileproc.StaticConfig.UploadPath))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", imgServer))
 
 	routerLoginRequired := router.PathPrefix("").Subrouter()
