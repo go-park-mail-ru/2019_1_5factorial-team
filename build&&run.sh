@@ -16,7 +16,7 @@ fi
 if [[ $1 == '-r' ]]
 then
     echo "running docker"
-    docker run -d -p 5051:5051 -v /var/www/media/factorial:/var/www/media/factorial --name 5factorial-main-back 5factorial-back:latest
+    docker run -d -p 5051:5051 -v /var/www/media/factorial:/var/www/media/factorial --name 5factorial 5factorial-back:latest
 elif [[ $1 == '-b' ]]
 then
     echo "building docker"

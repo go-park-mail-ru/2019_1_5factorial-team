@@ -4,4 +4,4 @@ whoami
 
 echo "stop docker 5factorial-back"
 
-docker stop 5factorial-main-back
+docker stop 5factorial
