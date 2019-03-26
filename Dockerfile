@@ -4,13 +4,6 @@ FROM ubuntu:18.04
 RUN apt-get -y update
 RUN apt install -y git wget gcc gnupg
 
-# Настройка окружения для статики
-RUN cd ~
-RUN mkdir /var/www
-RUN mkdir /var/www/media
-RUN mkdir /var/www/media/factorial
-RUN chmod -R 777 /var/www/media/factorial
-
 # Установка golang
 RUN wget https://dl.google.com/go/go1.11.linux-amd64.tar.gz
 RUN tar -xvf go1.11.linux-amd64.tar.gz
