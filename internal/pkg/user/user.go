@@ -17,7 +17,7 @@ func CreateUser(nickname string, email string, password string) (User, error) {
 	// TODO(smet1): добавить валидацию на повторение ника и почты
 
 	//rid := GetNextId()
-	//hashPassword, err := getPasswordHash(password)
+	//hashPassword, err := GetPasswordHash(password)
 	//if err != nil {
 	//	return User{}, errors.Wrap(err, "Hasher password error")
 	//}
@@ -101,7 +101,7 @@ func UpdateUser(id string, newAvatar string, oldPassword string, newPassword str
 		return errors.Wrap(err, "validate passwords error")
 	}
 
-	newHashPassword, err := getPasswordHash(newPassword)
+	newHashPassword, err := GetPasswordHash(newPassword)
 	if err != nil {
 		return errors.Wrap(err, "some password error")
 	}
@@ -157,12 +157,15 @@ func GetUsersScores(limit int, offset int) ([]Scores, error) {
 
 	page := make([]Scores, 0, 1)
 
-	databaseScores := getScores()
+	databaseScores, err := getScores(limit, begin)
+	if err != nil {
+		return nil, errors.Wrap(err, "cant get score")
+	}
 
-	for i := begin; i < end; i++ {
+	for _, val := range databaseScores {
 		page = append(page, Scores{
-			Nickname: databaseScores[i].Nickname,
-			Score:    databaseScores[i].Score,
+			Nickname: val.Nickname,
+			Score:    val.Score,
 		})
 	}
 
