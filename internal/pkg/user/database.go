@@ -3,21 +3,20 @@ package user
 import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/config_reader"
-	"github.com/manveru/faker"
 	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
-	"math/rand"
-	"sort"
 	"sync"
 	"sync/atomic"
 )
 
 type DBConfig struct {
-	MongoPort      string `json:"mongo_port"`
-	DatabaseName   string `json:"database_name"`
-	CollectionName string `json:"collection_name"`
+	MongoPort         string `json:"mongo_port"`
+	DatabaseName      string `json:"database_name"`
+	CollectionName    string `json:"collection_name"`
+	GenerateFakeUsers bool   `json:"generate_fake_users"`
+	TruncateTable     bool   `json:"truncate_table"`
 }
 
 var ConfigDBUser = DBConfig{}
@@ -38,6 +37,26 @@ func init() {
 
 	collection = session.DB(ConfigDBUser.DatabaseName).C(ConfigDBUser.CollectionName)
 
+	if n, _ := collection.Count(); n != 0 && ConfigDBUser.TruncateTable {
+		err = collection.DropCollection()
+		if err != nil {
+			log.Fatal("user db truncate: ", err)
+		}
+	}
+
+	if ConfigDBUser.GenerateFakeUsers {
+		fu := GenerateUsers()
+
+		for i, val := range fu {
+			fmt.Println(i, "| id:", val.CollectionID.Hex(), ", Nick:", val.Nickname, ", Password:", val.Nickname)
+
+			err = collection.Insert(val)
+			if err != nil {
+				log.Fatal(errors.Wrap(err, "error while adding new user"))
+			}
+
+		}
+	}
 }
 
 const DefaultAvatarLink = "../../../img/default.jpg"
@@ -57,49 +76,49 @@ var mu *sync.Mutex
 var users map[string]DatabaseUser
 var currentId int64
 
-func init() {
-	once.Do(func() {
-		fmt.Println("init users map")
-
-		fake, _ := faker.New("en")
-		fake.Rand = rand.New(rand.NewSource(42))
-
-		users = make(map[string]DatabaseUser)
-
-		hash, _ := getPasswordHash("password")
-		users["kekkekkek"] = DatabaseUser{
-			Id:           0,
-			Email:        "kek.k.ek",
-			Nickname:     "kekkekkek",
-			HashPassword: hash,
-			Score:        100500,
-			AvatarLink:   DefaultAvatarLink,
-		}
-		mu = &sync.Mutex{}
-		currentId = 0
-
-		var id int64
-		// TODO(smet1): generate fake accs in func
-		for i := 0; i < 20; i++ {
-			id = GetNextId()
-			nick := fake.FirstName()
-			hash, _ := getPasswordHash(nick)
-
-			fmt.Println("id:", id, ", Nick:", nick, ", Password:", nick)
-
-			users[nick] = DatabaseUser{
-				Id:           id,
-				Email:        fake.Email(),
-				Nickname:     nick,
-				HashPassword: hash,
-				Score:        rand.Intn(250000),
-				AvatarLink:   DefaultAvatarLink,
-			}
-
-		}
-
-	})
-}
+//func init() {
+//	once.Do(func() {
+//		fmt.Println("init users map")
+//
+//		fake, _ := faker.New("en")
+//		fake.Rand = rand.New(rand.NewSource(42))
+//
+//		users = make(map[string]DatabaseUser)
+//
+//		hash, _ := GetPasswordHash("password")
+//		users["kekkekkek"] = DatabaseUser{
+//			Id:           0,
+//			Email:        "kek.k.ek",
+//			Nickname:     "kekkekkek",
+//			HashPassword: hash,
+//			Score:        100500,
+//			AvatarLink:   DefaultAvatarLink,
+//		}
+//		mu = &sync.Mutex{}
+//		currentId = 0
+//
+//		var id int64
+//		// TODO(smet1): generate fake accs in func
+//		for i := 0; i < 20; i++ {
+//			id = GetNextId()
+//			nick := fake.FirstName()
+//			hash, _ := GetPasswordHash(nick)
+//
+//			fmt.Println("id:", id, ", Nick:", nick, ", Password:", nick)
+//
+//			users[nick] = DatabaseUser{
+//				Id:           id,
+//				Email:        fake.Email(),
+//				Nickname:     nick,
+//				HashPassword: hash,
+//				Score:        rand.Intn(250000),
+//				AvatarLink:   DefaultAvatarLink,
+//			}
+//
+//		}
+//
+//	})
+//}
 
 func getUsers() map[string]DatabaseUser {
 	mu.Lock()
@@ -159,18 +178,18 @@ func addUser(nickname string, email string, password string) (User, error) {
 	//
 	//users[in.Nickname] = in
 
-	hashPassword, err := getPasswordHash(password)
+	hashPassword, err := GetPasswordHash(password)
 	if err != nil {
 		return User{}, errors.Wrap(err, "Hasher password error")
 	}
 
 	dbu := DatabaseUser{
 		CollectionID: bson.NewObjectId(),
-		Email: email,
-		Nickname: nickname,
+		Email:        email,
+		Nickname:     nickname,
 		HashPassword: hashPassword,
-		Score: 0,
-		AvatarLink: DefaultAvatarLink,
+		Score:        0,
+		AvatarLink:   DefaultAvatarLink,
 	}
 
 	//in.CollectionID = bson.NewObjectId()
@@ -180,12 +199,12 @@ func addUser(nickname string, email string, password string) (User, error) {
 	}
 
 	return User{
-		Id: dbu.CollectionID.Hex(),
-		Email: dbu.Email,
-		Nickname: dbu.Nickname,
+		Id:           dbu.CollectionID.Hex(),
+		Email:        dbu.Email,
+		Nickname:     dbu.Nickname,
 		HashPassword: dbu.HashPassword,
-		Score: dbu.Score,
-		AvatarLink: dbu.AvatarLink,
+		Score:        dbu.Score,
+		AvatarLink:   dbu.AvatarLink,
 	}, nil
 }
 
@@ -231,17 +250,25 @@ func (a ByNameScore) Len() int           { return len(a) }
 func (a ByNameScore) Less(i, j int) bool { return a[i].Score < a[j].Score }
 func (a ByNameScore) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
-func getScores() []DatabaseUser {
-	mu.Lock()
+func getScores(limit int, skip int) ([]DatabaseUser, error) {
+	//mu.Lock()
 	result := make([]DatabaseUser, 0, 1)
-	for _, val := range users {
-		result = append(result, val)
+	//for _, val := range users {
+	//	result = append(result, val)
+	//}
+	//
+	//sort.Sort(ByNameScore(result))
+	//
+	//mu.Unlock()
+
+	err := collection.Find(nil).Skip(skip).
+		Sort("-score", "nickname").
+		Limit(limit).All(&result)
+	if err != nil {
+		return nil, errors.Wrap(err, "cant query leaderboard")
 	}
 
-	sort.Sort(ByNameScore(result))
-
-	mu.Unlock()
-	return result
+	return result, nil
 }
 
 func getUsersCount() (int, error) {
