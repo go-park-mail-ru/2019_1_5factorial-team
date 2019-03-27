@@ -11,7 +11,6 @@ func main() {
 	flag.Parse()
 
 	fmt.Println("server will start on port", *port)
-
 	err := server.Run(*port)
 	if err != nil {
 		panic(err)

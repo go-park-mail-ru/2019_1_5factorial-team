@@ -16,7 +16,7 @@ type User struct {
 func CreateUser(nickname string, email string, password string) (User, error) {
 	// TODO(smet1): добавить валидацию на повторение ника и почты
 
-	rid := getNextId()
+	rid := GetNextId()
 	hashPassword, err := getPasswordHash(password)
 	if err != nil {
 		return User{}, errors.Wrap(err, "Hasher password error")
