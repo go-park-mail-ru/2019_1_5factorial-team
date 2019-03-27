@@ -13,7 +13,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		log.Println(req.URL, "AuthMiddleware")
 
 		ctx := req.Context()
-		var userId int64 = -1
+		var userId string = ""
 		authorized := false
 
 		defer func() {

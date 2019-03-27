@@ -110,47 +110,83 @@ func getUsers() map[string]DatabaseUser {
 }
 
 func getUser(login string) (DatabaseUser, error) {
-	defer mu.Unlock()
+	//defer mu.Unlock()
+	//
+	//mu.Lock()
+	//if _, ok := users[login]; !ok {
+	//	return DatabaseUser{}, errors.New("Invalid login")
+	//} else {
+	//	return users[login], nil
+	//}
 
-	mu.Lock()
-	if _, ok := users[login]; !ok {
-		return DatabaseUser{}, errors.New("Invalid login")
-	} else {
-		return users[login], nil
-	}
+	u := DatabaseUser{}
 
-}
-
-func findUserById(id int64) (DatabaseUser, error) {
-	defer mu.Unlock()
-
-	mu.Lock()
-	for _, val := range users {
-		if val.Id == id {
-			return val, nil
-		}
-	}
-
-	return DatabaseUser{}, errors.New("user with this id not found")
-}
-
-func addUser(in DatabaseUser) error {
-	defer mu.Unlock()
-	mu.Lock()
-
-	if _, ok := users[in.Nickname]; ok {
-		return errors.New("User with this nickname already exist")
-	}
-
-	users[in.Nickname] = in
-
-	in.CollectionID = bson.NewObjectId()
-	err := collection.Insert(in)
+	err := collection.Find(bson.M{"nickname": login}).One(&u)
 	if err != nil {
-		return errors.Wrap(err, "error while adding new user")
+		return DatabaseUser{}, errors.New("Invalid login")
 	}
 
-	return nil
+	return u, nil
+}
+
+func findUserById(id string) (DatabaseUser, error) {
+	//defer mu.Unlock()
+	//
+	//mu.Lock()
+	//for _, val := range users {
+	//	if val.Id == id {
+	//		return val, nil
+	//	}
+	//}
+
+	u := DatabaseUser{}
+
+	err := collection.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&u)
+	if err != nil {
+		return DatabaseUser{}, errors.New("user with this id not found")
+	}
+
+	return u, nil
+}
+
+func addUser(nickname string, email string, password string) (User, error) {
+	//defer mu.Unlock()
+	//mu.Lock()
+	//
+	//if _, ok := users[in.Nickname]; ok {
+	//	return errors.New("User with this nickname already exist")
+	//}
+	//
+	//users[in.Nickname] = in
+
+	hashPassword, err := getPasswordHash(password)
+	if err != nil {
+		return User{}, errors.Wrap(err, "Hasher password error")
+	}
+
+	dbu := DatabaseUser{
+		CollectionID: bson.NewObjectId(),
+		Email: email,
+		Nickname: nickname,
+		HashPassword: hashPassword,
+		Score: 0,
+		AvatarLink: DefaultAvatarLink,
+	}
+
+	//in.CollectionID = bson.NewObjectId()
+	err = collection.Insert(dbu)
+	if err != nil {
+		return User{}, errors.Wrap(err, "error while adding new user")
+	}
+
+	return User{
+		Id: dbu.CollectionID.Hex(),
+		Email: dbu.Email,
+		Nickname: dbu.Nickname,
+		HashPassword: dbu.HashPassword,
+		Score: dbu.Score,
+		AvatarLink: dbu.AvatarLink,
+	}, nil
 }
 
 func PrintUsers() {
@@ -171,14 +207,21 @@ func GetNextId() int64 {
 }
 
 func updateDBUser(user DatabaseUser) error {
-	defer mu.Unlock()
+	//defer mu.Unlock()
+	//
+	//mu.Lock()
+	//if _, ok := users[user.Nickname]; !ok {
+	//	return errors.New("cannot find user")
+	//}
+	//
+	//users[user.Nickname] = user
+	//return nil
 
-	mu.Lock()
-	if _, ok := users[user.Nickname]; !ok {
-		return errors.New("cannot find user")
+	err := collection.UpdateId(user.CollectionID, user)
+	if err != nil {
+		return errors.Wrap(err, "error while updating value in DB")
 	}
 
-	users[user.Nickname] = user
 	return nil
 }
 
@@ -201,6 +244,11 @@ func getScores() []DatabaseUser {
 	return result
 }
 
-func getUsersCount() int {
-	return len(users)
+func getUsersCount() (int, error) {
+	lenTable, err := collection.Count()
+	if err != nil {
+		return -1, errors.Wrap(err, "cant count users")
+	}
+
+	return lenTable, nil
 }

@@ -10,7 +10,7 @@ import (
 const NoTokenFound string = "token not found"
 
 type DatabaseToken struct {
-	UserId            int64
+	UserId            string
 	CookieExpiredTime time.Time
 	//CookieIssuedTime  time.Time
 }
@@ -28,7 +28,7 @@ func init() {
 	})
 }
 
-func SetToken(id int64) (string, time.Time, error) {
+func SetToken(id string) (string, time.Time, error) {
 	defer mu.Unlock()
 
 	token := GenerateToken()
@@ -67,15 +67,15 @@ func UpdateToken(token string) (DatabaseToken, error) {
 }
 
 // при взятии токена, проверяет его на время
-func GetId(token string) (int64, error) {
+func GetId(token string) (string, error) {
 	defer mu.Unlock()
 	mu.Lock()
 
 	if i, ok := tokens[token]; !ok {
-		return 0, errors.New(NoTokenFound)
+		return "", errors.New(NoTokenFound)
 	} else {
 		if i.CookieExpiredTime.Unix() < time.Now().Unix() {
-			return 0, errors.New("your's session has been expired, relogin please")
+			return "", errors.New("your's session has been expired, relogin please")
 		} else {
 			return i.UserId, nil
 		}
