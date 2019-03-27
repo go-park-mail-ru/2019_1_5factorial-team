@@ -7,8 +7,6 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
-	"sync"
-	"sync/atomic"
 )
 
 type DBConfig struct {
@@ -71,73 +69,7 @@ type DatabaseUser struct {
 	AvatarLink   string        `bson:"avatar_link"`
 }
 
-var once sync.Once
-var mu *sync.Mutex
-var users map[string]DatabaseUser
-var currentId int64
-
-//func init() {
-//	once.Do(func() {
-//		fmt.Println("init users map")
-//
-//		fake, _ := faker.New("en")
-//		fake.Rand = rand.New(rand.NewSource(42))
-//
-//		users = make(map[string]DatabaseUser)
-//
-//		hash, _ := GetPasswordHash("password")
-//		users["kekkekkek"] = DatabaseUser{
-//			Id:           0,
-//			Email:        "kek.k.ek",
-//			Nickname:     "kekkekkek",
-//			HashPassword: hash,
-//			Score:        100500,
-//			AvatarLink:   DefaultAvatarLink,
-//		}
-//		mu = &sync.Mutex{}
-//		currentId = 0
-//
-//		var id int64
-//		// TODO(smet1): generate fake accs in func
-//		for i := 0; i < 20; i++ {
-//			id = GetNextId()
-//			nick := fake.FirstName()
-//			hash, _ := GetPasswordHash(nick)
-//
-//			fmt.Println("id:", id, ", Nick:", nick, ", Password:", nick)
-//
-//			users[nick] = DatabaseUser{
-//				Id:           id,
-//				Email:        fake.Email(),
-//				Nickname:     nick,
-//				HashPassword: hash,
-//				Score:        rand.Intn(250000),
-//				AvatarLink:   DefaultAvatarLink,
-//			}
-//
-//		}
-//
-//	})
-//}
-
-func getUsers() map[string]DatabaseUser {
-	mu.Lock()
-	fmt.Println(users)
-	mu.Unlock()
-
-	return users
-}
-
 func getUser(login string) (DatabaseUser, error) {
-	//defer mu.Unlock()
-	//
-	//mu.Lock()
-	//if _, ok := users[login]; !ok {
-	//	return DatabaseUser{}, errors.New("Invalid login")
-	//} else {
-	//	return users[login], nil
-	//}
-
 	u := DatabaseUser{}
 
 	err := collection.Find(bson.M{"nickname": login}).One(&u)
@@ -149,15 +81,6 @@ func getUser(login string) (DatabaseUser, error) {
 }
 
 func findUserById(id string) (DatabaseUser, error) {
-	//defer mu.Unlock()
-	//
-	//mu.Lock()
-	//for _, val := range users {
-	//	if val.Id == id {
-	//		return val, nil
-	//	}
-	//}
-
 	u := DatabaseUser{}
 
 	err := collection.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&u)
@@ -169,15 +92,6 @@ func findUserById(id string) (DatabaseUser, error) {
 }
 
 func addUser(nickname string, email string, password string) (User, error) {
-	//defer mu.Unlock()
-	//mu.Lock()
-	//
-	//if _, ok := users[in.Nickname]; ok {
-	//	return errors.New("User with this nickname already exist")
-	//}
-	//
-	//users[in.Nickname] = in
-
 	hashPassword, err := GetPasswordHash(password)
 	if err != nil {
 		return User{}, errors.Wrap(err, "Hasher password error")
@@ -192,7 +106,6 @@ func addUser(nickname string, email string, password string) (User, error) {
 		AvatarLink:   DefaultAvatarLink,
 	}
 
-	//in.CollectionID = bson.NewObjectId()
 	err = collection.Insert(dbu)
 	if err != nil {
 		return User{}, errors.Wrap(err, "error while adding new user")
@@ -208,33 +121,7 @@ func addUser(nickname string, email string, password string) (User, error) {
 	}, nil
 }
 
-func PrintUsers() {
-	mu.Lock()
-
-	for i, val := range users {
-		fmt.Println("\t", i, val)
-	}
-	fmt.Println("----end----")
-
-	mu.Unlock()
-}
-
-func GetNextId() int64 {
-	atomic.AddInt64(&currentId, 1)
-
-	return currentId
-}
-
 func updateDBUser(user DatabaseUser) error {
-	//defer mu.Unlock()
-	//
-	//mu.Lock()
-	//if _, ok := users[user.Nickname]; !ok {
-	//	return errors.New("cannot find user")
-	//}
-	//
-	//users[user.Nickname] = user
-	//return nil
 
 	err := collection.UpdateId(user.CollectionID, user)
 	if err != nil {
@@ -244,22 +131,8 @@ func updateDBUser(user DatabaseUser) error {
 	return nil
 }
 
-type ByNameScore []DatabaseUser
-
-func (a ByNameScore) Len() int           { return len(a) }
-func (a ByNameScore) Less(i, j int) bool { return a[i].Score < a[j].Score }
-func (a ByNameScore) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-
 func getScores(limit int, skip int) ([]DatabaseUser, error) {
-	//mu.Lock()
 	result := make([]DatabaseUser, 0, 1)
-	//for _, val := range users {
-	//	result = append(result, val)
-	//}
-	//
-	//sort.Sort(ByNameScore(result))
-	//
-	//mu.Unlock()
 
 	err := collection.Find(nil).Skip(skip).
 		Sort("-score", "nickname").

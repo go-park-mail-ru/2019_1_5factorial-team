@@ -137,14 +137,6 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//intID, err := strconv.ParseInt(searchingID, 10, 64)
-	//if err != nil {
-	//	ErrResponse(res, http.StatusInternalServerError, "bad id")
-	//
-	//	log.Println("\t", errors.New("cannot convert id from string"))
-	//	return
-	//}
-
 	searchingUser, err := user.GetUserById(searchingID)
 	if err != nil {
 		ErrResponse(res, http.StatusNotFound, "user with this id not found")

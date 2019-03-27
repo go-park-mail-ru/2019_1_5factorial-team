@@ -16,26 +16,11 @@ type User struct {
 func CreateUser(nickname string, email string, password string) (User, error) {
 	// TODO(smet1): добавить валидацию на повторение ника и почты
 
-	//rid := GetNextId()
-	//hashPassword, err := GetPasswordHash(password)
-	//if err != nil {
-	//	return User{}, errors.Wrap(err, "Hasher password error")
-	//}
-
 	u, err := addUser(nickname, email, password)
 	if err != nil {
 		err = errors.Wrap(err, "Cannot create user")
 		return User{}, err
 	}
-
-	//u := User{
-	//	Id:           rid,
-	//	Email:        email,
-	//	Nickname:     nickname,
-	//	HashPassword: hashPassword,
-	//	Score:        0,
-	//	AvatarLink:   DefaultAvatarLink,
-	//}
 
 	return u, nil
 }
