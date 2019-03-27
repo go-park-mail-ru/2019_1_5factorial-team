@@ -1,13 +1,12 @@
 package user
 
 import (
-	"context"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/config_reader"
 	"github.com/manveru/faker"
 	"github.com/pkg/errors"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 	"log"
 	"math/rand"
 	"sort"
@@ -22,7 +21,8 @@ type DBConfig struct {
 }
 
 var ConfigDBUser = DBConfig{}
-var collection *mongo.Collection
+var session *mgo.Session
+var collection *mgo.Collection
 
 func init() {
 	err := config_reader.ReadConfigFile("db_user_config.json", &ConfigDBUser)
@@ -31,32 +31,25 @@ func init() {
 	}
 	fmt.Println("DB conf", ConfigDBUser)
 
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
-	// Connect to MongoDB
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+	session, err = mgo.Dial("mongodb://localhost:" + ConfigDBUser.MongoPort)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Check the connection
-	err = client.Ping(context.TODO(), nil)
-	if err != nil {
-		log.Fatal(err)
-	}
+	collection = session.DB(ConfigDBUser.DatabaseName).C(ConfigDBUser.CollectionName)
 
-	collection = client.Database(ConfigDBUser.DatabaseName).Collection(ConfigDBUser.CollectionName)
 }
 
 const DefaultAvatarLink = "../../../img/default.jpg"
 
 type DatabaseUser struct {
-	Id           int64       `bson:"-"`
-	CollectionID interface{} `bson:"-"`
-	Email        string      `bson:"email"`
-	Nickname     string      `bson:"nickname"`
-	HashPassword string      `bson:"hash_password"`
-	Score        int         `bson:"score"`
-	AvatarLink   string      `bson:"avatar_link"`
+	Id           int64         `bson:"-"`
+	CollectionID bson.ObjectId `bson:"_id"`
+	Email        string        `bson:"email"`
+	Nickname     string        `bson:"nickname"`
+	HashPassword string        `bson:"hash_password"`
+	Score        int           `bson:"score"`
+	AvatarLink   string        `bson:"avatar_link"`
 }
 
 var once sync.Once
@@ -151,13 +144,11 @@ func addUser(in DatabaseUser) error {
 
 	users[in.Nickname] = in
 
-	insertResult, err := collection.InsertOne(context.TODO(), in)
+	in.CollectionID = bson.NewObjectId()
+	err := collection.Insert(in)
 	if err != nil {
-		return errors.New("cant insert user into DB")
+		return errors.Wrap(err, "error while adding new user")
 	}
-
-	fmt.Println("Inserted a single document: ", insertResult.InsertedID)
-	in.CollectionID = insertResult.InsertedID
 
 	return nil
 }
