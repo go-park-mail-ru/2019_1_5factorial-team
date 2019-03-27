@@ -129,7 +129,7 @@ type UserInfoResponse struct {
 func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 	log.Println("================", req.URL, req.Method, "GetUserFromSession", "================")
 
-	id := req.Context().Value("userID").(int64)
+	id := req.Context().Value("userID").(string)
 	u, err := user.GetUserById(id)
 	if err != nil {
 		// проверка на невалидный айди юзера
