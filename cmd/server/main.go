@@ -8,9 +8,14 @@ import (
 
 func main() {
 	port := flag.String("port", "5051", "server will start on this port")
+	configPath := flag.String("config", "/etc/5factorial/", "dir with server configs")
 	flag.Parse()
 
 	fmt.Println("server will start on port", *port)
+	fmt.Println("config path:", *configPath)
+
+	s := server.MyGorgeousServer{}
+	s.New("configs/")
 
 	err := server.Run(*port)
 	if err != nil {
