@@ -21,7 +21,5 @@ COPY . .
 # Объявлем порт сервера
 EXPOSE 5051
 
-RUN ls
-
 RUN go build cmd/server/main.go
 CMD ./main
