@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"log"
 	"net/http"
@@ -23,7 +24,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			next.ServeHTTP(res, req.WithContext(ctx))
 		}()
 
-		cookie, err := req.Cookie(session.CookieConf.CookieName)
+		cookie, err := req.Cookie(server.GetInstance().CookieConfig.CookieName)
 		if err != nil {
 			log.Println("no cookie found, user unauthorized")
 			return

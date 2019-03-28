@@ -2,6 +2,7 @@ package session
 
 import (
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
 	"net/http"
 	"strings"
 	"time"
@@ -51,17 +52,17 @@ var CookieConf = CookieConfig{}
 
 func CreateHttpCookie(value string, expiration time.Time) *http.Cookie {
 	return &http.Cookie{
-		Path:     CookieConf.ServerPrefix,
-		Name:     CookieConf.CookieName,
+		Path:     server.GetInstance().CookieConfig.ServerPrefix,
+		Name:     server.GetInstance().CookieConfig.CookieName,
 		Value:    value,
 		Expires:  expiration,
-		HttpOnly: CookieConf.HttpOnly,
+		HttpOnly: server.GetInstance().CookieConfig.HttpOnly,
 	}
 }
 
 func UpdateHttpCookie(cookie *http.Cookie, expiration time.Time) {
-	cookie.Path = CookieConf.ServerPrefix
-	cookie.Name = CookieConf.CookieName
+	cookie.Path = server.GetInstance().CookieConfig.ServerPrefix
+	cookie.Name = server.GetInstance().CookieConfig.CookieName
 	cookie.Expires = expiration
-	cookie.HttpOnly = CookieConf.HttpOnly
+	cookie.HttpOnly = server.GetInstance().CookieConfig.HttpOnly
 }

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	_ "github.com/go-park-mail-ru/2019_1_5factorial-team/docs"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/config_reader"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
@@ -15,7 +14,7 @@ import (
 	"github.com/swaggo/http-swagger"
 	"net/http"
 )
-
+// cycle import (server -> controllers -> server) ЕБАНЫЙ РОТ
 var instance *MyGorgeousServer
 
 type MyGorgeousServer struct {
@@ -26,10 +25,14 @@ type MyGorgeousServer struct {
 	configPath string
 }
 
-func (mgs *MyGorgeousServer) New(config string) *MyGorgeousServer {
+func GetInstance() *MyGorgeousServer {
+	return instance
+}
 
+func (mgs *MyGorgeousServer) New(config string) *MyGorgeousServer {
 	mgs.configPath = config
 
+	// конфиг статик сервера
 	err := config_reader.ReadConfigFile(config, "static_server_config.json", &mgs.StaticServerConfig)
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "error while reading static_server_config config"))
@@ -38,7 +41,7 @@ func (mgs *MyGorgeousServer) New(config string) *MyGorgeousServer {
 
 	log.Println("New Server->Static server config = ", mgs.StaticServerConfig)
 
-
+	// конфиг корса
 	err = config_reader.ReadConfigFile(config, "cors_config.json", &mgs.CORSConfig)
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "error while reading CORS config"))
@@ -46,22 +49,20 @@ func (mgs *MyGorgeousServer) New(config string) *MyGorgeousServer {
 
 	log.Println("New Server->CORS config = ", mgs.CORSConfig)
 
-
+	// конфиг кук
 	err = config_reader.ReadConfigFile(config, "cookie_config.json", &mgs.CookieConfig)
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "error while reading Cookie config"))
 	}
-	fmt.Println("New Server->Cookie config = ", mgs.CookieConfig)
+	log.Println("New Server->Cookie config = ", mgs.CookieConfig)
 
-	// чтобы не копипастить везде (это время жизни куки в часах, чтобы добавлять к уже созданной)
-	//CookieConf.CookieTimeHours = time.Duration(CookieConf.CookieDuration * int64(time.Hour))
-
+	// инстанс сервера
 	instance = mgs
 
 	return mgs
 }
 
-func Run(port string) error {
+func (mgs *MyGorgeousServer) Run(port string) error {
 
 	address := ":" + port
 	router := mux.NewRouter()
@@ -79,7 +80,7 @@ func Run(port string) error {
 
 	router.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
 
-	imgServer := http.FileServer(http.Dir(fileproc.StaticConfig.UploadPath))
+	imgServer := http.FileServer(http.Dir(mgs.StaticServerConfig.UploadPath))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", imgServer))
 
 	routerLoginRequired := router.PathPrefix("").Subrouter()

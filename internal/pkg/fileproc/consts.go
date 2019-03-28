@@ -1,12 +1,5 @@
 package fileproc
 
-import (
-	"fmt"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/config_reader"
-	"github.com/pkg/errors"
-	"log"
-)
-
 const MaxUploadSize = 2 * 1024 * 1024 // 2 mb
 const UploadPath = "/var/www/media/factorial"
 
@@ -16,15 +9,15 @@ type StaticServerConfig struct {
 	MaxUploadSize   int64
 }
 
-var StaticConfig = StaticServerConfig{}
+//var StaticConfig = StaticServerConfig{}
 
-func init() {
-	err := config_reader.ReadConfigFile("static_server_config.json", &StaticConfig)
-	if err != nil {
-		log.Fatal(errors.Wrap(err, "error while reading Cookie config"))
-	}
-
-	StaticConfig.MaxUploadSize = StaticConfig.MaxUploadSizeMB * 1024 * 1024
-
-	fmt.Println(StaticConfig)
-}
+//func init() {
+//	err := config_reader.ReadConfigFile("static_server_config.json", &StaticConfig)
+//	if err != nil {
+//		log.Fatal(errors.Wrap(err, "error while reading Cookie config"))
+//	}
+//
+//	StaticConfig.MaxUploadSize = StaticConfig.MaxUploadSizeMB * 1024 * 1024
+//
+//	fmt.Println(StaticConfig)
+//}

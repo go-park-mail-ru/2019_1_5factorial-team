@@ -17,7 +17,7 @@ func main() {
 	s := server.MyGorgeousServer{}
 	s.New("configs/")
 
-	err := server.Run(*port)
+	err := s.Run(*port)
 	if err != nil {
 		panic(err)
 	}

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -29,8 +30,8 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	log.Println(req.URL, "UploadAvatar")
 
 	// проверка на максимально допустимый размер
-	req.Body = http.MaxBytesReader(res, req.Body, fileproc.StaticConfig.MaxUploadSize)
-	if err := req.ParseMultipartForm(fileproc.StaticConfig.MaxUploadSize); err != nil {
+	req.Body = http.MaxBytesReader(res, req.Body, server.GetInstance().StaticServerConfig.MaxUploadSizeMB)
+	if err := req.ParseMultipartForm(server.GetInstance().StaticServerConfig.MaxUploadSize); err != nil {
 		ErrResponse(res, http.StatusBadRequest, "file too big")
 
 		log.Println(errors.Wrap(err, "file too big"))
