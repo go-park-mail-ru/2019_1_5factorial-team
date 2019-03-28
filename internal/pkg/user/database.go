@@ -28,7 +28,7 @@ func init() {
 	}
 	fmt.Println("DB conf", ConfigDBUser)
 
-	session, err = mgo.Dial("mongodb://localhost:" + ConfigDBUser.MongoPort)
+	session, err = mgo.Dial("localhost:" + ConfigDBUser.MongoPort)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -57,6 +57,7 @@ func init() {
 	}
 }
 
+// TODO(): change link to empty string
 const DefaultAvatarLink = "../../../img/default.jpg"
 
 type DatabaseUser struct {
