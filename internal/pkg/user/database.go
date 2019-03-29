@@ -1,12 +1,9 @@
 package user
 
 import (
-	"fmt"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
 	"github.com/pkg/errors"
-	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 )
 
 //type DBConfig struct {
@@ -18,45 +15,45 @@ import (
 //}
 
 //var ConfigDBUser = DBConfig{}
-var session *mgo.Session
-var collection *mgo.Collection
-
-// оставляю инит на базу, ибо надо
-func init() {
-	//err := config_reader.ReadConfigFile("db_user_config.json", &ConfigDBUser)
-	//if err != nil {
-	//	log.Fatal(errors.Wrap(err, "error while reading Cookie config"))
-	//}
-	//fmt.Println("DB conf", ConfigDBUser)
-
-	session, err := mgo.Dial("mongodb://localhost:" + config.GetInstance().DBUserConfig.MongoPort)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	collection = session.DB(config.GetInstance().DBUserConfig.DatabaseName).C(config.GetInstance().DBUserConfig.CollectionName)
-
-	if n, _ := collection.Count(); n != 0 && config.GetInstance().DBUserConfig.TruncateTable {
-		err = collection.DropCollection()
-		if err != nil {
-			log.Fatal("user db truncate: ", err)
-		}
-	}
-
-	if config.GetInstance().DBUserConfig.GenerateFakeUsers {
-		fu := GenerateUsers()
-
-		for i, val := range fu {
-			fmt.Println(i, "| id:", val.CollectionID.Hex(), ", Nick:", val.Nickname, ", Password:", val.Nickname)
-
-			err = collection.Insert(val)
-			if err != nil {
-				log.Fatal(errors.Wrap(err, "error while adding new user"))
-			}
-
-		}
-	}
-}
+//var session *mgo.Session
+//var collection *mgo.Collection
+//
+//// оставляю инит на базу, ибо надо
+//func init() {
+//	//err := config_reader.ReadConfigFile("db_user_config.json", &ConfigDBUser)
+//	//if err != nil {
+//	//	log.Fatal(errors.Wrap(err, "error while reading Cookie config"))
+//	//}
+//	//fmt.Println("DB conf", ConfigDBUser)
+//
+//	session, err := mgo.Dial("mongodb://localhost:" + config.GetInstance().DBUserConfig.MongoPort)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	collection = session.DB(config.GetInstance().DBUserConfig.DatabaseName).C(config.GetInstance().DBUserConfig.CollectionName)
+//
+//	if n, _ := collection.Count(); n != 0 && config.GetInstance().DBUserConfig.TruncateTable {
+//		err = collection.DropCollection()
+//		if err != nil {
+//			log.Fatal("user db truncate: ", err)
+//		}
+//	}
+//
+//	if config.GetInstance().DBUserConfig.GenerateFakeUsers {
+//		fu := GenerateUsers()
+//
+//		for i, val := range fu {
+//			fmt.Println(i, "| id:", val.CollectionID.Hex(), ", Nick:", val.Nickname, ", Password:", val.Nickname)
+//
+//			err = collection.Insert(val)
+//			if err != nil {
+//				log.Fatal(errors.Wrap(err, "error while adding new user"))
+//			}
+//
+//		}
+//	}
+//}
 
 const DefaultAvatarLink = "../../../img/default.jpg"
 
@@ -73,7 +70,7 @@ type DatabaseUser struct {
 func getUser(login string) (DatabaseUser, error) {
 	u := DatabaseUser{}
 
-	err := collection.Find(bson.M{"nickname": login}).One(&u)
+	err := database.GetUserCollection().Find(bson.M{"nickname": login}).One(&u)
 	if err != nil {
 		return DatabaseUser{}, errors.New("Invalid login")
 	}
@@ -84,7 +81,7 @@ func getUser(login string) (DatabaseUser, error) {
 func findUserById(id string) (DatabaseUser, error) {
 	u := DatabaseUser{}
 
-	err := collection.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&u)
+	err := database.GetUserCollection().Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&u)
 	if err != nil {
 		return DatabaseUser{}, errors.New("user with this id not found")
 	}
@@ -107,7 +104,7 @@ func addUser(nickname string, email string, password string) (User, error) {
 		AvatarLink:   "",
 	}
 
-	err = collection.Insert(dbu)
+	err = database.GetUserCollection().Insert(dbu)
 	if err != nil {
 		return User{}, errors.Wrap(err, "error while adding new user")
 	}
@@ -124,7 +121,7 @@ func addUser(nickname string, email string, password string) (User, error) {
 
 func updateDBUser(user DatabaseUser) error {
 
-	err := collection.UpdateId(user.CollectionID, user)
+	err := database.GetUserCollection().UpdateId(user.CollectionID, user)
 	if err != nil {
 		return errors.Wrap(err, "error while updating value in DB")
 	}
@@ -135,7 +132,7 @@ func updateDBUser(user DatabaseUser) error {
 func getScores(limit int, skip int) ([]DatabaseUser, error) {
 	result := make([]DatabaseUser, 0, 1)
 
-	err := collection.Find(nil).Skip(skip).
+	err := database.GetUserCollection().Find(nil).Skip(skip).
 		Sort("-score", "nickname").
 		Limit(limit).All(&result)
 	if err != nil {
@@ -146,7 +143,7 @@ func getScores(limit int, skip int) ([]DatabaseUser, error) {
 }
 
 func getUsersCount() (int, error) {
-	lenTable, err := collection.Count()
+	lenTable, err := database.GetUserCollection().Count()
 	if err != nil {
 		return -1, errors.Wrap(err, "cant count users")
 	}

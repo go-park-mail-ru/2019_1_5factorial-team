@@ -50,11 +50,29 @@ type CookieConfig struct {
 	CookieTimeHours Duration `json:"cookie_time"`
 }
 
+// структура конфига базы юзеров
+type DBUserConfig struct {
+	MongoPort         string `json:"mongo_port"`
+	DatabaseName      string `json:"database_name"`
+	CollectionName    string `json:"collection_name"`
+	GenerateFakeUsers bool   `json:"generate_fake_users"`
+	TruncateTable     bool   `json:"truncate_table"`
+}
+
+// структура конфига генератора фейковых юзеров
+type FakeUsersConfig struct {
+	UsersCount int    `json:"users_count"`
+	Lang       string `json:"lang"`
+	MaxScore   int    `json:"max_score"`
+}
+
 // структура сервера, собирает все вышеперечисленные структуры
 type ServerConfig struct {
 	StaticServerConfig StaticServerConfig
 	CORSConfig         CORSConfig
 	CookieConfig       CookieConfig
+	DBUserConfig       DBUserConfig
+	FakeUsersConfig    FakeUsersConfig
 
 	configPath string
 }
@@ -86,6 +104,20 @@ func (sc *ServerConfig) New(configsDir string) *ServerConfig {
 		log.Fatal(errors.Wrap(err, "error while reading Cookie config"))
 	}
 	log.Println("Configs->Cookie config = ", sc.CookieConfig)
+
+	// конфиг бд юзеров (монго)
+	err = config_reader.ReadConfigFile(configsDir, "db_user_config.json", &sc.DBUserConfig)
+	if err != nil {
+		log.Fatal(errors.Wrap(err, "error while reading DB User config"))
+	}
+	log.Println("Configs->DB User config = ", sc.DBUserConfig)
+
+	// конфиг генерации фейковых юзеров
+	err = config_reader.ReadConfigFile(configsDir, "user_faker_config.json", &sc.FakeUsersConfig)
+	if err != nil {
+		log.Fatal(errors.Wrap(err, "error while reading user faker config"))
+	}
+	log.Println("Configs->User faker config = ", sc.FakeUsersConfig)
 
 	// инстанс сервера
 	instance = sc

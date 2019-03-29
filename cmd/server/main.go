@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
@@ -18,6 +19,8 @@ func main() {
 
 	configs := config.ServerConfig{}
 	configs.New(*configPath)
+
+	database.InitConnection()
 
 	s := server.MyGorgeousServer{}
 	s.New(*port)
