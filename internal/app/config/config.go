@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 )
+
 var instance *ServerConfig
 
 type StaticServerConfig struct {
@@ -25,25 +26,25 @@ type CORSConfig struct {
 }
 
 // https://robreid.io/json-time-duration/
-type ConfigDuration struct {
+type Duration struct {
 	time.Duration
 }
 
-func (d *ConfigDuration) UnmarshalJSON(b []byte) (err error) {
+func (d *Duration) UnmarshalJSON(b []byte) (err error) {
 	d.Duration, err = time.ParseDuration(strings.Trim(string(b), `"`))
 	return
 }
 
-func (d ConfigDuration) MarshalJSON() (b []byte, err error) {
+func (d Duration) MarshalJSON() (b []byte, err error) {
 	return []byte(fmt.Sprintf(`"%s"`, d.String())), nil
 }
 
 type CookieConfig struct {
-	CookieName      string         `json:"cookie_name"`
-	HttpOnly        bool           `json:"http_only"`
-	CookieDuration  int64          `json:"cookie_time_hours"`
-	ServerPrefix    string         `json:"server_prefix"`
-	CookieTimeHours ConfigDuration `json:"cookie_time"`
+	CookieName      string   `json:"cookie_name"`
+	HttpOnly        bool     `json:"http_only"`
+	CookieDuration  int64    `json:"cookie_time_hours"`
+	ServerPrefix    string   `json:"server_prefix"`
+	CookieTimeHours Duration `json:"cookie_time"`
 }
 
 type ServerConfig struct {
