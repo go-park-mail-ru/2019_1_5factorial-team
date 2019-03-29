@@ -2,47 +2,48 @@ package user
 
 import (
 	"fmt"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/config_reader"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
 )
 
-type DBConfig struct {
-	MongoPort         string `json:"mongo_port"`
-	DatabaseName      string `json:"database_name"`
-	CollectionName    string `json:"collection_name"`
-	GenerateFakeUsers bool   `json:"generate_fake_users"`
-	TruncateTable     bool   `json:"truncate_table"`
-}
+//type DBConfig struct {
+//	MongoPort         string `json:"mongo_port"`
+//	DatabaseName      string `json:"database_name"`
+//	CollectionName    string `json:"collection_name"`
+//	GenerateFakeUsers bool   `json:"generate_fake_users"`
+//	TruncateTable     bool   `json:"truncate_table"`
+//}
 
-var ConfigDBUser = DBConfig{}
+//var ConfigDBUser = DBConfig{}
 var session *mgo.Session
 var collection *mgo.Collection
 
+// оставляю инит на базу, ибо надо
 func init() {
-	err := config_reader.ReadConfigFile("db_user_config.json", &ConfigDBUser)
-	if err != nil {
-		log.Fatal(errors.Wrap(err, "error while reading Cookie config"))
-	}
-	fmt.Println("DB conf", ConfigDBUser)
+	//err := config_reader.ReadConfigFile("db_user_config.json", &ConfigDBUser)
+	//if err != nil {
+	//	log.Fatal(errors.Wrap(err, "error while reading Cookie config"))
+	//}
+	//fmt.Println("DB conf", ConfigDBUser)
 
-	session, err = mgo.Dial("mongodb://localhost:" + ConfigDBUser.MongoPort)
+	session, err := mgo.Dial("mongodb://localhost:" + config.GetInstance().DBUserConfig.MongoPort)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	collection = session.DB(ConfigDBUser.DatabaseName).C(ConfigDBUser.CollectionName)
+	collection = session.DB(config.GetInstance().DBUserConfig.DatabaseName).C(config.GetInstance().DBUserConfig.CollectionName)
 
-	if n, _ := collection.Count(); n != 0 && ConfigDBUser.TruncateTable {
+	if n, _ := collection.Count(); n != 0 && config.GetInstance().DBUserConfig.TruncateTable {
 		err = collection.DropCollection()
 		if err != nil {
 			log.Fatal("user db truncate: ", err)
 		}
 	}
 
-	if ConfigDBUser.GenerateFakeUsers {
+	if config.GetInstance().DBUserConfig.GenerateFakeUsers {
 		fu := GenerateUsers()
 
 		for i, val := range fu {
@@ -103,7 +104,7 @@ func addUser(nickname string, email string, password string) (User, error) {
 		Nickname:     nickname,
 		HashPassword: hashPassword,
 		Score:        0,
-		AvatarLink:   DefaultAvatarLink,
+		AvatarLink:   "",
 	}
 
 	err = collection.Insert(dbu)

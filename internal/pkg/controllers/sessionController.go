@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/pkg/errors"
@@ -71,7 +72,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 func SignOut(res http.ResponseWriter, req *http.Request) {
 	log.Println("================", req.URL, req.Method, "SignOut", "================")
 
-	currentSession, err := req.Cookie(session.CookieConf.CookieName)
+	currentSession, err := req.Cookie(config.GetInstance().CookieConfig.CookieName)
 	if err == http.ErrNoCookie {
 		// бесполезная проверка, так кука валидна, но по гостайлу нужна
 		ErrResponse(res, http.StatusUnauthorized, "not authorized")

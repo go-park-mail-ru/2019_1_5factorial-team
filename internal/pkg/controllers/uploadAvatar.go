@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -26,11 +27,11 @@ type AvatarLinkResponse struct {
 // @Failure 400 {object} controllers.errorResponse
 // @Router /api/upload_avatar [post]
 func UploadAvatar(res http.ResponseWriter, req *http.Request) {
-	log.Println(req.URL, "UploadAvatar")
+	log.Println("================", req.URL, req.Method, "UploadAvatar", "================")
 
 	// проверка на максимально допустимый размер
-	req.Body = http.MaxBytesReader(res, req.Body, fileproc.StaticConfig.MaxUploadSize)
-	if err := req.ParseMultipartForm(fileproc.StaticConfig.MaxUploadSize); err != nil {
+	req.Body = http.MaxBytesReader(res, req.Body, config.GetInstance().StaticServerConfig.MaxUploadSize)
+	if err := req.ParseMultipartForm(config.GetInstance().StaticServerConfig.MaxUploadSize); err != nil {
 		ErrResponse(res, http.StatusBadRequest, "file too big")
 
 		log.Println(errors.Wrap(err, "file too big"))

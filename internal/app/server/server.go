@@ -2,20 +2,38 @@ package server
 
 import (
 	_ "github.com/go-park-mail-ru/2019_1_5factorial-team/docs"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/fileproc"
-
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-
 	"github.com/swaggo/http-swagger"
 	"net/http"
 )
 
-func Run(port string) error {
+var instance *MyGorgeousServer
 
-	address := ":" + port
+type MyGorgeousServer struct {
+	port string
+}
+
+func GetInstance() *MyGorgeousServer {
+
+	return instance
+}
+
+func (mgs *MyGorgeousServer) New(port string) *MyGorgeousServer {
+	mgs.port = port
+
+	// инстанс сервера
+	instance = mgs
+
+	return mgs
+}
+
+func (mgs *MyGorgeousServer) Run() error {
+
+	address := ":" + mgs.port
 	router := mux.NewRouter()
 
 	// TODO: panic
@@ -31,7 +49,7 @@ func Run(port string) error {
 
 	router.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
 
-	imgServer := http.FileServer(http.Dir(fileproc.StaticConfig.UploadPath))
+	imgServer := http.FileServer(http.Dir(config.GetInstance().StaticServerConfig.UploadPath))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", imgServer))
 
 	routerLoginRequired := router.PathPrefix("").Subrouter()
