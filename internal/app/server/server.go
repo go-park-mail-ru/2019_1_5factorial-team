@@ -23,6 +23,7 @@ func GetInstance() *MyGorgeousServer {
 }
 
 func (mgs *MyGorgeousServer) New(port string) *MyGorgeousServer {
+	mgs.port = port
 
 	// инстанс сервера
 	instance = mgs
