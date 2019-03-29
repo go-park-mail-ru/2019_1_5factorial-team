@@ -23,6 +23,7 @@ func main() {
 	configs := config.ServerConfig{}
 	configs.New(*configPath)
 
+	// мб вынести саму базу в app?
 	database.InitConnection()
 
 	// вот в душе не знаю куда это засунуть, ибо если это оставить в internal/pkg/database/database.go
