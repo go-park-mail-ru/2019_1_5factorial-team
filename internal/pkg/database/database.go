@@ -1,10 +1,7 @@
 package database
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
-	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2"
 	"log"
 	"sync"
@@ -34,20 +31,20 @@ func InitConnection() {
 			}
 		}
 
-		// заполнение коллекции юзеров по конфигу
-		if config.GetInstance().DBUserConfig.GenerateFakeUsers {
-			fu := user.GenerateUsers()
-
-			for i, val := range fu {
-				fmt.Println(i, "| id:", val.CollectionID.Hex(), ", Nick:", val.Nickname, ", Password:", val.Nickname)
-
-				err = userCollection.Insert(val)
-				if err != nil {
-					log.Fatal(errors.Wrap(err, "error while adding new user"))
-				}
-
-			}
-		}
+		//// заполнение коллекции юзеров по конфигу
+		//if config.GetInstance().DBUserConfig.GenerateFakeUsers {
+		//	fu := user.GenerateUsers()
+		//
+		//	for i, val := range fu {
+		//		fmt.Println(i, "| id:", val.CollectionID.Hex(), ", Nick:", val.Nickname, ", Password:", val.Nickname)
+		//
+		//		err = userCollection.Insert(val)
+		//		if err != nil {
+		//			log.Fatal(errors.Wrap(err, "error while adding new user"))
+		//		}
+		//
+		//	}
+		//}
 
 	})
 }
@@ -59,5 +56,3 @@ func GetDBSesion() *mgo.Session {
 func GetUserCollection() *mgo.Collection {
 	return userCollection
 }
-
-

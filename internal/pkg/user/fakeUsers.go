@@ -8,23 +8,6 @@ import (
 	"math/rand"
 )
 
-//type FakeUsersConfig struct {
-//	UsersCount int    `json:"users_count"`
-//	Lang       string `json:"lang"`
-//	MaxScore   int    `json:"max_score"`
-//}
-//
-//var FakeUsersConf = FakeUsersConfig{}
-//
-//func init() {
-//	err := config_reader.ReadConfigFile("user_faker_config.json", &FakeUsersConf)
-//	if err != nil {
-//		log.Fatal(errors.Wrap(err, "error while reading User faker config"))
-//	}
-//	fmt.Println("Faker init:", FakeUsersConf)
-//
-//}
-
 func GenerateUsers() []DatabaseUser {
 	fmt.Println("---=== GENERATE FAKE USERS IN PROGRESS ===---")
 	u := make([]DatabaseUser, 0, config.GetInstance().FakeUsersConfig.UsersCount)

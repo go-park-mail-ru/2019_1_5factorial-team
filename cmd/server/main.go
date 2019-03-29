@@ -4,6 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
+	"github.com/pkg/errors"
+	"log"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
@@ -21,6 +24,21 @@ func main() {
 	configs.New(*configPath)
 
 	database.InitConnection()
+
+	// вот в душе не знаю куда это засунуть, ибо если это оставить в internal/pkg/database/database.go
+	// что впринципе логично, возникает мои любимые циклические конфликты
+	if config.GetInstance().DBUserConfig.GenerateFakeUsers {
+		fu := user.GenerateUsers()
+
+		for i, val := range fu {
+			fmt.Println(i, "| id:", val.CollectionID.Hex(), ", Nick:", val.Nickname, ", Password:", val.Nickname)
+
+			err := database.GetUserCollection().Insert(val)
+			if err != nil {
+				log.Fatal(errors.Wrap(err, "error while adding new user"))
+			}
+		}
+	}
 
 	s := server.MyGorgeousServer{}
 	s.New(*port)
