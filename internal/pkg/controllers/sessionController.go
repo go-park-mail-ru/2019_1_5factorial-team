@@ -49,13 +49,13 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	randToken, expiration, err := session.SetToken(u.Id)
+	randToken, expiration, err := session.SetToken(u.ID.Hex())
 
 	cookie := session.CreateHttpCookie(randToken, expiration)
 
 	http.SetCookie(res, cookie)
 	OkResponse(res, "ok auth")
-	log.Println("\t ok response SignIn, user:\n\t\t\t\t\t\t\tid =", u.Id, "\n\t\t\t\t\t\t\tnickname =",
+	log.Println("\t ok response SignIn, user:\n\t\t\t\t\t\t\tid =", u.ID.Hex(), "\n\t\t\t\t\t\t\tnickname =",
 		u.Nickname, "\n\t\t\t\t\t\t\temail =", u.Email, "\n\t\t\t\t\t\t\tscore =", u.Score)
 	log.Println("\t ok set cookie", cookie)
 }

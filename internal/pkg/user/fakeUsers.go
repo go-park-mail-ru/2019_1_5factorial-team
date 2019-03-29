@@ -8,20 +8,20 @@ import (
 	"math/rand"
 )
 
-func GenerateUsers() []DatabaseUser {
+func GenerateUsers() []User {
 	fmt.Println("---=== GENERATE FAKE USERS IN PROGRESS ===---")
-	u := make([]DatabaseUser, 0, config.GetInstance().FakeUsersConfig.UsersCount)
+	u := make([]User, 0, config.GetInstance().FakeUsersConfig.UsersCount)
 	fake, _ := faker.New(config.GetInstance().FakeUsersConfig.Lang)
 	fake.Rand = rand.New(rand.NewSource(42))
 
 	// наш самый любимый юзер, с истоков нашего проекта
 	hash, _ := GetPasswordHash("password")
-	u = append(u, DatabaseUser{
-		CollectionID: bson.NewObjectId(),
+	u = append(u, User{
+		ID:           bson.NewObjectId(),
 		Email:        "kek.k.ek",
 		Nickname:     "kekkekkek",
 		HashPassword: hash,
-		Score:        rand.Intn(config.GetInstance().FakeUsersConfig.MaxScore),
+		Score:        100500,
 		AvatarLink:   "",
 	})
 
@@ -29,8 +29,8 @@ func GenerateUsers() []DatabaseUser {
 		nick := fake.FirstName()
 		hash, _ := GetPasswordHash(nick)
 
-		u = append(u, DatabaseUser{
-			CollectionID: bson.NewObjectId(),
+		u = append(u, User{
+			ID:           bson.NewObjectId(),
 			Email:        fake.Email(),
 			Nickname:     nick,
 			HashPassword: hash,

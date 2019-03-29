@@ -2,15 +2,16 @@ package user
 
 import (
 	"github.com/pkg/errors"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type User struct {
-	Id           string
-	Email        string
-	Nickname     string
-	HashPassword string
-	Score        int
-	AvatarLink   string
+	ID           bson.ObjectId `bson:"_id"`
+	Email        string        `bson:"email"`
+	Nickname     string        `bson:"nickname"`
+	HashPassword string        `bson:"hash_password"`
+	Score        int           `bson:"score"`
+	AvatarLink   string        `bson:"avatar_link"`
 }
 
 func CreateUser(nickname string, email string, password string) (User, error) {
@@ -36,11 +37,7 @@ func IdentifyUser(login string, password string) (User, error) {
 		return User{}, errors.Wrap(err, "Wrong password")
 	}
 
-	return User{
-		Id:       u.CollectionID.Hex(),
-		Email:    u.Email,
-		Nickname: u.Nickname,
-	}, nil
+	return u, nil
 }
 
 func GetUserById(id string) (User, error) {
@@ -49,13 +46,7 @@ func GetUserById(id string) (User, error) {
 		return User{}, errors.Wrap(err, "can't find user")
 	}
 
-	return User{
-		Id:         u.CollectionID.Hex(),
-		Email:      u.Email,
-		Nickname:   u.Nickname,
-		Score:      u.Score,
-		AvatarLink: u.AvatarLink,
-	}, nil
+	return u, nil
 }
 
 func UpdateUser(id string, newAvatar string, oldPassword string, newPassword string) error {

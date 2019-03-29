@@ -6,33 +6,23 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type DatabaseUser struct {
-	Id           int64         `bson:"-"`
-	CollectionID bson.ObjectId `bson:"_id"`
-	Email        string        `bson:"email"`
-	Nickname     string        `bson:"nickname"`
-	HashPassword string        `bson:"hash_password"`
-	Score        int           `bson:"score"`
-	AvatarLink   string        `bson:"avatar_link"`
-}
-
-func getUser(login string) (DatabaseUser, error) {
-	u := DatabaseUser{}
+func getUser(login string) (User, error) {
+	u := User{}
 
 	err := database.GetUserCollection().Find(bson.M{"nickname": login}).One(&u)
 	if err != nil {
-		return DatabaseUser{}, errors.New("Invalid login")
+		return User{}, errors.New("Invalid login")
 	}
 
 	return u, nil
 }
 
-func findUserById(id string) (DatabaseUser, error) {
-	u := DatabaseUser{}
+func findUserById(id string) (User, error) {
+	u := User{}
 
 	err := database.GetUserCollection().Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&u)
 	if err != nil {
-		return DatabaseUser{}, errors.New("user with this id not found")
+		return User{}, errors.New("user with this id not found")
 	}
 
 	return u, nil
@@ -44,8 +34,8 @@ func addUser(nickname string, email string, password string) (User, error) {
 		return User{}, errors.Wrap(err, "Hasher password error")
 	}
 
-	dbu := DatabaseUser{
-		CollectionID: bson.NewObjectId(),
+	dbu := User{
+		ID:           bson.NewObjectId(),
 		Email:        email,
 		Nickname:     nickname,
 		HashPassword: hashPassword,
@@ -58,19 +48,12 @@ func addUser(nickname string, email string, password string) (User, error) {
 		return User{}, errors.Wrap(err, "error while adding new user")
 	}
 
-	return User{
-		Id:           dbu.CollectionID.Hex(),
-		Email:        dbu.Email,
-		Nickname:     dbu.Nickname,
-		HashPassword: dbu.HashPassword,
-		Score:        dbu.Score,
-		AvatarLink:   dbu.AvatarLink,
-	}, nil
+	return dbu, nil
 }
 
-func updateDBUser(user DatabaseUser) error {
+func updateDBUser(user User) error {
 
-	err := database.GetUserCollection().UpdateId(user.CollectionID, user)
+	err := database.GetUserCollection().UpdateId(user.ID, user)
 	if err != nil {
 		return errors.Wrap(err, "error while updating value in DB")
 	}
@@ -78,8 +61,8 @@ func updateDBUser(user DatabaseUser) error {
 	return nil
 }
 
-func getScores(limit int, skip int) ([]DatabaseUser, error) {
-	result := make([]DatabaseUser, 0, 1)
+func getScores(limit int, skip int) ([]User, error) {
+	result := make([]User, 0, 1)
 
 	err := database.GetUserCollection().Find(nil).Skip(skip).
 		Sort("-score", "nickname").

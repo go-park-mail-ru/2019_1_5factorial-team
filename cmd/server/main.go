@@ -31,7 +31,7 @@ func main() {
 		fu := user.GenerateUsers()
 
 		for i, val := range fu {
-			fmt.Println(i, "| id:", val.CollectionID.Hex(), ", Nick:", val.Nickname, ", Password:", val.Nickname)
+			fmt.Println(i, "| id:", val.ID.Hex(), ", Nick:", val.Nickname, ", Password:", val.Nickname)
 
 			err := database.GetUserCollection().Insert(val)
 			if err != nil {
