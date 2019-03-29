@@ -1,10 +1,8 @@
 package session
 
 import (
-	"fmt"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -15,29 +13,29 @@ const (
 	ServerPrefix    string = "/api"
 )
 
-// https://robreid.io/json-time-duration/
-type ConfigDuration struct {
-	time.Duration
-}
+//// https://robreid.io/json-time-duration/
+//type ConfigDuration struct {
+//	time.Duration
+//}
+//
+//func (d *ConfigDuration) UnmarshalJSON(b []byte) (err error) {
+//	d.Duration, err = time.ParseDuration(strings.Trim(string(b), `"`))
+//	return
+//}
+//
+//func (d ConfigDuration) MarshalJSON() (b []byte, err error) {
+//	return []byte(fmt.Sprintf(`"%s"`, d.String())), nil
+//}
 
-func (d *ConfigDuration) UnmarshalJSON(b []byte) (err error) {
-	d.Duration, err = time.ParseDuration(strings.Trim(string(b), `"`))
-	return
-}
+//type CookieConfig struct {
+//	CookieName      string         `json:"cookie_name"`
+//	HttpOnly        bool           `json:"http_only"`
+//	CookieDuration  int64          `json:"cookie_time_hours"`
+//	ServerPrefix    string         `json:"server_prefix"`
+//	CookieTimeHours ConfigDuration `json:"cookie_time"`
+//}
 
-func (d ConfigDuration) MarshalJSON() (b []byte, err error) {
-	return []byte(fmt.Sprintf(`"%s"`, d.String())), nil
-}
-
-type CookieConfig struct {
-	CookieName      string         `json:"cookie_name"`
-	HttpOnly        bool           `json:"http_only"`
-	CookieDuration  int64          `json:"cookie_time_hours"`
-	ServerPrefix    string         `json:"server_prefix"`
-	CookieTimeHours ConfigDuration `json:"cookie_time"`
-}
-
-var CookieConf = CookieConfig{}
+//var CookieConf = CookieConfig{}
 
 //func init() {
 //	err := config_reader.ReadConfigFile("cookie_config.json", &CookieConf)
@@ -52,17 +50,17 @@ var CookieConf = CookieConfig{}
 
 func CreateHttpCookie(value string, expiration time.Time) *http.Cookie {
 	return &http.Cookie{
-		Path:     server.GetInstance().CookieConfig.ServerPrefix,
-		Name:     server.GetInstance().CookieConfig.CookieName,
+		Path:     config.GetInstance().CookieConfig.ServerPrefix,
+		Name:     config.GetInstance().CookieConfig.CookieName,
 		Value:    value,
 		Expires:  expiration,
-		HttpOnly: server.GetInstance().CookieConfig.HttpOnly,
+		HttpOnly: config.GetInstance().CookieConfig.HttpOnly,
 	}
 }
 
 func UpdateHttpCookie(cookie *http.Cookie, expiration time.Time) {
-	cookie.Path = server.GetInstance().CookieConfig.ServerPrefix
-	cookie.Name = server.GetInstance().CookieConfig.CookieName
+	cookie.Path = config.GetInstance().CookieConfig.ServerPrefix
+	cookie.Name = config.GetInstance().CookieConfig.CookieName
 	cookie.Expires = expiration
-	cookie.HttpOnly = server.GetInstance().CookieConfig.HttpOnly
+	cookie.HttpOnly = config.GetInstance().CookieConfig.HttpOnly
 }

@@ -1,19 +1,55 @@
 package config
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/config_reader"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/fileproc"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/pkg/errors"
 	"log"
+	"strings"
+	"time"
 )
 var instance *ServerConfig
 
+type StaticServerConfig struct {
+	MaxUploadSizeMB int64  `json:"max_upload_size_mb"`
+	UploadPath      string `json:"upload_path"`
+	MaxUploadSize   int64
+}
+
+type CORSConfig struct {
+	Origin      string   `json:"allow-origin"`
+	Credentials bool     `json:"allow-credentials"`
+	Methods     []string `json:"allow-methods"`
+	Headers     []string `json:"allow-headers"`
+	MaxAge      int      `json:"max-age"`
+}
+
+// https://robreid.io/json-time-duration/
+type ConfigDuration struct {
+	time.Duration
+}
+
+func (d *ConfigDuration) UnmarshalJSON(b []byte) (err error) {
+	d.Duration, err = time.ParseDuration(strings.Trim(string(b), `"`))
+	return
+}
+
+func (d ConfigDuration) MarshalJSON() (b []byte, err error) {
+	return []byte(fmt.Sprintf(`"%s"`, d.String())), nil
+}
+
+type CookieConfig struct {
+	CookieName      string         `json:"cookie_name"`
+	HttpOnly        bool           `json:"http_only"`
+	CookieDuration  int64          `json:"cookie_time_hours"`
+	ServerPrefix    string         `json:"server_prefix"`
+	CookieTimeHours ConfigDuration `json:"cookie_time"`
+}
+
 type ServerConfig struct {
-	StaticServerConfig fileproc.StaticServerConfig
-	CORSConfig         middleware.CORSConfig
-	CookieConfig       session.CookieConfig
+	StaticServerConfig StaticServerConfig
+	CORSConfig         CORSConfig
+	CookieConfig       CookieConfig
 
 	configPath string
 }

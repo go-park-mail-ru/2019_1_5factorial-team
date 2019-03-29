@@ -3,7 +3,7 @@ package fileproc
 import (
 	"crypto/rand"
 	"fmt"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"os"
 	"path/filepath"
 )
@@ -27,7 +27,7 @@ func CheckFileType(receivedFileType string) bool {
 func CreateNewFile(fileName string, fileExtension string, filetype string) string {
 
 	newFile := filepath.Join(
-		server.GetInstance().StaticServerConfig.UploadPath,
+		config.GetInstance().StaticServerConfig.UploadPath,
 		fileName+fileExtension,
 		)
 	//log.Printf("filetype: %s, file: %s\n", filetype, newFile)
