@@ -11,47 +11,18 @@ import (
 	"net/http"
 )
 
-// cycle import (server -> controllers -> server) ЕБАНЫЙ РОТ
 var instance *MyGorgeousServer
 
 type MyGorgeousServer struct {
-	//StaticServerConfig fileproc.StaticServerConfig
-	//CORSConfig         middleware.CORSConfig
-	//CookieConfig       session.CookieConfig
-
-	configPath string
+	port string
 }
 
 func GetInstance() *MyGorgeousServer {
+
 	return instance
 }
 
-func (mgs *MyGorgeousServer) New(config string) *MyGorgeousServer {
-	mgs.configPath = config
-
-	//// конфиг статик сервера
-	//err := config_reader.ReadConfigFile(config, "static_server_config.json", &mgs.StaticServerConfig)
-	//if err != nil {
-	//	log.Fatal(errors.Wrap(err, "error while reading static_server_config config"))
-	//}
-	//mgs.StaticServerConfig.MaxUploadSize = mgs.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
-	//
-	//log.Println("New Server->Static server config = ", mgs.StaticServerConfig)
-	//
-	//// конфиг корса
-	//err = config_reader.ReadConfigFile(config, "cors_config.json", &mgs.CORSConfig)
-	//if err != nil {
-	//	log.Fatal(errors.Wrap(err, "error while reading CORS config"))
-	//}
-	//
-	//log.Println("New Server->CORS config = ", mgs.CORSConfig)
-	//
-	//// конфиг кук
-	//err = config_reader.ReadConfigFile(config, "cookie_config.json", &mgs.CookieConfig)
-	//if err != nil {
-	//	log.Fatal(errors.Wrap(err, "error while reading Cookie config"))
-	//}
-	//log.Println("New Server->Cookie config = ", mgs.CookieConfig)
+func (mgs *MyGorgeousServer) New(port string) *MyGorgeousServer {
 
 	// инстанс сервера
 	instance = mgs
@@ -59,9 +30,9 @@ func (mgs *MyGorgeousServer) New(config string) *MyGorgeousServer {
 	return mgs
 }
 
-func (mgs *MyGorgeousServer) Run(port string) error {
+func (mgs *MyGorgeousServer) Run() error {
 
-	address := ":" + port
+	address := ":" + mgs.port
 	router := mux.NewRouter()
 
 	// TODO: panic

@@ -11,12 +11,14 @@ import (
 
 var instance *ServerConfig
 
+// структура конфига статики
 type StaticServerConfig struct {
 	MaxUploadSizeMB int64  `json:"max_upload_size_mb"`
 	UploadPath      string `json:"upload_path"`
 	MaxUploadSize   int64
 }
 
+// структура конфига КОРС
 type CORSConfig struct {
 	Origin      string   `json:"allow-origin"`
 	Credentials bool     `json:"allow-credentials"`
@@ -39,6 +41,7 @@ func (d Duration) MarshalJSON() (b []byte, err error) {
 	return []byte(fmt.Sprintf(`"%s"`, d.String())), nil
 }
 
+// структура конфига кук
 type CookieConfig struct {
 	CookieName      string   `json:"cookie_name"`
 	HttpOnly        bool     `json:"http_only"`
@@ -47,6 +50,7 @@ type CookieConfig struct {
 	CookieTimeHours Duration `json:"cookie_time"`
 }
 
+// структура сервера, собирает все вышеперечисленные структуры
 type ServerConfig struct {
 	StaticServerConfig StaticServerConfig
 	CORSConfig         CORSConfig
@@ -55,6 +59,7 @@ type ServerConfig struct {
 	configPath string
 }
 
+// считывание всех конфигов по пути `configsDir`
 func (sc *ServerConfig) New(configsDir string) *ServerConfig {
 	sc.configPath = configsDir
 
@@ -65,7 +70,7 @@ func (sc *ServerConfig) New(configsDir string) *ServerConfig {
 	}
 	sc.StaticServerConfig.MaxUploadSize = sc.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
 
-	log.Println("New Server->Static server config = ", sc.StaticServerConfig)
+	log.Println("Configs->Static server config = ", sc.StaticServerConfig)
 
 	// конфиг корса
 	err = config_reader.ReadConfigFile(configsDir, "cors_config.json", &sc.CORSConfig)
@@ -73,14 +78,14 @@ func (sc *ServerConfig) New(configsDir string) *ServerConfig {
 		log.Fatal(errors.Wrap(err, "error while reading CORS config"))
 	}
 
-	log.Println("New Server->CORS config = ", sc.CORSConfig)
+	log.Println("Configs->CORS config = ", sc.CORSConfig)
 
 	// конфиг кук
 	err = config_reader.ReadConfigFile(configsDir, "cookie_config.json", &sc.CookieConfig)
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "error while reading Cookie config"))
 	}
-	log.Println("New Server->Cookie config = ", sc.CookieConfig)
+	log.Println("Configs->Cookie config = ", sc.CookieConfig)
 
 	// инстанс сервера
 	instance = sc

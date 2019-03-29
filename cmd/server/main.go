@@ -16,7 +16,7 @@ func main() {
 	fmt.Println("config path:", *configPath)
 
 	configs := config.ServerConfig{}
-	configs.New("configs/")
+	configs.New(*configPath)
 
 	s := server.MyGorgeousServer{}
 	s.New("configs/")
