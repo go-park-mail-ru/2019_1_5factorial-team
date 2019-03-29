@@ -29,7 +29,6 @@ type AvatarLinkResponse struct {
 func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	log.Println("================", req.URL, req.Method, "UploadAvatar", "================")
 
-
 	// проверка на максимально допустимый размер
 	req.Body = http.MaxBytesReader(res, req.Body, config.GetInstance().StaticServerConfig.MaxUploadSize)
 	if err := req.ParseMultipartForm(config.GetInstance().StaticServerConfig.MaxUploadSize); err != nil {

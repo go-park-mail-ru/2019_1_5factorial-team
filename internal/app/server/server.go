@@ -10,6 +10,7 @@ import (
 	"github.com/swaggo/http-swagger"
 	"net/http"
 )
+
 // cycle import (server -> controllers -> server) ЕБАНЫЙ РОТ
 var instance *MyGorgeousServer
 
