@@ -22,13 +22,16 @@ var session *mgo.Session
 var collection *mgo.Collection
 
 func init() {
-	err := config_reader.ReadConfigFile("db_user_config.json", &ConfigDBUser)
+	var err error
+
+	err = config_reader.ReadConfigFile("db_user_config.json", &ConfigDBUser)
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "error while reading Cookie config"))
 	}
 	fmt.Println("DB conf", ConfigDBUser)
 
-	session, err = mgo.Dial("localhost:" + ConfigDBUser.MongoPort)
+	session, err = mgo.Dial("mongodb://mongo:" + ConfigDBUser.MongoPort)
+
 	if err != nil {
 		log.Fatal(err)
 	}
