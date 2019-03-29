@@ -16,7 +16,7 @@ ENV PATH $GOPATH/bin:$GOROOT/bin:$PATH
 
 # Копируем исходный код в Docker-контейнер
 WORKDIR /server
-COPY ../.. .
+COPY . .
 
 # Объявлем порт сервера
 EXPOSE 5051
