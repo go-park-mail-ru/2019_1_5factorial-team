@@ -61,6 +61,8 @@ type ServerConfig struct {
 
 // считывание всех конфигов по пути `configsDir`
 func (sc *ServerConfig) New(configsDir string) *ServerConfig {
+	log.Println("Configs->logs path = ", configsDir)
+
 	sc.configPath = configsDir
 
 	// конфиг статик сервера

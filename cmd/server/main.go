@@ -18,8 +18,7 @@ func main() {
 	configs := config.ServerConfig{}
 	configs.New(*configPath)
 
-	s := server.MyGorgeousServer{}
-	s.New(*port)
+	s := server.New(*port)
 
 	err := s.Run()
 	if err != nil {

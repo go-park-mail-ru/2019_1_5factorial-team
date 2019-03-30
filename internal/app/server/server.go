@@ -11,24 +11,15 @@ import (
 	"net/http"
 )
 
-var instance *MyGorgeousServer
-
 type MyGorgeousServer struct {
 	port string
 }
 
-func GetInstance() *MyGorgeousServer {
-
-	return instance
-}
-
-func (mgs *MyGorgeousServer) New(port string) *MyGorgeousServer {
+func New(port string) *MyGorgeousServer {
+	mgs := MyGorgeousServer{}
 	mgs.port = port
 
-	// инстанс сервера
-	instance = mgs
-
-	return mgs
+	return &mgs
 }
 
 func (mgs *MyGorgeousServer) Run() error {
