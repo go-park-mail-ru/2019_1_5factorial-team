@@ -59,36 +59,43 @@ type ServerConfig struct {
 	configPath string
 }
 
+// откуда читать, куда заносить
+type valueAndPath struct {
+	from string
+	to interface{}
+}
+
 // считывание всех конфигов по пути `configsDir`
 func Init(configsDir string) error {
 	// ага
 	instance = &ServerConfig{}
 
+	// вынести нельзя ибо инстанс не инициализирован
+	var configs = []valueAndPath{
+		{
+			from: "static_server_config.json",
+			to: &instance.StaticServerConfig,
+		},
+		{
+			from: "cors_config.json",
+			to: &instance.CORSConfig,
+		},
+		{
+			from: "cookie_config.json",
+			to: &instance.CookieConfig,
+		},
+	}
+
 	log.Println("Configs->logs path = ", configsDir)
 
-	// конфиг статик сервера
-	err := config_reader.ReadConfigFile(configsDir, "static_server_config.json", &instance.StaticServerConfig)
-	if err != nil {
-		return errors.Wrap(err, "error while reading static_server_config config")
+	for i, val := range configs {
+		err := config_reader.ReadConfigFile(configsDir, val.from, val.to)
+		if err != nil {
+			return errors.Wrap(err, "error while reading config")
+		}
+
+		log.Println("Configs->", i, "config = ", val.to)
 	}
-	instance.StaticServerConfig.MaxUploadSize = instance.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
-
-	log.Println("Configs->Static server config = ", instance.StaticServerConfig)
-
-	// конфиг корса
-	err = config_reader.ReadConfigFile(configsDir, "cors_config.json", &instance.CORSConfig)
-	if err != nil {
-		return errors.Wrap(err, "error while reading CORS config")
-	}
-
-	log.Println("Configs->CORS config = ", instance.CORSConfig)
-
-	// конфиг кук
-	err = config_reader.ReadConfigFile(configsDir, "cookie_config.json", &instance.CookieConfig)
-	if err != nil {
-		return errors.Wrap(err, "error while reading Cookie config")
-	}
-	log.Println("Configs->Cookie config = ", instance.CookieConfig)
 
 	return nil
 }
