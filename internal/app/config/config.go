@@ -70,7 +70,6 @@ func Init(configsDir string) error {
 	err := config_reader.ReadConfigFile(configsDir, "static_server_config.json", &instance.StaticServerConfig)
 	if err != nil {
 		return errors.Wrap(err, "error while reading static_server_config config")
-		//log.Fatal(errors.Wrap(err, "error while reading static_server_config config"))
 	}
 	instance.StaticServerConfig.MaxUploadSize = instance.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
 
@@ -80,7 +79,6 @@ func Init(configsDir string) error {
 	err = config_reader.ReadConfigFile(configsDir, "cors_config.json", &instance.CORSConfig)
 	if err != nil {
 		return errors.Wrap(err, "error while reading CORS config")
-		//log.Fatal(errors.Wrap(err, "error while reading CORS config"))
 	}
 
 	log.Println("Configs->CORS config = ", instance.CORSConfig)
@@ -89,7 +87,6 @@ func Init(configsDir string) error {
 	err = config_reader.ReadConfigFile(configsDir, "cookie_config.json", &instance.CookieConfig)
 	if err != nil {
 		return errors.Wrap(err, "error while reading Cookie config")
-		//log.Fatal(errors.Wrap(err, "error while reading Cookie config"))
 	}
 	log.Println("Configs->Cookie config = ", instance.CookieConfig)
 
