@@ -6,10 +6,17 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+var collectionName = "profile"
+
 func getUser(login string) (User, error) {
 	u := User{}
 
-	err := database.GetUserCollection().Find(bson.M{"nickname": login}).One(&u)
+	col, err := database.GetCollection(collectionName)
+	if err != nil {
+		return User{}, errors.Wrap(err, "collection not found")
+	}
+
+	err = col.Find(bson.M{"nickname": login}).One(&u)
 	if err != nil {
 		return User{}, errors.New("Invalid login")
 	}
@@ -20,7 +27,12 @@ func getUser(login string) (User, error) {
 func findUserById(id string) (User, error) {
 	u := User{}
 
-	err := database.GetUserCollection().Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&u)
+	col, err := database.GetCollection(collectionName)
+	if err != nil {
+		return User{}, errors.Wrap(err, "collection not found")
+	}
+
+	err = col.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&u)
 	if err != nil {
 		return User{}, errors.New("user with this id not found")
 	}
@@ -43,7 +55,12 @@ func addUser(nickname string, email string, password string) (User, error) {
 		AvatarLink:   "",
 	}
 
-	err = database.GetUserCollection().Insert(dbu)
+	col, err := database.GetCollection(collectionName)
+	if err != nil {
+		return User{}, errors.Wrap(err, "collection not found")
+	}
+
+	err = col.Insert(dbu)
 	if err != nil {
 		return User{}, errors.Wrap(err, "error while adding new user")
 	}
@@ -52,8 +69,12 @@ func addUser(nickname string, email string, password string) (User, error) {
 }
 
 func updateDBUser(user User) error {
+	col, err := database.GetCollection(collectionName)
+	if err != nil {
+		return errors.Wrap(err, "collection not found")
+	}
 
-	err := database.GetUserCollection().UpdateId(user.ID, user)
+	err = col.UpdateId(user.ID, user)
 	if err != nil {
 		return errors.Wrap(err, "error while updating value in DB")
 	}
@@ -63,8 +84,12 @@ func updateDBUser(user User) error {
 
 func getScores(limit int, skip int) ([]User, error) {
 	result := make([]User, 0, 1)
+	col, err := database.GetCollection(collectionName)
+	if err != nil {
+		return []User{}, errors.Wrap(err, "collection not found")
+	}
 
-	err := database.GetUserCollection().Find(nil).Skip(skip).
+	err = col.Find(nil).Skip(skip).
 		Sort("-score", "nickname").
 		Limit(limit).All(&result)
 	if err != nil {
@@ -75,7 +100,12 @@ func getScores(limit int, skip int) ([]User, error) {
 }
 
 func getUsersCount() (int, error) {
-	lenTable, err := database.GetUserCollection().Count()
+	col, err := database.GetCollection(collectionName)
+	if err != nil {
+		return -1, errors.Wrap(err, "collection not found")
+	}
+
+	lenTable, err := col.Count()
 	if err != nil {
 		return -1, errors.Wrap(err, "cant count users")
 	}

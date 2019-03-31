@@ -2,21 +2,24 @@ package database
 
 import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
+	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2"
 	"log"
 	"sync"
 )
 
 var session *mgo.Session
-var userCollection *mgo.Collection
 
-var collections map[string] *mgo.Collection
+var collections map[string]*mgo.Collection
 
 var once sync.Once
+var mu *sync.Mutex
 
 func InitConnection() {
 	once.Do(func() {
-		collections = make(map[string] *mgo.Collection)
+		mu = &sync.Mutex{}
+
+		collections = make(map[string]*mgo.Collection)
 		var err error
 
 		for _, val := range config.Get().DBUserConfig {
@@ -27,57 +30,27 @@ func InitConnection() {
 
 			collection := session.DB(val.DatabaseName).C(val.CollectionName)
 
-			// очистка коллекции юзеров по конфигу
+			// очистка коллекции по конфигу
 			if n, _ := collection.Count(); n != 0 && val.TruncateTable {
 				err = collection.DropCollection()
 				if err != nil {
-					log.Fatal("user db truncate: ", err)
+					log.Fatal("db truncate: ", err, val)
 				}
 			}
 
 			collections[val.CollectionName] = collection
 		}
 
-		//var err error
-		//session, err = mgo.Dial("mongodb://localhost:" + config.Get().DBUserConfig.MongoPort)
-		//if err != nil {
-		//	log.Fatal(err)
-		//}
-		//
-		//userCollection = session.DB(config.Get().DBUserConfig.DatabaseName).
-		//	C(config.Get().DBUserConfig.CollectionName)
-		//
-		//// очистка коллекции юзеров по конфигу
-		//if n, _ := userCollection.Count(); n != 0 && config.Get().DBUserConfig.TruncateTable {
-		//	err = userCollection.DropCollection()
-		//	if err != nil {
-		//		log.Fatal("user db truncate: ", err)
-		//	}
-		//}
-
-		//// заполнение коллекции юзеров по конфигу
-		//if config.GetInstance().DBUserConfig.GenerateFakeUsers {
-		//	fu := user.GenerateUsers()
-		//
-		//	for i, val := range fu {
-		//		fmt.Println(i, "| id:", val.CollectionID.Hex(), ", Nick:", val.Nickname, ", Password:", val.Nickname)
-		//
-		//		err = userCollection.Insert(val)
-		//		if err != nil {
-		//			log.Fatal(errors.Wrap(err, "error while adding new user"))
-		//		}
-		//
-		//	}
-		//}
-
 	})
 }
 
-func GetDBSesion() *mgo.Session {
-	return session
-}
+func GetCollection(name string) (*mgo.Collection, error) {
+	defer mu.Unlock()
+	mu.Lock()
 
-func GetUserCollection() *mgo.Collection {
-	// TODO(): параметр для взятия коллекшона по имени
-	return collections["profile"]
+	if i, ok := collections[name]; !ok {
+		return nil, errors.New("no connection found, name = " + name)
+	} else {
+		return i, nil
+	}
 }
