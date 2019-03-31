@@ -9,8 +9,6 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/pkg/errors"
 
-	"log"
-
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
 )
@@ -23,12 +21,17 @@ func main() {
 	fmt.Println("server will start on port", *port)
 	fmt.Println("config path:", *configPath)
 
+	err := config.Init(*configPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// мб вынести саму базу в app?
 	database.InitConnection()
 
 	// вот в душе не знаю куда это засунуть, ибо если это оставить в internal/pkg/database/database.go
 	// что впринципе логично, возникает мои любимые циклические конфликты
-	if config.GetInstance().DBUserConfig.GenerateFakeUsers {
+	if config.Get().DBUserConfig.GenerateFakeUsers {
 		fu := user.GenerateUsers()
 
 		for i, val := range fu {
@@ -39,11 +42,6 @@ func main() {
 				log.Fatal(errors.Wrap(err, "error while adding new user"))
 			}
 		}
-	}
-
-	err := config.Init(*configPath)
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	s := server.New(*port)

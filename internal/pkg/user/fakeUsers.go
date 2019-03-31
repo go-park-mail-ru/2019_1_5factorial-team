@@ -10,8 +10,8 @@ import (
 
 func GenerateUsers() []User {
 	fmt.Println("---=== GENERATE FAKE USERS IN PROGRESS ===---")
-	u := make([]User, 0, config.GetInstance().FakeUsersConfig.UsersCount)
-	fake, _ := faker.New(config.GetInstance().FakeUsersConfig.Lang)
+	u := make([]User, 0, config.Get().FakeUsersConfig.UsersCount)
+	fake, _ := faker.New(config.Get().FakeUsersConfig.Lang)
 	fake.Rand = rand.New(rand.NewSource(42))
 
 	// наш самый любимый юзер, с истоков нашего проекта
@@ -25,7 +25,7 @@ func GenerateUsers() []User {
 		AvatarLink:   "",
 	})
 
-	for i := 0; i < config.GetInstance().FakeUsersConfig.UsersCount; i++ {
+	for i := 0; i < config.Get().FakeUsersConfig.UsersCount; i++ {
 		nick := fake.FirstName()
 		hash, _ := GetPasswordHash(nick)
 
@@ -34,7 +34,7 @@ func GenerateUsers() []User {
 			Email:        fake.Email(),
 			Nickname:     nick,
 			HashPassword: hash,
-			Score:        rand.Intn(config.GetInstance().FakeUsersConfig.MaxScore),
+			Score:        rand.Intn(config.Get().FakeUsersConfig.MaxScore),
 			AvatarLink:   "",
 		})
 	}

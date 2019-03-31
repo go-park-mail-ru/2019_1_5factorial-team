@@ -15,16 +15,16 @@ var once sync.Once
 func InitConnection() {
 	once.Do(func() {
 		var err error
-		session, err = mgo.Dial("mongodb://localhost:" + config.GetInstance().DBUserConfig.MongoPort)
+		session, err = mgo.Dial("mongodb://localhost:" + config.Get().DBUserConfig.MongoPort)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		userCollection = session.DB(config.GetInstance().DBUserConfig.DatabaseName).
-			C(config.GetInstance().DBUserConfig.CollectionName)
+		userCollection = session.DB(config.Get().DBUserConfig.DatabaseName).
+			C(config.Get().DBUserConfig.CollectionName)
 
 		// очистка коллекции юзеров по конфигу
-		if n, _ := userCollection.Count(); n != 0 && config.GetInstance().DBUserConfig.TruncateTable {
+		if n, _ := userCollection.Count(); n != 0 && config.Get().DBUserConfig.TruncateTable {
 			err = userCollection.DropCollection()
 			if err != nil {
 				log.Fatal("user db truncate: ", err)
