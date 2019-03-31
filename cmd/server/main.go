@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
+	"log"
 )
 
 func main() {
@@ -15,12 +16,14 @@ func main() {
 	fmt.Println("server will start on port", *port)
 	fmt.Println("config path:", *configPath)
 
-	configs := config.ServerConfig{}
-	configs.New(*configPath)
+
+	err := config.Init(*configPath)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	s := server.New(*port)
-
-	err := s.Run()
+	err = s.Run()
 	if err != nil {
 		panic(err)
 	}

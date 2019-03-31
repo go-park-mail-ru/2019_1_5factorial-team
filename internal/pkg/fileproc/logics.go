@@ -27,7 +27,7 @@ func CheckFileType(receivedFileType string) bool {
 func CreateNewFile(fileName string, fileExtension string, filetype string) string {
 
 	newFile := filepath.Join(
-		config.GetInstance().StaticServerConfig.UploadPath,
+		config.Get().StaticServerConfig.UploadPath,
 		fileName+fileExtension,
 	)
 	//log.Printf("filetype: %s, file: %s\n", filetype, newFile)

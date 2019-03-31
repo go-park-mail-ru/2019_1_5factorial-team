@@ -60,41 +60,42 @@ type ServerConfig struct {
 }
 
 // считывание всех конфигов по пути `configsDir`
-func (sc *ServerConfig) New(configsDir string) *ServerConfig {
+func Init(configsDir string) error {
+	// ага
+	instance = &ServerConfig{}
+
 	log.Println("Configs->logs path = ", configsDir)
 
-	sc.configPath = configsDir
-
 	// конфиг статик сервера
-	err := config_reader.ReadConfigFile(configsDir, "static_server_config.json", &sc.StaticServerConfig)
+	err := config_reader.ReadConfigFile(configsDir, "static_server_config.json", &instance.StaticServerConfig)
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "error while reading static_server_config config"))
+		return errors.Wrap(err, "error while reading static_server_config config")
+		//log.Fatal(errors.Wrap(err, "error while reading static_server_config config"))
 	}
-	sc.StaticServerConfig.MaxUploadSize = sc.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
+	instance.StaticServerConfig.MaxUploadSize = instance.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
 
-	log.Println("Configs->Static server config = ", sc.StaticServerConfig)
+	log.Println("Configs->Static server config = ", instance.StaticServerConfig)
 
 	// конфиг корса
-	err = config_reader.ReadConfigFile(configsDir, "cors_config.json", &sc.CORSConfig)
+	err = config_reader.ReadConfigFile(configsDir, "cors_config.json", &instance.CORSConfig)
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "error while reading CORS config"))
+		return errors.Wrap(err, "error while reading CORS config")
+		//log.Fatal(errors.Wrap(err, "error while reading CORS config"))
 	}
 
-	log.Println("Configs->CORS config = ", sc.CORSConfig)
+	log.Println("Configs->CORS config = ", instance.CORSConfig)
 
 	// конфиг кук
-	err = config_reader.ReadConfigFile(configsDir, "cookie_config.json", &sc.CookieConfig)
+	err = config_reader.ReadConfigFile(configsDir, "cookie_config.json", &instance.CookieConfig)
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "error while reading Cookie config"))
+		return errors.Wrap(err, "error while reading Cookie config")
+		//log.Fatal(errors.Wrap(err, "error while reading Cookie config"))
 	}
-	log.Println("Configs->Cookie config = ", sc.CookieConfig)
+	log.Println("Configs->Cookie config = ", instance.CookieConfig)
 
-	// инстанс сервера
-	instance = sc
-
-	return sc
+	return nil
 }
 
-func GetInstance() *ServerConfig {
+func Get() *ServerConfig {
 	return instance
 }

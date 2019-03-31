@@ -40,7 +40,7 @@ func (mgs *MyGorgeousServer) Run() error {
 
 	router.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
 
-	imgServer := http.FileServer(http.Dir(config.GetInstance().StaticServerConfig.UploadPath))
+	imgServer := http.FileServer(http.Dir(config.Get().StaticServerConfig.UploadPath))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", imgServer))
 
 	routerLoginRequired := router.PathPrefix("").Subrouter()
