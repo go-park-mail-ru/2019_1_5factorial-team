@@ -9,8 +9,6 @@ import (
 	"time"
 )
 
-var instance *ServerConfig
-
 // структура конфига статики
 type StaticServerConfig struct {
 	MaxUploadSizeMB int64  `json:"max_upload_size_mb"`
@@ -50,6 +48,8 @@ type CookieConfig struct {
 	CookieTimeHours Duration `json:"cookie_time"`
 }
 
+
+// TODO(): есть смысл объединить в 1 файл конфига
 // структура сервера, собирает все вышеперечисленные структуры
 type ServerConfig struct {
 	StaticServerConfig StaticServerConfig
@@ -59,33 +59,32 @@ type ServerConfig struct {
 	configPath string
 }
 
+var instance = &ServerConfig{}
+
 // откуда читать, куда заносить
 type valueAndPath struct {
 	from string
 	to interface{}
 }
 
+var configs = []valueAndPath{
+	{
+		from: "static_server_config.json",
+		to: &instance.StaticServerConfig,
+	},
+	{
+		from: "cors_config.json",
+		to: &instance.CORSConfig,
+	},
+	{
+		from: "cookie_config.json",
+		to: &instance.CookieConfig,
+	},
+}
+
+
 // считывание всех конфигов по пути `configsDir`
 func Init(configsDir string) error {
-	// ага
-	instance = &ServerConfig{}
-
-	// вынести нельзя ибо инстанс не инициализирован
-	var configs = []valueAndPath{
-		{
-			from: "static_server_config.json",
-			to: &instance.StaticServerConfig,
-		},
-		{
-			from: "cors_config.json",
-			to: &instance.CORSConfig,
-		},
-		{
-			from: "cookie_config.json",
-			to: &instance.CookieConfig,
-		},
-	}
-
 	log.Println("Configs->logs path = ", configsDir)
 
 	for i, val := range configs {
