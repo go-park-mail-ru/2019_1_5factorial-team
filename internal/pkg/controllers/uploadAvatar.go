@@ -30,8 +30,8 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	log.Println("================", req.URL, req.Method, "UploadAvatar", "================")
 
 	// проверка на максимально допустимый размер
-	req.Body = http.MaxBytesReader(res, req.Body, config.GetInstance().StaticServerConfig.MaxUploadSize)
-	if err := req.ParseMultipartForm(config.GetInstance().StaticServerConfig.MaxUploadSize); err != nil {
+	req.Body = http.MaxBytesReader(res, req.Body, config.Get().StaticServerConfig.MaxUploadSize)
+	if err := req.ParseMultipartForm(config.Get().StaticServerConfig.MaxUploadSize); err != nil {
 		ErrResponse(res, http.StatusBadRequest, "file too big")
 
 		log.Println(errors.Wrap(err, "file too big"))

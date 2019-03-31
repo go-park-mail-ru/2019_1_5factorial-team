@@ -3,9 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/pkg/errors"
+
 	"log"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
@@ -19,9 +22,6 @@ func main() {
 
 	fmt.Println("server will start on port", *port)
 	fmt.Println("config path:", *configPath)
-
-	configs := config.ServerConfig{}
-	configs.New(*configPath)
 
 	// мб вынести саму базу в app?
 	database.InitConnection()
@@ -41,10 +41,13 @@ func main() {
 		}
 	}
 
-	s := server.MyGorgeousServer{}
-	s.New(*port)
+	err := config.Init(*configPath)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	err := s.Run()
+	s := server.New(*port)
+	err = s.Run()
 	if err != nil {
 		panic(err)
 	}

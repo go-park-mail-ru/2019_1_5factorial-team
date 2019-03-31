@@ -78,53 +78,53 @@ type ServerConfig struct {
 }
 
 // считывание всех конфигов по пути `configsDir`
-func (sc *ServerConfig) New(configsDir string) *ServerConfig {
-	sc.configPath = configsDir
+func Init(configsDir string) error {
+	// ага
+	instance = &ServerConfig{}
+
+	log.Println("Configs->logs path = ", configsDir)
 
 	// конфиг статик сервера
-	err := config_reader.ReadConfigFile(configsDir, "static_server_config.json", &sc.StaticServerConfig)
+	err := config_reader.ReadConfigFile(configsDir, "static_server_config.json", &instance.StaticServerConfig)
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "error while reading static_server_config config"))
+		return errors.Wrap(err, "error while reading static_server_config config")
 	}
-	sc.StaticServerConfig.MaxUploadSize = sc.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
+	instance.StaticServerConfig.MaxUploadSize = instance.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
 
-	log.Println("Configs->Static server config = ", sc.StaticServerConfig)
+	log.Println("Configs->Static server config = ", instance.StaticServerConfig)
 
 	// конфиг корса
-	err = config_reader.ReadConfigFile(configsDir, "cors_config.json", &sc.CORSConfig)
+	err = config_reader.ReadConfigFile(configsDir, "cors_config.json", &instance.CORSConfig)
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "error while reading CORS config"))
+		return errors.Wrap(err, "error while reading CORS config")
 	}
 
-	log.Println("Configs->CORS config = ", sc.CORSConfig)
+	log.Println("Configs->CORS config = ", instance.CORSConfig)
 
 	// конфиг кук
-	err = config_reader.ReadConfigFile(configsDir, "cookie_config.json", &sc.CookieConfig)
+	err = config_reader.ReadConfigFile(configsDir, "cookie_config.json", &instance.CookieConfig)
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "error while reading Cookie config"))
+		return errors.Wrap(err, "error while reading Cookie config")
 	}
-	log.Println("Configs->Cookie config = ", sc.CookieConfig)
+	log.Println("Configs->Cookie config = ", instance.CookieConfig)
 
 	// конфиг бд юзеров (монго)
-	err = config_reader.ReadConfigFile(configsDir, "db_user_config.json", &sc.DBUserConfig)
+	err = config_reader.ReadConfigFile(configsDir, "db_user_config.json", &instance.DBUserConfig)
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "error while reading DB User config"))
 	}
-	log.Println("Configs->DB User config = ", sc.DBUserConfig)
+	log.Println("Configs->DB User config = ", instance.DBUserConfig)
 
 	// конфиг генерации фейковых юзеров
-	err = config_reader.ReadConfigFile(configsDir, "user_faker_config.json", &sc.FakeUsersConfig)
+	err = config_reader.ReadConfigFile(configsDir, "user_faker_config.json", &instance.FakeUsersConfig)
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "error while reading user faker config"))
 	}
-	log.Println("Configs->User faker config = ", sc.FakeUsersConfig)
+	log.Println("Configs->User faker config = ", instance.FakeUsersConfig)
 
-	// инстанс сервера
-	instance = sc
-
-	return sc
+	return nil
 }
 
-func GetInstance() *ServerConfig {
+func Get() *ServerConfig {
 	return instance
 }
