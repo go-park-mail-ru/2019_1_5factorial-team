@@ -71,7 +71,7 @@ type ServerConfig struct {
 	StaticServerConfig StaticServerConfig
 	CORSConfig         CORSConfig
 	CookieConfig       CookieConfig
-	DBUserConfig       DBUserConfig
+	DBUserConfig       []DBUserConfig
 	FakeUsersConfig    FakeUsersConfig
 
 	configPath string
@@ -81,6 +81,7 @@ type ServerConfig struct {
 func Init(configsDir string) error {
 	// ага
 	instance = &ServerConfig{}
+	instance.DBUserConfig = make([]DBUserConfig, 0, 1)
 
 	log.Println("Configs->logs path = ", configsDir)
 
