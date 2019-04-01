@@ -2,16 +2,22 @@ package user
 
 import (
 	"fmt"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/manveru/faker"
 	"gopkg.in/mgo.v2/bson"
 	"math/rand"
 )
 
-func GenerateUsers() []User {
+// структура конфига генератора фейковых юзеров
+type FakeUsersConfig struct {
+	UsersCount int    `json:"users_count"`
+	Lang       string `json:"lang"`
+	MaxScore   int    `json:"max_score"`
+}
+
+func GenerateUsers(config FakeUsersConfig) []User {
 	fmt.Println("---=== GENERATE FAKE USERS IN PROGRESS ===---")
-	u := make([]User, 0, config.Get().FakeUsersConfig.UsersCount)
-	fake, _ := faker.New(config.Get().FakeUsersConfig.Lang)
+	u := make([]User, 0, config.UsersCount)
+	fake, _ := faker.New(config.Lang)
 	fake.Rand = rand.New(rand.NewSource(42))
 
 	// наш самый любимый юзер, с истоков нашего проекта
@@ -25,7 +31,7 @@ func GenerateUsers() []User {
 		AvatarLink:   "",
 	})
 
-	for i := 0; i < config.Get().FakeUsersConfig.UsersCount; i++ {
+	for i := 0; i < config.UsersCount; i++ {
 		nick := fake.FirstName()
 		hash, _ := GetPasswordHash(nick)
 
@@ -34,7 +40,7 @@ func GenerateUsers() []User {
 			Email:        fake.Email(),
 			Nickname:     nick,
 			HashPassword: hash,
-			Score:        rand.Intn(config.Get().FakeUsersConfig.MaxScore),
+			Score:        rand.Intn(config.MaxScore),
 			AvatarLink:   "",
 		})
 	}
