@@ -8,6 +8,7 @@ services:
       dockerfile: ./third-party/server/Dockerfile
     volumes:
       - "/var/www/media/factorial:/var/www/media/factorial"
+      - "/etc/5factorial:/etc/5factorial"
     ports:
       - "5051:5051"
 
