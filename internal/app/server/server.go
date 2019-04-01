@@ -1,17 +1,14 @@
 package server
 
 import (
-	"fmt"
 	_ "github.com/go-park-mail-ru/2019_1_5factorial-team/docs"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/swaggo/http-swagger"
-	"log"
 	"net/http"
 )
 
@@ -24,29 +21,6 @@ func New(port string) *MyGorgeousServer {
 	mgs.port = port
 
 	database.InitConnection()
-
-	// TODO(): говно - переделать
-	// хочу передавать в json'е имя функи для фейк генерации и здесь ее вызывать
-	// avoid cycle imports
-	for _, conn := range config.Get().DBUserConfig {
-		if conn.GenerateFakeUsers {
-			fu := user.GenerateUsers()
-
-			for i, val := range fu {
-				fmt.Println(i, "| id:", val.ID.Hex(), ", Nick:", val.Nickname, ", Password:", val.Nickname)
-
-				col, err := database.GetCollection(conn.CollectionName)
-				if err != nil {
-					log.Fatal(errors.Wrap(err, "collection empty"))
-				}
-
-				err = col.Insert(val)
-				if err != nil {
-					log.Fatal(errors.Wrap(err, "error while adding new user"))
-				}
-			}
-		}
-	}
 
 	return &mgs
 }

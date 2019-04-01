@@ -55,15 +55,8 @@ type DBUserConfig struct {
 	MongoPort         string `json:"mongo_port"`
 	DatabaseName      string `json:"database_name"`
 	CollectionName    string `json:"collection_name"`
-	GenerateFakeUsers bool   `json:"generate_fake_users"`
+	//GenerateFakeUsers bool   `json:"generate_fake_users"`
 	TruncateTable     bool   `json:"truncate_table"`
-}
-
-// структура конфига генератора фейковых юзеров
-type FakeUsersConfig struct {
-	UsersCount int    `json:"users_count"`
-	Lang       string `json:"lang"`
-	MaxScore   int    `json:"max_score"`
 }
 
 // структура сервера, собирает все вышеперечисленные структуры
@@ -72,7 +65,6 @@ type ServerConfig struct {
 	CORSConfig         CORSConfig
 	CookieConfig       CookieConfig
 	DBUserConfig       []DBUserConfig
-	FakeUsersConfig    FakeUsersConfig
 
 	configPath string
 }
@@ -115,13 +107,6 @@ func Init(configsDir string) error {
 		log.Fatal(errors.Wrap(err, "error while reading DB User config"))
 	}
 	log.Println("Configs->DB User config = ", instance.DBUserConfig)
-
-	// конфиг генерации фейковых юзеров
-	err = config_reader.ReadConfigFile(configsDir, "user_faker_config.json", &instance.FakeUsersConfig)
-	if err != nil {
-		log.Fatal(errors.Wrap(err, "error while reading user faker config"))
-	}
-	log.Println("Configs->User faker config = ", instance.FakeUsersConfig)
 
 	return nil
 }

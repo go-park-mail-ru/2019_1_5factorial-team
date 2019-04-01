@@ -25,6 +25,7 @@ func InitConnection() {
 		for _, val := range config.Get().DBUserConfig {
 			session, err = mgo.Dial("mongodb://mongo:" + val.MongoPort)
 			if err != nil {
+				session.Close()
 				log.Fatal(err)
 			}
 
@@ -34,13 +35,13 @@ func InitConnection() {
 			if n, _ := collection.Count(); n != 0 && val.TruncateTable {
 				err = collection.DropCollection()
 				if err != nil {
+					session.Close()
 					log.Fatal("db truncate: ", err, val)
 				}
 			}
 
 			collections[val.CollectionName] = collection
 		}
-
 	})
 }
 
