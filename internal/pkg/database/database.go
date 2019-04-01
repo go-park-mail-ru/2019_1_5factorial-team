@@ -23,7 +23,7 @@ func InitConnection() {
 		var err error
 
 		for _, val := range config.Get().DBUserConfig {
-			session, err = mgo.Dial("mongodb://localhost:" + val.MongoPort)
+			session, err = mgo.Dial("mongodb://mongo:" + val.MongoPort)
 			if err != nil {
 				log.Fatal(err)
 			}
