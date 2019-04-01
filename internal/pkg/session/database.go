@@ -2,6 +2,7 @@ package session
 
 import (
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/pkg/errors"
 	"sync"
 	"time"
@@ -46,11 +47,11 @@ LOOP:
 	now := time.Now()
 	tokens[token] = DatabaseToken{
 		UserId:            id,
-		CookieExpiredTime: now.Add(CookieConf.CookieTimeHours),
+		CookieExpiredTime: now.Add(config.Get().CookieConfig.CookieTimeHours.Duration),
 		//CookieIssuedTime:  now
 	}
 
-	return token, now.Add(CookieConf.CookieTimeHours), nil
+	return token, now.Add(config.Get().CookieConfig.CookieTimeHours.Duration), nil
 }
 
 func UpdateToken(token string) (DatabaseToken, error) {
@@ -60,7 +61,7 @@ func UpdateToken(token string) (DatabaseToken, error) {
 
 	// updating values in map not via ptrs
 	tmpToken := tokens[token]
-	tmpToken.CookieExpiredTime = time.Now().Add(CookieConf.CookieTimeHours)
+	tmpToken.CookieExpiredTime = time.Now().Add(config.Get().CookieConfig.CookieTimeHours.Duration)
 	tokens[token] = tmpToken
 
 	return tokens[token], nil

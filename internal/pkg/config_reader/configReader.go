@@ -6,8 +6,9 @@ import (
 	"io/ioutil"
 )
 
-func ReadConfigFile(filename string, dest interface{}) error {
-	data, err := ioutil.ReadFile("configs/" + filename)
+func ReadConfigFile(path string, filename string, dest interface{}) error {
+	//data, err := ioutil.ReadFile("configs/" + filename)
+	data, err := ioutil.ReadFile(path + filename)
 	if err != nil {
 		return errors.Wrap(err, "cant read config file:")
 	}

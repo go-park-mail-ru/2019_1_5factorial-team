@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/gorilla/mux"
@@ -48,7 +49,7 @@ func ParseRequestIntoStruct(auth bool, req *http.Request, requestStruct interfac
 }
 
 func DropUserCookie(res http.ResponseWriter, req *http.Request) (int, error) {
-	currentSession, err := req.Cookie(session.CookieConf.CookieName)
+	currentSession, err := req.Cookie(config.Get().CookieConfig.CookieName)
 	if err == http.ErrNoCookie {
 		// бесполезная проверка, так кука валидна, но по гостайлу нужна
 
@@ -94,7 +95,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	randToken, expiration, err := session.SetToken(u.Id)
+	randToken, expiration, err := session.SetToken(u.ID.Hex())
 
 	cookie := session.CreateHttpCookie(randToken, expiration)
 
@@ -102,7 +103,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	OkResponse(res, "signUp ok")
 
 	log.Println("\t", "ok response SignUp")
-	log.Println("\t ok response SignUp, user:\n\t\t\t\t\t\t\tid =", u.Id, "\n\t\t\t\t\t\t\tnickname =",
+	log.Println("\t ok response SignUp, user:\n\t\t\t\t\t\t\tid =", u.ID.Hex(), "\n\t\t\t\t\t\t\tnickname =",
 		u.Nickname, "\n\t\t\t\t\t\t\temail =", u.Email, "\n\t\t\t\t\t\t\tscore =", u.Score)
 	log.Println("\t ok set cookie", cookie)
 }
