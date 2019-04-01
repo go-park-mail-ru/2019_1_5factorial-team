@@ -25,7 +25,7 @@ func InitConnection() {
 		for _, val := range config.Get().DBUserConfig {
 			session, err = mgo.Dial("mongodb://mongo:" + val.MongoPort)
 			if err != nil {
-				session.Close()
+				//session.Close()
 				log.Fatal(err)
 			}
 

@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+var collectionName = "profile"
+
 const NoTokenFound string = "token not found"
 
 type DatabaseToken struct {
