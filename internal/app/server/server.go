@@ -25,6 +25,8 @@ func New(port string) *MyGorgeousServer {
 
 	database.InitConnection()
 
+	// TODO(): говно - переделать
+	// хочу передавать в json'е имя функи для фейк генерации и здесь ее вызывать
 	// avoid cycle imports
 	for _, conn := range config.Get().DBUserConfig {
 		if conn.GenerateFakeUsers {
