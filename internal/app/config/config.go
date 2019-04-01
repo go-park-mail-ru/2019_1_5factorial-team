@@ -2,14 +2,13 @@ package config
 
 import (
 	"fmt"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/config_reader"
-	"github.com/pkg/errors"
 	"log"
 	"strings"
 	"time"
-)
 
-var instance *ServerConfig
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/config_reader"
+	"github.com/pkg/errors"
+)
 
 // структура конфига статики
 type StaticServerConfig struct {
@@ -52,13 +51,14 @@ type CookieConfig struct {
 
 // структура конфига базы юзеров
 type DBUserConfig struct {
-	MongoPort         string `json:"mongo_port"`
-	DatabaseName      string `json:"database_name"`
-	CollectionName    string `json:"collection_name"`
+	MongoPort      string `json:"mongo_port"`
+	DatabaseName   string `json:"database_name"`
+	CollectionName string `json:"collection_name"`
 	//GenerateFakeUsers bool   `json:"generate_fake_users"`
-	TruncateTable     bool   `json:"truncate_table"`
+	TruncateTable bool `json:"truncate_table"`
 }
 
+// TODO(): есть смысл объединить в 1 файл конфига
 // структура сервера, собирает все вышеперечисленные структуры
 type ServerConfig struct {
 	StaticServerConfig StaticServerConfig
@@ -69,44 +69,45 @@ type ServerConfig struct {
 	configPath string
 }
 
+var instance = &ServerConfig{}
+
+// откуда читать, куда заносить
+type valueAndPath struct {
+	from string
+	to   interface{}
+}
+
+var configs = []valueAndPath{
+	{
+		from: "static_server_config.json",
+		to:   &instance.StaticServerConfig,
+	},
+	{
+		from: "cors_config.json",
+		to:   &instance.CORSConfig,
+	},
+	{
+		from: "cookie_config.json",
+		to:   &instance.CookieConfig,
+	},
+	{
+		from: "db_user_config.json",
+		to: &instance.DBUserConfig,
+	},
+}
+
 // считывание всех конфигов по пути `configsDir`
 func Init(configsDir string) error {
-	// ага
-	instance = &ServerConfig{}
-	instance.DBUserConfig = make([]DBUserConfig, 0, 1)
-
 	log.Println("Configs->logs path = ", configsDir)
 
-	// конфиг статик сервера
-	err := config_reader.ReadConfigFile(configsDir, "static_server_config.json", &instance.StaticServerConfig)
-	if err != nil {
-		return errors.Wrap(err, "error while reading static_server_config config")
+	for i, val := range configs {
+		err := config_reader.ReadConfigFile(configsDir, val.from, val.to)
+		if err != nil {
+			return errors.Wrap(err, "error while reading config")
+		}
+
+		log.Println("Configs->", i, "config = ", val.to)
 	}
-	instance.StaticServerConfig.MaxUploadSize = instance.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
-
-	log.Println("Configs->Static server config = ", instance.StaticServerConfig)
-
-	// конфиг корса
-	err = config_reader.ReadConfigFile(configsDir, "cors_config.json", &instance.CORSConfig)
-	if err != nil {
-		return errors.Wrap(err, "error while reading CORS config")
-	}
-
-	log.Println("Configs->CORS config = ", instance.CORSConfig)
-
-	// конфиг кук
-	err = config_reader.ReadConfigFile(configsDir, "cookie_config.json", &instance.CookieConfig)
-	if err != nil {
-		return errors.Wrap(err, "error while reading Cookie config")
-	}
-	log.Println("Configs->Cookie config = ", instance.CookieConfig)
-
-	// конфиг бд юзеров (монго)
-	err = config_reader.ReadConfigFile(configsDir, "db_user_config.json", &instance.DBUserConfig)
-	if err != nil {
-		log.Fatal(errors.Wrap(err, "error while reading DB User config"))
-	}
-	log.Println("Configs->DB User config = ", instance.DBUserConfig)
 
 	return nil
 }
