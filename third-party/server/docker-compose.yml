@@ -1,0 +1,13 @@
+version: '3'
+services:
+  server-go:
+    container_name: 5factorial-back
+    #    restart: always
+    build:
+      context: ../../
+      dockerfile: ./third-party/server/Dockerfile
+    volumes:
+      - "/var/www/media/factorial:/var/www/media/factorial"
+      - "/etc/5factorial:/etc/5factorial"
+    ports:
+      - "5051:5051"

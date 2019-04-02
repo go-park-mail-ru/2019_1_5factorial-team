@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2"
@@ -23,6 +24,8 @@ func InitConnection() {
 		var err error
 
 		for _, val := range config.Get().DBUserConfig {
+			fmt.Println("mongodb://mongo:" + val.MongoPort)
+
 			session, err = mgo.Dial("mongodb://mongo:" + val.MongoPort)
 			if err != nil {
 				//session.Close()

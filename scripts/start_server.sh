@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-cd ..
-cd third-party
+sleep 5
+
+cd ../third-party/server
+pwd
 
 docker-compose up --build "$@"

@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var collectionName = "profile"
+var collectionName = "session"
 
 const NoTokenFound string = "token not found"
 
