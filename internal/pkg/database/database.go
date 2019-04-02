@@ -24,9 +24,10 @@ func InitConnection() {
 		var err error
 
 		for _, val := range config.Get().DBUserConfig {
-			fmt.Println("mongodb://mongo:" + val.MongoPort)
 
-			session, err = mgo.Dial("mongo:" + val.MongoPort)
+			//mongodb://mongo-user:27031,
+			fmt.Println(fmt.Sprintf("%s://%s:%s", "mongodb", val.Hostname, val.MongoPort))
+			session, err = mgo.Dial(fmt.Sprintf("%s://%s:%s", "mongodb", val.Hostname, val.MongoPort))
 			if err != nil {
 				//session.Close()
 				log.Fatal(err)

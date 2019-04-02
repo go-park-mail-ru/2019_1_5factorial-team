@@ -51,11 +51,11 @@ type CookieConfig struct {
 
 // структура конфига базы юзеров
 type DBUserConfig struct {
+	Hostname       string `json:"hostname"`
 	MongoPort      string `json:"mongo_port"`
 	DatabaseName   string `json:"database_name"`
 	CollectionName string `json:"collection_name"`
-	//GenerateFakeUsers bool   `json:"generate_fake_users"`
-	TruncateTable bool `json:"truncate_table"`
+	TruncateTable  bool   `json:"truncate_table"`
 }
 
 // TODO(): есть смысл объединить в 1 файл конфига
@@ -92,7 +92,7 @@ var configs = []valueAndPath{
 	},
 	{
 		from: "db_user_config.json",
-		to: &instance.DBUserConfig,
+		to:   &instance.DBUserConfig,
 	},
 }
 

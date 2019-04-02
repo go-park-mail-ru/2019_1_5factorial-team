@@ -4,23 +4,25 @@ services:
     container_name: 5factorial-user-mongo
     command: mongod --port 27031
     image: mongo:4.0
-    #    restart: no
-    #    environment:
-    #      MONGO_INITDB_ROOT_USERNAME: user
-    #      MONGO_INITDB_ROOT_PASSWORD: user
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: user
+#      MONGO_INITDB_ROOT_PASSWORD: user
     volumes:
       - '/Users/smet_k/Desktop/test-mongo-db/user:/data/db'  # /data/db/user:/data/db
     ports:
-      - "27051:27017" # map port to none standard port, to avoid conflicts with locally installed mongodb.
+      - "27051:27031" # map port to none standard port, to avoid conflicts with locally installed mongodb.
 
   mongo-session:
     container_name: 5factorial-session-mongo
     command: mongod --port 27032
     image: mongo:4.0
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: user
+#      MONGO_INITDB_ROOT_PASSWORD: user
     volumes:
-      - '/Users/smet_k/Desktop/test-mongo-db/session:/data/db'  # /data/db/user:/data/db
+      - '/Users/smet_k/Desktop/test-mongo-db/session:/data/db'  # /data/db/session:/data/db
     ports:
-      - "27052:27017" # map port to none standard port, to avoid conflicts with locally installed mongodb.
+      - "27052:27032" # map port to none standard port, to avoid conflicts with locally installed mongodb.
 
   server-go:
     container_name: 5factorial-back
@@ -33,3 +35,6 @@ services:
       - "/etc/5factorial:/etc/5factorial"
     ports:
       - "5051:5051"
+    depends_on:
+      - mongo-user
+      - mongo-session
