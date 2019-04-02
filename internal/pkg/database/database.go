@@ -23,7 +23,7 @@ func InitConnection() {
 		collections = make(map[string]*mgo.Collection)
 		var err error
 
-		for _, val := range config.Get().DBUserConfig {
+		for _, val := range config.Get().DBConfig {
 
 			//mongodb://mongo-user:27031,
 			fmt.Println(fmt.Sprintf("%s://%s:%s", "mongodb", val.Hostname, val.MongoPort))

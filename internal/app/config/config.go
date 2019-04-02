@@ -50,7 +50,7 @@ type CookieConfig struct {
 }
 
 // структура конфига базы юзеров
-type DBUserConfig struct {
+type DBConfig struct {
 	Hostname       string `json:"hostname"`
 	MongoPort      string `json:"mongo_port"`
 	DatabaseName   string `json:"database_name"`
@@ -64,7 +64,7 @@ type ServerConfig struct {
 	StaticServerConfig StaticServerConfig
 	CORSConfig         CORSConfig
 	CookieConfig       CookieConfig
-	DBUserConfig       []DBUserConfig
+	DBConfig           []DBConfig
 
 	configPath string
 }
@@ -91,8 +91,8 @@ var configs = []valueAndPath{
 		to:   &instance.CookieConfig,
 	},
 	{
-		from: "db_user_config.json",
-		to:   &instance.DBUserConfig,
+		from: "db_config.json",
+		to:   &instance.DBConfig,
 	},
 }
 

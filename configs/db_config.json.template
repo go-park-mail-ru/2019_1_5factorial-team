@@ -1,3 +1,16 @@
-{
-  "db_name": ""
-}
+[
+    {
+        "hostname": "mongo-user",
+        "mongo_port": "27031",
+        "database_name": "user",
+        "collection_name": "profile",
+        "truncate_table": true
+    },
+    {
+        "hostname": "mongo-session",
+        "mongo_port": "27032",
+        "database_name": "user_session",
+        "collection_name": "user_session",
+        "truncate_table": true
+    }
+]
