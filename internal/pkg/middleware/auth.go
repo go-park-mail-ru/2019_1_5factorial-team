@@ -43,6 +43,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			// и обновляем время токена
 			updatedToken, err := session.UpdateToken(cookie.Value)
 			if err != nil {
+				// TODO(): переделать на ErrResponse
 				http.Error(res, "relogin, please", http.StatusInternalServerError)
 			}
 
@@ -59,6 +60,7 @@ func CheckLoginMiddleware(next http.Handler) http.Handler {
 		log.Println(req.URL, "CheckLoginMiddleware")
 		// request has context, bcs its coming after AuthMiddleware
 		if req.Context().Value("authorized").(bool) == false {
+			// TODO(): переделать на ErrResponse
 			http.Error(res, "unauthorized, login please", http.StatusUnauthorized)
 
 			return
