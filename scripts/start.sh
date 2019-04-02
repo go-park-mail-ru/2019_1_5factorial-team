@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
 
-./start_db.sh & ./start_server.sh
+./stop.sh
+
+cd ..
+cd third-party
+
+docker-compose up --build "$@"
