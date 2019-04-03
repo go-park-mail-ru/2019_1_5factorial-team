@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"strings"
 	"time"
 
@@ -67,6 +67,7 @@ type ServerConfig struct {
 	CookieConfig       CookieConfig
 	DBConfig           []DBConfig
 
+	Logger     *log.Logger
 	configPath string
 }
 
@@ -99,15 +100,23 @@ var configs = []valueAndPath{
 
 // считывание всех конфигов по пути `configsDir`
 func Init(configsDir string) error {
-	log.Println("Configs->logs path = ", configsDir)
+	//log.Println("Configs->logs path = ", configsDir)
+	log.WithField("logs path", configsDir).Info("config.Init")
 
 	for i, val := range configs {
 		err := config_reader.ReadConfigFile(configsDir, val.from, val.to)
 		if err != nil {
+			log.WithField("err", err.Error()).Error("config.Init")
+
 			return errors.Wrap(err, "error while reading config")
 		}
 
-		log.Println("Configs->", i, "config = ", val.to)
+		//log.Println("Configs->", i, "config = ", val.to)
+		log.WithFields(log.Fields{
+			"i":         i,
+			"from file": val.from,
+			"config":    val.to,
+		}).Info("config.Init")
 	}
 
 	return nil

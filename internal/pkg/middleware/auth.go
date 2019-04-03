@@ -4,14 +4,18 @@ import (
 	"context"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 )
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-		log.Println(req.URL, "AuthMiddleware")
+		//log.Println(req.URL, "AuthMiddleware")
+		log.WithFields(log.Fields{
+			"url":    req.URL,
+			"method": req.Method,
+		}).Info("AuthMiddleware")
 
 		ctx := req.Context()
 		var userId string = ""
@@ -26,7 +30,9 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		cookie, err := req.Cookie(config.Get().CookieConfig.CookieName)
 		if err != nil {
-			log.Println("no cookie found, user unauthorized")
+			//log.Println("no cookie found, user unauthorized")
+			log.WithField("cookie", cookie).Warn("no cookie found, user unauthorized")
+
 			return
 		}
 
@@ -57,12 +63,18 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 func CheckLoginMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-		log.Println(req.URL, "CheckLoginMiddleware")
+		//log.Println(req.URL, "CheckLoginMiddleware")
+		log.WithFields(log.Fields{
+			"url":    req.URL,
+			"method": req.Method,
+		}).Info("CheckLoginMiddleware")
+
 		// request has context, bcs its coming after AuthMiddleware
 		if req.Context().Value("authorized").(bool) == false {
 			// TODO(): переделать на ErrResponse
 			http.Error(res, "unauthorized, login please", http.StatusUnauthorized)
 
+			log.WithField("authorized", req.Context().Value("authorized").(bool)).Warn("user unauthorized")
 			return
 		}
 		next.ServeHTTP(res, req)

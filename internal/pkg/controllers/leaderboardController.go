@@ -35,7 +35,6 @@ func GetLeaderboard(res http.ResponseWriter, req *http.Request) {
 		"host":   req.Host,
 		"func":   "GetLeaderboard",
 	})
-
 	ctxLogger.Info("============================================")
 
 	query := req.URL.Query()

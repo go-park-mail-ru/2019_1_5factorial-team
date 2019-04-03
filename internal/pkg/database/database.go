@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/mgo.v2"
-	"log"
 	"sync"
 )
 
@@ -26,11 +26,14 @@ func InitConnection() {
 		for _, val := range config.Get().DBConfig {
 
 			//mongodb://mongo-user:27031,
-			fmt.Println(fmt.Sprintf("%s://%s:%s", "mongodb", val.Hostname, val.MongoPort))
+			log.WithFields(log.Fields{
+				"dial": fmt.Sprintf("%s://%s:%s", "mongodb", val.Hostname, val.MongoPort),
+			}).Info("database.InitConnection")
+
 			session, err = mgo.Dial(fmt.Sprintf("%s://%s:%s", "mongodb", val.Hostname, val.MongoPort))
 			if err != nil {
 				//session.Close()
-				log.Fatal(err)
+				log.Fatal(errors.Wrap(err, "cant connect to db"))
 			}
 
 			collection := session.DB(val.DatabaseName).C(val.CollectionName)
