@@ -40,6 +40,7 @@ func (d Duration) MarshalJSON() (b []byte, err error) {
 	return []byte(fmt.Sprintf(`"%s"`, d.String())), nil
 }
 
+// TODO(): вырезать CookieDuration здесь и в конфиге
 // структура конфига кук
 type CookieConfig struct {
 	CookieName      string   `json:"cookie_name"`
