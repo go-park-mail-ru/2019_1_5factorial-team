@@ -8,7 +8,7 @@ services:
 #      MONGO_INITDB_ROOT_USERNAME: user
 #      MONGO_INITDB_ROOT_PASSWORD: user
     volumes:
-      - '/Users/smet_k/Desktop/test-mongo-db/user:/data/db'  # /data/db/user:/data/db
+      - '/data/db/user:/data/db'  # /Users/smet_k/Desktop/test-mongo-db/user:/data/db
     ports:
       - "27051:27031" # map port to none standard port, to avoid conflicts with locally installed mongodb.
 
@@ -20,7 +20,7 @@ services:
 #      MONGO_INITDB_ROOT_USERNAME: user
 #      MONGO_INITDB_ROOT_PASSWORD: user
     volumes:
-      - '/Users/smet_k/Desktop/test-mongo-db/session:/data/db'  # /data/db/session:/data/db
+      - '/data/db/session:/data/db'  # /Users/smet_k/Desktop/test-mongo-db/session:/data/db
     ports:
       - "27052:27032" # map port to none standard port, to avoid conflicts with locally installed mongodb.
 
