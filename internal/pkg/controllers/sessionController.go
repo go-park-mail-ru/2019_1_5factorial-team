@@ -5,7 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/pkg/errors"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -30,14 +30,20 @@ type signInRequest struct {
 // @Failure 500 {object} controllers.errorResponse
 // @Router /session [post]
 func SignIn(res http.ResponseWriter, req *http.Request) {
-	log.Println("================", req.URL, req.Method, "SignIn", "================")
+	ctxLogger := log.WithFields(log.Fields{
+		"req":    req.URL,
+		"method": req.Method,
+		"host":   req.Host,
+		"func":   "SignIn",
+	})
+	ctxLogger.Info("============================================")
 
 	data := signInRequest{}
 	status, err := ParseRequestIntoStruct(true, req, &data)
 	if err != nil {
 		ErrResponse(res, status, err.Error())
 
-		log.Println("\t", errors.Wrap(err, "ParseRequestIntoStruct error"))
+		ctxLogger.Error(errors.Wrap(err, "ParseRequestIntoStruct error"))
 		return
 	}
 
@@ -45,7 +51,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, "Wrong password or login")
 
-		log.Println("\t", errors.Wrap(err, "Wrong password or login"))
+		ctxLogger.Error(errors.Wrap(err, "Wrong password or login"))
 		return
 	}
 
@@ -55,9 +61,11 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 
 	http.SetCookie(res, cookie)
 	OkResponse(res, "ok auth")
-	log.Println("\t ok response SignIn, user:\n\t\t\t\t\t\t\tid =", u.ID.Hex(), "\n\t\t\t\t\t\t\tnickname =",
-		u.Nickname, "\n\t\t\t\t\t\t\temail =", u.Email, "\n\t\t\t\t\t\t\tscore =", u.Score)
-	log.Println("\t ok set cookie", cookie)
+
+	ctxLogger.Infof("OK response\n\t--id = %s,\n\t--nickname = %s,\n\t--email = %s,\n\t--score = %d",
+		u.ID.Hex(), u.Nickname, u.Email, u.Score)
+	ctxLogger.Infof("OK set cookie\n\t--token = %s,\n\t--path = %s,\n\t--expires = %s,\n\t--httpOnly = %t",
+		cookie.Value, cookie.Path, cookie.Expires, cookie.HttpOnly)
 }
 
 // SignOut godoc
