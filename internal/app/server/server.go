@@ -11,7 +11,6 @@ import (
 	"github.com/rossmcdonald/telegram_hook"
 	log "github.com/sirupsen/logrus"
 	"github.com/swaggo/http-swagger"
-	"golang.org/x/net/proxy"
 	"net/http"
 	"os"
 	"time"
@@ -30,16 +29,24 @@ func New(port string) *MyGorgeousServer {
 		TimestampFormat: "2006-01-02 15:04:05",
 	})
 
-	httpTransport := &http.Transport{}
-	httpClient := &http.Client{Transport: httpTransport}
-	dialer, err := proxy.SOCKS5("tcp", "127.0.0.1:9050", nil, proxy.Direct)
-	httpTransport.Dial = dialer.Dial
+	//httpTransport := &http.Transport{}
+	//httpClient := &http.Client{Transport: httpTransport}
+	//dialer, err := proxy.SOCKS5("tcp", "127.0.0.1:9050", nil, proxy.Direct)
+	//httpTransport.Dial = dialer.Dial
+	//
+	//hook, err := telegram_hook.NewTelegramHookWithClient(
+	//	"5factorial",
+	//	"871491595:AAEpe6PSwbbV96dpeUSiugpkhQs-jCd0hCg",
+	//	"149677494",
+	//	httpClient,
+	//	telegram_hook.WithAsync(true),
+	//	telegram_hook.WithTimeout(30 * time.Second),
+	//)
 
-	hook, err := telegram_hook.NewTelegramHookWithClient(
+	hook, err := telegram_hook.NewTelegramHook(
 		"5factorial",
 		"871491595:AAEpe6PSwbbV96dpeUSiugpkhQs-jCd0hCg",
 		"149677494",
-		httpClient,
 		telegram_hook.WithAsync(true),
 		telegram_hook.WithTimeout(30 * time.Second),
 	)
