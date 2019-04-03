@@ -6,4 +6,5 @@ $mongoClient << EOF
 use user_session
 db.createCollection("user_session")
 db.user_session.createIndex({"user_id": 1}, {unique: true})
+db.user_session.createIndex({"token": 1}, {unique: true})
 EOF
