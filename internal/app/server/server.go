@@ -19,7 +19,7 @@ type MyGorgeousServer struct {
 	port string
 }
 
-func New(port string) *MyGorgeousServer {
+func InitLogs()  {
 	// настраиваем logrus (по всему проекту)
 	log.SetOutput(os.Stdout)
 	log.SetFormatter(&log.TextFormatter{
@@ -28,18 +28,24 @@ func New(port string) *MyGorgeousServer {
 		TimestampFormat: config.Get().LogrusConfig.TimestampFormat,
 	})
 
-	// тележка <3
-	hook, err := telegram_hook.NewTelegramHook(
-		config.Get().LogrusConfig.AppName,
-		config.Get().LogrusConfig.AuthToken,
-		config.Get().LogrusConfig.TargetID,
-		telegram_hook.WithAsync(config.Get().LogrusConfig.Async),
-		telegram_hook.WithTimeout(config.Get().LogrusConfig.Timeout.Duration),
-	)
-	if err != nil {
-		log.Fatalf("Encountered error when creating Telegram hook: %s", err)
+	if config.Get().LogrusConfig.AppName != "" {
+		// тележка <3
+		hook, err := telegram_hook.NewTelegramHook(
+			config.Get().LogrusConfig.AppName,
+			config.Get().LogrusConfig.AuthToken,
+			config.Get().LogrusConfig.TargetID,
+			telegram_hook.WithAsync(config.Get().LogrusConfig.Async),
+			telegram_hook.WithTimeout(config.Get().LogrusConfig.Timeout.Duration),
+		)
+		if err != nil {
+			log.Fatalf("Encountered error when creating Telegram hook: %s", err)
+		}
+		log.AddHook(hook)
 	}
-	log.AddHook(hook)
+}
+
+func New(port string) *MyGorgeousServer {
+	InitLogs()
 
 	mgs := MyGorgeousServer{}
 	mgs.port = port
