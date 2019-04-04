@@ -1,5 +1,6 @@
 version: '3'
 services:
+#  TODO(): авторизация при подключении к бд
   mongo-user:
     container_name: 5factorial-user-mongo
     command: mongod --port 27031

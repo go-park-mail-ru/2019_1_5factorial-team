@@ -13,7 +13,6 @@ import (
 	"github.com/swaggo/http-swagger"
 	"net/http"
 	"os"
-	"time"
 )
 
 type MyGorgeousServer struct {
@@ -34,8 +33,8 @@ func New(port string) *MyGorgeousServer {
 		config.Get().LogrusConfig.AppName,
 		config.Get().LogrusConfig.AuthToken,
 		config.Get().LogrusConfig.TargetID,
-		telegram_hook.WithAsync(true),
-		telegram_hook.WithTimeout(30*time.Second),
+		telegram_hook.WithAsync(config.Get().LogrusConfig.Async),
+		telegram_hook.WithTimeout(config.Get().LogrusConfig.Timeout.Duration),
 	)
 	if err != nil {
 		log.Fatalf("Encountered error when creating Telegram hook: %s", err)
