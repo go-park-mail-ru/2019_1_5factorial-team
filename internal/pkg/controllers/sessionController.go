@@ -78,14 +78,22 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 // @Failure 401 {object} controllers.errorResponse
 // @Router /session [delete]
 func SignOut(res http.ResponseWriter, req *http.Request) {
-	log.Println("================", req.URL, req.Method, "SignOut", "================")
+	ctxLogger := log.WithFields(log.Fields{
+		"req":    req.URL,
+		"method": req.Method,
+		"host":   req.Host,
+		"func":   "SignOut",
+		"userID": req.Context().Value("userID"),
+		"auth":   req.Context().Value("authorized"),
+	})
+	ctxLogger.Info("===========================================")
 
 	currentSession, err := req.Cookie(config.Get().CookieConfig.CookieName)
 	if err == http.ErrNoCookie {
 		// бесполезная проверка, так кука валидна, но по гостайлу нужна
 		ErrResponse(res, http.StatusUnauthorized, "not authorized")
 
-		log.Println("\t", errors.Wrap(err, "not authorized"))
+		ctxLogger.Error(errors.Wrap(err, "not authorized"))
 		return
 	}
 
@@ -96,7 +104,7 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 	} else if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, err.Error())
 
-		log.Println("\t", errors.Wrap(err, "delete token error"))
+		ctxLogger.Error(errors.Wrap(err, "delete token error"))
 		return
 	}
 
@@ -106,12 +114,13 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		ErrResponse(res, status, err.Error())
 
-		log.Println("\t", errors.Wrap(err, "cannot drop user cookie"))
+		ctxLogger.Error(errors.Wrap(err, "cannot drop user cookie"))
 		return
 	}
 
 	OkResponse(res, "ok logout")
-	log.Println("\t", "ok response SignOut, cookie set expired, session deleted")
+
+	ctxLogger.Info("OK response, cookie set expired, session deleted")
 }
 
 // 'Content-Type': 'application/json; charset=utf-8'
@@ -136,7 +145,15 @@ type UserInfoResponse struct {
 // @Failure 401 {object} controllers.errorResponse
 // @Router /api/user [get]
 func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
-	log.Println("================", req.URL, req.Method, "GetUserFromSession", "================")
+	ctxLogger := log.WithFields(log.Fields{
+		"req":    req.URL,
+		"method": req.Method,
+		"host":   req.Host,
+		"func":   "GetUserFromSession",
+		"userID": req.Context().Value("userID"),
+		"auth":   req.Context().Value("authorized"),
+	})
+	//log.Println("================", req.URL, req.Method, "GetUserFromSession", "================")
 
 	id := req.Context().Value("userID").(string)
 	u, err := user.GetUserById(id)
@@ -146,13 +163,15 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			ErrResponse(res, status, err.Error())
 
-			log.Println("\t", errors.Wrap(err, "cannot drop user cookie"))
+			ctxLogger.Error(errors.Wrap(err, "cannot drop user cookie"))
+			//log.Println("\t", errors.Wrap(err, "cannot drop user cookie"))
 			return
 		}
 
 		ErrResponse(res, http.StatusBadRequest, "error")
 
-		log.Println("\t", errors.Wrap(err, "user have invalid id"))
+		ctxLogger.Error(errors.Wrap(err, "user have invalid id"))
+		//log.Println("\t", errors.Wrap(err, "user have invalid id"))
 		return
 	}
 
@@ -163,12 +182,14 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 		AvatarLink: u.AvatarLink,
 	})
 
-	log.Println("\t", "ok response GetUserFromSession", UserInfoResponse{
-		Email:      u.Email,
-		Nickname:   u.Nickname,
-		Score:      u.Score,
-		AvatarLink: u.AvatarLink,
-	})
+	//log.Println("\t", "ok response GetUserFromSession", UserInfoResponse{
+	//	Email:      u.Email,
+	//	Nickname:   u.Nickname,
+	//	Score:      u.Score,
+	//	AvatarLink: u.AvatarLink,
+	//})
+	ctxLogger.Infof("OK response\n\t--email = %v,\n\t--nickname = %v,\n\t--score = %v,\n\t--avatarLink = %v",
+		u.Email, u.Nickname, u.Score, u.AvatarLink)
 }
 
 // IsSessionValid godoc
@@ -179,8 +200,17 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 // @Success 200 {string} ok message
 // @Router /api/session [get]
 func IsSessionValid(res http.ResponseWriter, req *http.Request) {
-	log.Println("================", req.URL, req.Method, "IsSessionValid", "================")
+	ctxLogger := log.WithFields(log.Fields{
+		"req":    req.URL,
+		"method": req.Method,
+		"host":   req.Host,
+		"func":   "IsSessionValid",
+		"userID": req.Context().Value("userID"),
+		"auth":   req.Context().Value("authorized"),
+	})
+	//log.Println("================", req.URL, req.Method, "IsSessionValid", "================")
 
 	OkResponse(res, "session is valid")
-	log.Println("\t", "ok response IsSessionValid, session is valid")
+	//log.Println("\t", "ok response IsSessionValid, session is valid")
+	ctxLogger.Info("session is valid")
 }
