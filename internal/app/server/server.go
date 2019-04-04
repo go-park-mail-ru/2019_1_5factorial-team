@@ -24,31 +24,18 @@ func New(port string) *MyGorgeousServer {
 	// настраиваем logrus (по всему проекту)
 	log.SetOutput(os.Stdout)
 	log.SetFormatter(&log.TextFormatter{
-		DisableColors:   false,
-		FullTimestamp:   true,
-		TimestampFormat: "2006-01-02 15:04:05",
+		DisableColors:   config.Get().LogrusConfig.DisableColors,
+		FullTimestamp:   config.Get().LogrusConfig.FullTimestamp,
+		TimestampFormat: config.Get().LogrusConfig.TimestampFormat,
 	})
 
-	//httpTransport := &http.Transport{}
-	//httpClient := &http.Client{Transport: httpTransport}
-	//dialer, err := proxy.SOCKS5("tcp", "127.0.0.1:9050", nil, proxy.Direct)
-	//httpTransport.Dial = dialer.Dial
-	//
-	//hook, err := telegram_hook.NewTelegramHookWithClient(
-	//	"5factorial",
-	//	"871491595:AAEpe6PSwbbV96dpeUSiugpkhQs-jCd0hCg",
-	//	"149677494",
-	//	httpClient,
-	//	telegram_hook.WithAsync(true),
-	//	telegram_hook.WithTimeout(30 * time.Second),
-	//)
-
+	// тележка <3
 	hook, err := telegram_hook.NewTelegramHook(
-		"5factorial",
-		"871491595:AAEpe6PSwbbV96dpeUSiugpkhQs-jCd0hCg",
-		"149677494",
+		config.Get().LogrusConfig.AppName,
+		config.Get().LogrusConfig.AuthToken,
+		config.Get().LogrusConfig.TargetID,
 		telegram_hook.WithAsync(true),
-		telegram_hook.WithTimeout(30 * time.Second),
+		telegram_hook.WithTimeout(30*time.Second),
 	)
 	if err != nil {
 		log.Fatalf("Encountered error when creating Telegram hook: %s", err)

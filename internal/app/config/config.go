@@ -59,6 +59,20 @@ type DBConfig struct {
 	TruncateTable  bool   `json:"truncate_table"`
 }
 
+// структура конфига хука под тележку и основного лога
+type LogrusConfig struct {
+	// тг
+	AppName   string   `json:"app_name"`
+	AuthToken string   `json:"auth_token"`
+	TargetID  string   `json:"target_id"`
+	Async     bool     `json:"async"`
+	Timeout   Duration `json:"timeout"`
+	// логрус
+	DisableColors   bool   `json:"disable_colors"`
+	FullTimestamp   bool   `json:"full_timestamp"`
+	TimestampFormat string `json:"timestamp_format"`
+}
+
 // TODO(): есть смысл объединить в 1 файл конфига
 // структура сервера, собирает все вышеперечисленные структуры
 type ServerConfig struct {
@@ -66,8 +80,8 @@ type ServerConfig struct {
 	CORSConfig         CORSConfig
 	CookieConfig       CookieConfig
 	DBConfig           []DBConfig
+	LogrusConfig       LogrusConfig
 
-	Logger     *log.Logger
 	configPath string
 }
 
@@ -95,6 +109,10 @@ var configs = []valueAndPath{
 	{
 		from: "db_config.json",
 		to:   &instance.DBConfig,
+	},
+	{
+		from: "logrus_config.json",
+		to:   &instance.LogrusConfig,
 	},
 }
 
