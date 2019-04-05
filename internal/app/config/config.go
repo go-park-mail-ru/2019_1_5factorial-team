@@ -134,6 +134,8 @@ func Init(configsDir string) error {
 			Infof("i = %d, from file = %s, config = %v", i, val.from, val.to)
 	}
 
+	instance.StaticServerConfig.MaxUploadSize = instance.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
+
 	return nil
 }
 
