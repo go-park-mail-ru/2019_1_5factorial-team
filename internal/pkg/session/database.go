@@ -122,7 +122,7 @@ func DeleteToken(token string) error {
 
 	err = col.Find(bson.M{"token": token}).One(&dt)
 	if err != nil {
-		return errors.Wrap(err, "token not found")
+		return errors.Wrap(err, NoTokenFound)
 	}
 
 	err = col.RemoveId(dt.ID)

@@ -119,7 +119,7 @@ var configs = []valueAndPath{
 // считывание всех конфигов по пути `configsDir`
 func Init(configsDir string) error {
 	//log.Println("Configs->logs path = ", configsDir)
-	log.WithField("logs path", configsDir).Info("config.Init")
+	log.WithField("func", "config.Init").Info("logs path = ", configsDir)
 
 	for i, val := range configs {
 		err := config_reader.ReadConfigFile(configsDir, val.from, val.to)
@@ -130,11 +130,8 @@ func Init(configsDir string) error {
 		}
 
 		//log.Println("Configs->", i, "config = ", val.to)
-		log.WithFields(log.Fields{
-			"i":         i,
-			"from file": val.from,
-			"config":    val.to,
-		}).Info("config.Init")
+		log.WithField("func", "config.Init").
+			Infof("i = %d, from file = %s, config = %v", i, val.from, val.to)
 	}
 
 	return nil
