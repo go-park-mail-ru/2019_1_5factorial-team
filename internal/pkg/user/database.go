@@ -2,28 +2,20 @@ package user
 
 import (
 	"fmt"
-	"github.com/manveru/faker"
-	"github.com/pkg/errors"
 	"math/rand"
 	"sort"
 	"sync"
 	"sync/atomic"
+
+	"github.com/manveru/faker"
+	"github.com/pkg/errors"
 )
 
 const DefaultAvatarLink = "../../../img/default.jpg"
 
-type DatabaseUser struct {
-	Id           int64
-	Email        string
-	Nickname     string
-	HashPassword string
-	Score        int
-	AvatarLink   string
-}
-
 var once sync.Once
 var mu *sync.Mutex
-var users map[string]DatabaseUser
+var users map[string]User
 var currentId int64
 
 func init() {
@@ -33,10 +25,10 @@ func init() {
 		fake, _ := faker.New("en")
 		fake.Rand = rand.New(rand.NewSource(42))
 
-		users = make(map[string]DatabaseUser)
+		users = make(map[string]User)
 
 		hash, _ := getPasswordHash("password")
-		users["kekkekkek"] = DatabaseUser{
+		users["kekkekkek"] = User{
 			Id:           0,
 			Email:        "kek.k.ek",
 			Nickname:     "kekkekkek",
@@ -56,7 +48,7 @@ func init() {
 
 			fmt.Println("id:", id, ", Nick:", nick, ", Password:", nick)
 
-			users[nick] = DatabaseUser{
+			users[nick] = User{
 				Id:           id,
 				Email:        fake.Email(),
 				Nickname:     nick,
@@ -70,7 +62,7 @@ func init() {
 	})
 }
 
-func getUsers() map[string]DatabaseUser {
+func getUsers() map[string]User {
 	mu.Lock()
 	fmt.Println(users)
 	mu.Unlock()
@@ -78,18 +70,18 @@ func getUsers() map[string]DatabaseUser {
 	return users
 }
 
-func getUser(login string) (DatabaseUser, error) {
+func GetUser(login string) (User, error) {
 	defer mu.Unlock()
 
 	mu.Lock()
 	if _, ok := users[login]; !ok {
-		return DatabaseUser{}, errors.New("Invalid login")
+		return User{}, errors.New("Invalid login")
 	} else {
 		return users[login], nil
 	}
 }
 
-func findUserById(id int64) (DatabaseUser, error) {
+func findUserById(id int64) (User, error) {
 	defer mu.Unlock()
 
 	mu.Lock()
@@ -99,10 +91,10 @@ func findUserById(id int64) (DatabaseUser, error) {
 		}
 	}
 
-	return DatabaseUser{}, errors.New("user with this id not found")
+	return User{}, errors.New("user with this id not found")
 }
 
-func addUser(in DatabaseUser) error {
+func addUser(in User) error {
 	defer mu.Unlock()
 	mu.Lock()
 
@@ -132,7 +124,7 @@ func getNextId() int64 {
 	return currentId
 }
 
-func updateDBUser(user DatabaseUser) error {
+func updateDBUser(user User) error {
 	defer mu.Unlock()
 
 	mu.Lock()
@@ -144,15 +136,15 @@ func updateDBUser(user DatabaseUser) error {
 	return nil
 }
 
-type ByNameScore []DatabaseUser
+type ByNameScore []User
 
 func (a ByNameScore) Len() int           { return len(a) }
 func (a ByNameScore) Less(i, j int) bool { return a[i].Score < a[j].Score }
 func (a ByNameScore) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
-func getScores() []DatabaseUser {
+func getScores() []User {
 	mu.Lock()
-	result := make([]DatabaseUser, 0, 1)
+	result := make([]User, 0, 1)
 	for _, val := range users {
 		result = append(result, val)
 	}

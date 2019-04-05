@@ -3,15 +3,16 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
-	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
+	"github.com/gorilla/mux"
+	"github.com/pkg/errors"
 )
 
 // 'Content-Type': 'application/json; charset=utf-8'

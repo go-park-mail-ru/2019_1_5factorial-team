@@ -22,7 +22,7 @@ func CreateUser(nickname string, email string, password string) (User, error) {
 		return User{}, errors.Wrap(err, "Hasher password error")
 	}
 
-	err = addUser(DatabaseUser{
+	err = addUser(User{
 		Id:           rid,
 		Email:        email,
 		Nickname:     nickname,
@@ -48,7 +48,7 @@ func CreateUser(nickname string, email string, password string) (User, error) {
 }
 
 func IdentifyUser(login string, password string) (User, error) {
-	u, err := getUser(login)
+	u, err := GetUser(login)
 	if err != nil {
 		return User{}, errors.Wrap(err, "Can't find user")
 	}
