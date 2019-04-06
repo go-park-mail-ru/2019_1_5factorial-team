@@ -1,15 +1,13 @@
 package server
 
 import (
-	_ "github.com/go-park-mail-ru/2019_1_5factorial-team/docs"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 
 	"net/http"
-
-	"github.com/swaggo/http-swagger"
+	// "github.com/swaggo/http-swagger"
 )
 
 func Run(port string) error {
@@ -24,9 +22,9 @@ func Run(port string) error {
 	router.HandleFunc("/hello", controllers.HelloWorld).Methods("GET")
 	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST", "OPTIONS")
 
-	router.HandleFunc("/api/login_google", controllers.LoginFromGoogle).Methods("POST", "OPTIONS")
-	router.HandleFunc("/api/login_vk", controllers.LoginFromVK).Methods("POST", "OPTIONS")
-	router.HandleFunc("/api/login_yandex", controllers.LoginFromYandex).Methods("POST", "OPTIONS")
+	router.HandleFunc("/api/session/login_google", controllers.LoginFromGoogle).Methods("POST", "OPTIONS")
+	router.HandleFunc("/api/session/login_vk", controllers.LoginFromVK).Methods("POST", "OPTIONS")
+	router.HandleFunc("/api/session/login_yandex", controllers.LoginFromYandex).Methods("POST", "OPTIONS")
 
 	router.HandleFunc("/api/user/{id:[0-9]+}", controllers.GetUser).Methods("GET", "OPTIONS")
 	router.HandleFunc("/api/user/score", controllers.GetLeaderboard).Methods("GET", "OPTIONS")

@@ -5,5 +5,5 @@ import (
 )
 
 func LoginFromVK(res http.ResponseWriter, req *http.Request) {
-	GetUserInfo(res, req, "vk")
+	OauthUser(res, req, "vk")
 }

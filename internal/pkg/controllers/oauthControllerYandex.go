@@ -5,5 +5,5 @@ import (
 )
 
 func LoginFromYandex(res http.ResponseWriter, req *http.Request) {
-	GetUserInfo(res, req, "yandex")
+	OauthUser(res, req, "yandex")
 }

@@ -5,5 +5,5 @@ import (
 )
 
 func LoginFromGoogle(res http.ResponseWriter, req *http.Request) {
-	GetUserInfo(res, req, "google")
+	OauthUser(res, req, "google")
 }
