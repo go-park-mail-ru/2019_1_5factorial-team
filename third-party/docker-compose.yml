@@ -10,9 +10,8 @@ services:
 #      MONGO_INITDB_ROOT_PASSWORD: user
     volumes:
       - '/data/db/user:/data/db'  # /Users/smet_k/Desktop/test-mongo-db/user:/data/db
-#      - "/var/lib/docker/containers"
     ports:
-      - "27051:27031" # map port to none standard port, to avoid conflicts with locally installed mongodb.
+      - '27051:27031' # map port to none standard port, to avoid conflicts with locally installed mongodb.
 
   mongo-session:
     container_name: 5factorial-session-mongo
@@ -23,9 +22,8 @@ services:
 #      MONGO_INITDB_ROOT_PASSWORD: user
     volumes:
       - '/data/db/session:/data/db'  # /Users/smet_k/Desktop/test-mongo-db/session:/data/db
-      - "/Users/smet_k/Desktop/test:/var/lib/docker/containers"
     ports:
-      - "27052:27032" # map port to none standard port, to avoid conflicts with locally installed mongodb.
+      - '27052:27032' # map port to none standard port, to avoid conflicts with locally installed mongodb.
 
   server-go:
     container_name: 5factorial-back
@@ -34,16 +32,15 @@ services:
       context: ../.
       dockerfile: ./third-party/server/Dockerfile
     volumes:
-      - "/var/www/media/factorial:/var/www/media/factorial"
-      - "/etc/5factorial:/etc/5factorial"
-#      - "/Users/smet_k/Desktop/test:/var/lib/docker/containers"
+      - '/var/www/media/factorial:/var/www/media/factorial'
+      - '/etc/5factorial:/etc/5factorial'
     ports:
-      - "5051:5051"
+      - '5051:5051'
     depends_on:
       - mongo-user
       - mongo-session
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1k"
-        max-file: "3"
+#    logging:
+#      driver: "json-file"
+#      options:
+#        max-size: "1k"
+#        max-file: "3"
