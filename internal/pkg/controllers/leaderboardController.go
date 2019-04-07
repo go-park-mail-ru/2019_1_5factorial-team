@@ -30,10 +30,11 @@ type GetLeaderboardResponse struct {
 // @Router /user/score [get]
 func GetLeaderboard(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := log.WithFields(log.Fields{
-		"req":    req.URL,
-		"method": req.Method,
-		"host":   req.Host,
-		"func":   "GetLeaderboard",
+		"req":        req.URL,
+		"method":     req.Method,
+		"host":       req.Host,
+		"remoteAddr": req.RemoteAddr,
+		"func":       "GetLeaderboard",
 	})
 	ctxLogger.Info("============================================")
 

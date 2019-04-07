@@ -19,7 +19,7 @@ type MyGorgeousServer struct {
 	port string
 }
 
-func InitLogs()  {
+func InitLogs() {
 	// настраиваем logrus (по всему проекту)
 	log.SetOutput(os.Stdout)
 	log.SetFormatter(&log.TextFormatter{

@@ -31,10 +31,11 @@ type signInRequest struct {
 // @Router /session [post]
 func SignIn(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := log.WithFields(log.Fields{
-		"req":    req.URL,
-		"method": req.Method,
-		"host":   req.Host,
-		"func":   "SignIn",
+		"req":        req.URL,
+		"method":     req.Method,
+		"host":       req.Host,
+		"remoteAddr": req.RemoteAddr,
+		"func":       "SignIn",
 	})
 	ctxLogger.Info("============================================")
 
@@ -79,12 +80,13 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 // @Router /session [delete]
 func SignOut(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := log.WithFields(log.Fields{
-		"req":    req.URL,
-		"method": req.Method,
-		"host":   req.Host,
-		"func":   "SignOut",
-		"userID": req.Context().Value("userID"),
-		"auth":   req.Context().Value("authorized"),
+		"req":        req.URL,
+		"method":     req.Method,
+		"host":       req.Host,
+		"remoteAddr": req.RemoteAddr,
+		"func":       "SignOut",
+		"userID":     req.Context().Value("userID"),
+		"auth":       req.Context().Value("authorized"),
 	})
 	ctxLogger.Info("===========================================")
 
@@ -146,14 +148,15 @@ type UserInfoResponse struct {
 // @Router /api/user [get]
 func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := log.WithFields(log.Fields{
-		"req":    req.URL,
-		"method": req.Method,
-		"host":   req.Host,
-		"func":   "GetUserFromSession",
-		"userID": req.Context().Value("userID"),
-		"auth":   req.Context().Value("authorized"),
+		"req":        req.URL,
+		"method":     req.Method,
+		"host":       req.Host,
+		"remoteAddr": req.RemoteAddr,
+		"func":       "GetUserFromSession",
+		"userID":     req.Context().Value("userID"),
+		"auth":       req.Context().Value("authorized"),
 	})
-	//log.Println("================", req.URL, req.Method, "GetUserFromSession", "================")
+	ctxLogger.Info("===========================================")
 
 	id := req.Context().Value("userID").(string)
 	u, err := user.GetUserById(id)
@@ -164,14 +167,12 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 			ErrResponse(res, status, err.Error())
 
 			ctxLogger.Error(errors.Wrap(err, "cannot drop user cookie"))
-			//log.Println("\t", errors.Wrap(err, "cannot drop user cookie"))
 			return
 		}
 
 		ErrResponse(res, http.StatusBadRequest, "error")
 
 		ctxLogger.Error(errors.Wrap(err, "user have invalid id"))
-		//log.Println("\t", errors.Wrap(err, "user have invalid id"))
 		return
 	}
 
@@ -182,12 +183,6 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 		AvatarLink: u.AvatarLink,
 	})
 
-	//log.Println("\t", "ok response GetUserFromSession", UserInfoResponse{
-	//	Email:      u.Email,
-	//	Nickname:   u.Nickname,
-	//	Score:      u.Score,
-	//	AvatarLink: u.AvatarLink,
-	//})
 	ctxLogger.Infof("OK response\n\t--email = %v,\n\t--nickname = %v,\n\t--score = %v,\n\t--avatarLink = %v",
 		u.Email, u.Nickname, u.Score, u.AvatarLink)
 }
@@ -201,16 +196,16 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 // @Router /api/session [get]
 func IsSessionValid(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := log.WithFields(log.Fields{
-		"req":    req.URL,
-		"method": req.Method,
-		"host":   req.Host,
-		"func":   "IsSessionValid",
-		"userID": req.Context().Value("userID"),
-		"auth":   req.Context().Value("authorized"),
+		"req":        req.URL,
+		"method":     req.Method,
+		"host":       req.Host,
+		"remoteAddr": req.RemoteAddr,
+		"func":       "IsSessionValid",
+		"userID":     req.Context().Value("userID"),
+		"auth":       req.Context().Value("authorized"),
 	})
-	//log.Println("================", req.URL, req.Method, "IsSessionValid", "================")
+	ctxLogger.Info("===========================================")
 
 	OkResponse(res, "session is valid")
-	//log.Println("\t", "ok response IsSessionValid, session is valid")
 	ctxLogger.Info("session is valid")
 }
