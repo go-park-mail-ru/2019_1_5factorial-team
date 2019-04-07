@@ -2,46 +2,25 @@ package user
 
 import (
 	"github.com/pkg/errors"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type User struct {
-	Id           int64
-	Email        string
-	Nickname     string
-	HashPassword string
-	Score        int
-	AvatarLink   string
+	ID           bson.ObjectId `bson:"_id"`
+	Email        string        `bson:"email"`
+	Nickname     string        `bson:"nickname"`
+	HashPassword string        `bson:"hash_password"`
+	Score        int           `bson:"score"`
+	AvatarLink   string        `bson:"avatar_link"`
 }
 
 func CreateUser(nickname string, email string, password string) (User, error) {
 	// TODO(smet1): добавить валидацию на повторение ника и почты
 
-	rid := getNextId()
-	hashPassword, err := getPasswordHash(password)
-	if err != nil {
-		return User{}, errors.Wrap(err, "Hasher password error")
-	}
-
-	err = addUser(DatabaseUser{
-		Id:           rid,
-		Email:        email,
-		Nickname:     nickname,
-		HashPassword: hashPassword,
-		Score:        0,
-		AvatarLink:   DefaultAvatarLink,
-	})
+	u, err := addUser(nickname, email, password)
 	if err != nil {
 		err = errors.Wrap(err, "Cannot create user")
 		return User{}, err
-	}
-
-	u := User{
-		Id:           rid,
-		Email:        email,
-		Nickname:     nickname,
-		HashPassword: hashPassword,
-		Score:        0,
-		AvatarLink:   DefaultAvatarLink,
 	}
 
 	return u, nil
@@ -58,29 +37,19 @@ func IdentifyUser(login string, password string) (User, error) {
 		return User{}, errors.Wrap(err, "Wrong password")
 	}
 
-	return User{
-		Id:       u.Id,
-		Email:    u.Email,
-		Nickname: u.Nickname,
-	}, nil
+	return u, nil
 }
 
-func GetUserById(id int64) (User, error) {
+func GetUserById(id string) (User, error) {
 	u, err := findUserById(id)
 	if err != nil {
 		return User{}, errors.Wrap(err, "can't find user")
 	}
 
-	return User{
-		Id:         u.Id,
-		Email:      u.Email,
-		Nickname:   u.Nickname,
-		Score:      u.Score,
-		AvatarLink: u.AvatarLink,
-	}, nil
+	return u, nil
 }
 
-func UpdateUser(id int64, newAvatar string, oldPassword string, newPassword string) error {
+func UpdateUser(id string, newAvatar string, oldPassword string, newPassword string) error {
 
 	if newPassword == "" && newAvatar == "" {
 		return errors.New("nothing to update")
@@ -108,7 +77,7 @@ func UpdateUser(id int64, newAvatar string, oldPassword string, newPassword stri
 		return errors.Wrap(err, "validate passwords error")
 	}
 
-	newHashPassword, err := getPasswordHash(newPassword)
+	newHashPassword, err := GetPasswordHash(newPassword)
 	if err != nil {
 		return errors.Wrap(err, "some password error")
 	}
@@ -149,7 +118,10 @@ func GetUsersScores(limit int, offset int) ([]Scores, error) {
 	begin := limit * (offset - 1)
 	end := limit * offset
 
-	usersCount := getUsersCount()
+	usersCount, err := getUsersCount()
+	if err != nil {
+		return nil, errors.Wrap(err, "GetUsersScores-cant get users count")
+	}
 
 	if begin > usersCount {
 		return nil, errors.New("limit * (offset - 1) > users count")
@@ -161,18 +133,26 @@ func GetUsersScores(limit int, offset int) ([]Scores, error) {
 
 	page := make([]Scores, 0, 1)
 
-	databaseScores := getScores()
+	databaseScores, err := getScores(limit, begin)
+	if err != nil {
+		return nil, errors.Wrap(err, "cant get score")
+	}
 
-	for i := begin; i < end; i++ {
+	for _, val := range databaseScores {
 		page = append(page, Scores{
-			Nickname: databaseScores[i].Nickname,
-			Score:    databaseScores[i].Score,
+			Nickname: val.Nickname,
+			Score:    val.Score,
 		})
 	}
 
 	return page, nil
 }
 
-func GetUsersCount() int {
-	return getUsersCount()
+func GetUsersCount() (int, error) {
+	usersCount, err := getUsersCount()
+	if err != nil {
+		return -1, errors.Wrap(err, "GetUsersScores-cant get users count")
+	}
+
+	return usersCount, nil
 }

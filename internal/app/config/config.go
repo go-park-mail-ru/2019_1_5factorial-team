@@ -2,11 +2,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/config_reader"
-	"github.com/pkg/errors"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/config_reader"
+	"github.com/pkg/errors"
 )
 
 // структура конфига статики
@@ -48,6 +49,14 @@ type CookieConfig struct {
 	CookieTimeHours Duration `json:"cookie_time"`
 }
 
+// структура конфига базы юзеров
+type DBUserConfig struct {
+	MongoPort      string `json:"mongo_port"`
+	DatabaseName   string `json:"database_name"`
+	CollectionName string `json:"collection_name"`
+	//GenerateFakeUsers bool   `json:"generate_fake_users"`
+	TruncateTable bool `json:"truncate_table"`
+}
 
 // TODO(): есть смысл объединить в 1 файл конфига
 // структура сервера, собирает все вышеперечисленные структуры
@@ -55,6 +64,7 @@ type ServerConfig struct {
 	StaticServerConfig StaticServerConfig
 	CORSConfig         CORSConfig
 	CookieConfig       CookieConfig
+	DBUserConfig       []DBUserConfig
 
 	configPath string
 }
@@ -64,24 +74,27 @@ var instance = &ServerConfig{}
 // откуда читать, куда заносить
 type valueAndPath struct {
 	from string
-	to interface{}
+	to   interface{}
 }
 
 var configs = []valueAndPath{
 	{
 		from: "static_server_config.json",
-		to: &instance.StaticServerConfig,
+		to:   &instance.StaticServerConfig,
 	},
 	{
 		from: "cors_config.json",
-		to: &instance.CORSConfig,
+		to:   &instance.CORSConfig,
 	},
 	{
 		from: "cookie_config.json",
-		to: &instance.CookieConfig,
+		to:   &instance.CookieConfig,
+	},
+	{
+		from: "db_user_config.json",
+		to: &instance.DBUserConfig,
 	},
 }
-
 
 // считывание всех конфигов по пути `configsDir`
 func Init(configsDir string) error {

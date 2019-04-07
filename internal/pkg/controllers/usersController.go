@@ -11,7 +11,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -96,7 +95,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	randToken, expiration, err := session.SetToken(u.Id)
+	randToken, expiration, err := session.SetToken(u.ID.Hex())
 
 	cookie := session.CreateHttpCookie(randToken, expiration)
 
@@ -104,7 +103,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	OkResponse(res, "signUp ok")
 
 	log.Println("\t", "ok response SignUp")
-	log.Println("\t ok response SignUp, user:\n\t\t\t\t\t\t\tid =", u.Id, "\n\t\t\t\t\t\t\tnickname =",
+	log.Println("\t ok response SignUp, user:\n\t\t\t\t\t\t\tid =", u.ID.Hex(), "\n\t\t\t\t\t\t\tnickname =",
 		u.Nickname, "\n\t\t\t\t\t\t\temail =", u.Email, "\n\t\t\t\t\t\t\tscore =", u.Score)
 	log.Println("\t ok set cookie", cookie)
 }
@@ -139,15 +138,7 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	intID, err := strconv.ParseInt(searchingID, 10, 64)
-	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, "bad id")
-
-		log.Println("\t", errors.New("cannot convert id from string"))
-		return
-	}
-
-	searchingUser, err := user.GetUserById(intID)
+	searchingUser, err := user.GetUserById(searchingID)
 	if err != nil {
 		ErrResponse(res, http.StatusNotFound, "user with this id not found")
 
@@ -215,7 +206,9 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = user.UpdateUser(req.Context().Value("userID").(int64), data.Avatar, data.NewPassword, data.OldPassword)
+	userId := req.Context().Value("userID").(string)
+
+	err = user.UpdateUser(userId, data.Avatar, data.NewPassword, data.OldPassword)
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, err.Error())
 
@@ -223,7 +216,7 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	u, _ := user.GetUserById(req.Context().Value("userID").(int64))
+	u, _ := user.GetUserById(userId)
 
 	OkResponse(res, ProfileUpdateResponse{
 		Email:      u.Email,
@@ -254,7 +247,14 @@ type UsersCountInfoResponse struct {
 func UsersCountInfo(res http.ResponseWriter, req *http.Request) {
 	log.Println("================", req.URL, req.Method, "UsersCountInfo", "================")
 
-	count := user.GetUsersCount()
+	count, err := user.GetUsersCount()
+	if err != nil {
+		ErrResponse(res, http.StatusInternalServerError, err.Error())
+
+		log.Println(err.Error())
+		return
+	}
+
 	OkResponse(res, UsersCountInfoResponse{
 		Count: count,
 	})

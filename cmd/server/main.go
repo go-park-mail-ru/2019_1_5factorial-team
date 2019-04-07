@@ -3,9 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
-	"log"
 )
 
 func main() {
@@ -15,7 +16,6 @@ func main() {
 
 	fmt.Println("server will start on port", *port)
 	fmt.Println("config path:", *configPath)
-
 
 	err := config.Init(*configPath)
 	if err != nil {

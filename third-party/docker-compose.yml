@@ -1,0 +1,26 @@
+version: '3'
+services:
+  mongo:
+    container_name: 5factorial-user-mongo
+    command: mongod
+    image: mongo:4.0
+    #    restart: no
+    #    environment:
+    #      MONGO_INITDB_ROOT_USERNAME: user
+    #      MONGO_INITDB_ROOT_PASSWORD: user
+    volumes:
+      - '/Users/smet_k/Desktop/test-mongo-db:/data/db'  # /data/db/main:/data/db
+    ports:
+      - "27051:27017" # map port to none standard port, to avoid conflicts with locally installed mongodb.
+
+  server-go:
+    container_name: 5factorial-back
+    restart: always
+    build:
+      context: ../.
+      dockerfile: ./third-party/server/Dockerfile
+    volumes:
+      - "/var/www/media/factorial:/var/www/media/factorial"
+      - "/etc/5factorial:/etc/5factorial"
+    ports:
+      - "5051:5051"
