@@ -1,7 +1,6 @@
 package session
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
 	"github.com/pkg/errors"
@@ -82,26 +81,17 @@ func GetId(token string) (string, error) {
 	dt := DatabaseToken{}
 	col, err := database.GetCollection(collectionName)
 	if err != nil {
-		log.Println(errors.Wrap(err, "collection not found"))
-
 		return "", errors.Wrap(err, "collection not found")
 	}
 
 	err = col.Find(bson.M{"token": token}).One(&dt)
 	if err != nil {
-		log.Println(errors.Wrap(err, "token not found"))
-
 		return "", errors.Wrap(err, "token not found")
 	}
-
-	fmt.Println("--== get id ==--")
-	fmt.Println(dt.CookieExpiredTime.Sub(time.Now()))
 
 	if dt.CookieExpiredTime.Sub(time.Now()) < 0 {
 		err = DeleteToken(dt.Token)
 		if err != nil {
-			log.Println(errors.Wrap(err, "cant delete expired token"))
-
 			return "", errors.Wrap(err, "cant delete expired token")
 		}
 
