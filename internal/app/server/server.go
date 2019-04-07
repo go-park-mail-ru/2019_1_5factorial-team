@@ -27,6 +27,10 @@ func InitLogs()  {
 		FullTimestamp:   config.Get().LogrusConfig.FullTimestamp,
 		TimestampFormat: config.Get().LogrusConfig.TimestampFormat,
 	})
+	//log.SetFormatter(&log.JSONFormatter{
+	//	TimestampFormat: config.Get().LogrusConfig.TimestampFormat,
+	//	PrettyPrint: true,
+	//})
 
 	if config.Get().LogrusConfig.AppName != "" {
 		// тележка <3
