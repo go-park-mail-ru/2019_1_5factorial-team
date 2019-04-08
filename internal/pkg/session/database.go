@@ -14,7 +14,7 @@ var collectionName = "user_session"
 
 const NoTokenFound string = "token not found"
 
-type DatabaseToken struct {
+type UserSession struct {
 	ID                bson.ObjectId `bson:"_id"`
 	Token             string        `bson:"token"`
 	UserId            string        `bson:"user_id"`
@@ -24,7 +24,7 @@ type DatabaseToken struct {
 func SetToken(id string) (string, time.Time, error) {
 	now := time.Now()
 
-	dt := DatabaseToken{
+	dt := UserSession{
 		ID:                bson.NewObjectId(),
 		Token:             GenerateToken(),
 		UserId:            id,
@@ -44,16 +44,16 @@ func SetToken(id string) (string, time.Time, error) {
 	return dt.Token, dt.CookieExpiredTime, nil
 }
 
-func UpdateToken(token string) (DatabaseToken, error) {
-	dt := DatabaseToken{}
+func UpdateToken(token string) (UserSession, error) {
+	dt := UserSession{}
 	col, err := database.GetCollection(collectionName)
 	if err != nil {
-		return DatabaseToken{}, errors.Wrap(err, "collection not found")
+		return UserSession{}, errors.Wrap(err, "collection not found")
 	}
 
 	err = col.Find(bson.M{"token": token}).One(&dt)
 	if err != nil {
-		return DatabaseToken{}, errors.Wrap(err, "token not found")
+		return UserSession{}, errors.Wrap(err, "token not found")
 	}
 
 	// если через 10 минут кука умрет, добавим ему времени
@@ -62,16 +62,16 @@ func UpdateToken(token string) (DatabaseToken, error) {
 
 		err = col.UpdateId(dt.ID, dt)
 		if err != nil {
-			return DatabaseToken{}, errors.Wrap(err, "error while updating value in DB")
+			return UserSession{}, errors.Wrap(err, "error while updating value in DB")
 		}
 	} else if dt.CookieExpiredTime.Sub(time.Now()) < 0 {
 		// убиваем истекшую куку, вряд ли такое случится (хз)
 		err = DeleteToken(dt.Token)
 		if err != nil {
-			return DatabaseToken{}, errors.Wrap(err, "cant delete expired token")
+			return UserSession{}, errors.Wrap(err, "cant delete expired token")
 		}
 
-		return DatabaseToken{}, errors.New("your token expired")
+		return UserSession{}, errors.New("your token expired")
 	}
 
 	return dt, nil
@@ -79,7 +79,7 @@ func UpdateToken(token string) (DatabaseToken, error) {
 
 // при взятии токена, проверяет его на время
 func GetId(token string) (string, error) {
-	dt := DatabaseToken{}
+	dt := UserSession{}
 	col, err := database.GetCollection(collectionName)
 	if err != nil {
 		log.Println(errors.Wrap(err, "collection not found"))
@@ -114,7 +114,7 @@ func GetId(token string) (string, error) {
 }
 
 func DeleteToken(token string) error {
-	dt := DatabaseToken{}
+	dt := UserSession{}
 	col, err := database.GetCollection(collectionName)
 	if err != nil {
 		return errors.Wrap(err, "collection not found")
