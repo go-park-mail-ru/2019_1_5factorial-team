@@ -6,9 +6,9 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -74,13 +74,7 @@ func DropUserCookie(res http.ResponseWriter, req *http.Request) (int, error) {
 // @Failure 500 {object} controllers.errorResponse
 // @Router /api/user [post]
 func SignUp(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.WithFields(log.Fields{
-		"req":        req.URL,
-		"method":     req.Method,
-		"host":       req.Host,
-		"remoteAddr": req.RemoteAddr,
-		"func":       "SignUp",
-	})
+	ctxLogger := log.LoggerWithoutAuth("SignUp", req)
 	ctxLogger.Info("===========================================")
 
 	data := SingUpRequest{}
@@ -128,13 +122,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 // @Failure 500 {object} controllers.errorResponse
 // @Router /api/user/{id} [get]
 func GetUser(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.WithFields(log.Fields{
-		"req":        req.URL,
-		"method":     req.Method,
-		"host":       req.Host,
-		"remoteAddr": req.RemoteAddr,
-		"func":       "GetUser",
-	})
+	ctxLogger := log.LoggerWithoutAuth("GetUser", req)
 	ctxLogger.Info("============================================")
 
 	requestVariables := mux.Vars(req)
@@ -206,15 +194,7 @@ type ProfileUpdateResponse struct {
 // @Failure 500 {object} controllers.errorResponse
 // @Router /api/user [put]
 func UpdateProfile(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.WithFields(log.Fields{
-		"req":        req.URL,
-		"method":     req.Method,
-		"host":       req.Host,
-		"remoteAddr": req.RemoteAddr,
-		"func":       "UpdateProfile",
-		"userID":     req.Context().Value("userID"),
-		"auth":       req.Context().Value("authorized"),
-	})
+	ctxLogger := log.LoggerWithAuth("UpdateProfile", req)
 	ctxLogger.Info("===========================================")
 
 	data := ProfileUpdateRequest{}
@@ -261,13 +241,7 @@ type UsersCountInfoResponse struct {
 // @Success 200 {object} controllers.UsersCountInfoResponse
 // @Router /api/user/count [get]
 func UsersCountInfo(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.WithFields(log.Fields{
-		"req":        req.URL,
-		"method":     req.Method,
-		"host":       req.Host,
-		"remoteAddr": req.RemoteAddr,
-		"func":       "UsersCountInfo",
-	})
+	ctxLogger := log.LoggerWithoutAuth("UsersCountInfo", req)
 	ctxLogger.Info("============================================")
 
 	count, err := user.GetUsersCount()

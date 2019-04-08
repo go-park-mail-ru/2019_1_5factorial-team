@@ -2,11 +2,10 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"log"
-
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 )
 
 func main() {
@@ -14,13 +13,17 @@ func main() {
 	configPath := flag.String("config", "/etc/5factorial/", "dir with server configs")
 	flag.Parse()
 
-	fmt.Println("server will start on port", *port)
-	fmt.Println("config path:", *configPath)
+	log.InitLogs()
+
+	log.Warn("server will start on port", *port)
+	log.Warn("config path:", *configPath)
 
 	err := config.Init(*configPath)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err.Error())
 	}
+
+	database.InitConnection()
 
 	s := server.New(*port)
 	err = s.Run()

@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"strings"
 	"time"
 
@@ -118,19 +118,18 @@ var configs = []valueAndPath{
 
 // считывание всех конфигов по пути `configsDir`
 func Init(configsDir string) error {
-	//log.Println("Configs->logs path = ", configsDir)
-	log.WithField("func", "config.Init").Info("logs path = ", configsDir)
+	logrus.WithField("func", "config.Init").Info("logs path = ", configsDir)
 
 	for i, val := range configs {
 		err := config_reader.ReadConfigFile(configsDir, val.from, val.to)
 		if err != nil {
-			log.WithField("err", err.Error()).Error("config.Init")
+			logrus.WithField("err", err.Error()).Error("config.Init")
 
 			return errors.Wrap(err, "error while reading config")
 		}
 
 		//log.Println("Configs->", i, "config = ", val.to)
-		log.WithField("func", "config.Init").
+		logrus.WithField("func", "config.Init").
 			Infof("i = %d, from file = %s, config = %v", i, val.from, val.to)
 	}
 

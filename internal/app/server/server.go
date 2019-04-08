@@ -4,57 +4,20 @@ import (
 	_ "github.com/go-park-mail-ru/2019_1_5factorial-team/docs"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-	"github.com/rossmcdonald/telegram_hook"
-	log "github.com/sirupsen/logrus"
 	"github.com/swaggo/http-swagger"
 	"net/http"
-	"os"
 )
 
 type MyGorgeousServer struct {
 	port string
 }
 
-func InitLogs() {
-	// настраиваем logrus (по всему проекту)
-	log.SetOutput(os.Stdout)
-	log.SetFormatter(&log.TextFormatter{
-		DisableColors:   config.Get().LogrusConfig.DisableColors,
-		FullTimestamp:   config.Get().LogrusConfig.FullTimestamp,
-		TimestampFormat: config.Get().LogrusConfig.TimestampFormat,
-	})
-	//log.SetFormatter(&log.JSONFormatter{
-	//	TimestampFormat: config.Get().LogrusConfig.TimestampFormat,
-	//	PrettyPrint: true,
-	//})
-
-	if config.Get().LogrusConfig.AppName != "" {
-		// тележка <3
-		hook, err := telegram_hook.NewTelegramHook(
-			config.Get().LogrusConfig.AppName,
-			config.Get().LogrusConfig.AuthToken,
-			config.Get().LogrusConfig.TargetID,
-			telegram_hook.WithAsync(config.Get().LogrusConfig.Async),
-			telegram_hook.WithTimeout(config.Get().LogrusConfig.Timeout.Duration),
-		)
-		if err != nil {
-			log.Fatalf("Encountered error when creating Telegram hook: %s", err)
-		}
-		log.AddHook(hook)
-	}
-}
-
 func New(port string) *MyGorgeousServer {
-	InitLogs()
-
 	mgs := MyGorgeousServer{}
 	mgs.port = port
-
-	database.InitConnection()
 
 	return &mgs
 }

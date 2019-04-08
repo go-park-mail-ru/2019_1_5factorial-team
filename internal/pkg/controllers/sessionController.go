@@ -4,8 +4,8 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -30,13 +30,7 @@ type signInRequest struct {
 // @Failure 500 {object} controllers.errorResponse
 // @Router /session [post]
 func SignIn(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.WithFields(log.Fields{
-		"req":        req.URL,
-		"method":     req.Method,
-		"host":       req.Host,
-		"remoteAddr": req.RemoteAddr,
-		"func":       "SignIn",
-	})
+	ctxLogger := log.LoggerWithoutAuth("SignIn", req)
 	ctxLogger.Info("============================================")
 
 	data := signInRequest{}
@@ -79,15 +73,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 // @Failure 401 {object} controllers.errorResponse
 // @Router /session [delete]
 func SignOut(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.WithFields(log.Fields{
-		"req":        req.URL,
-		"method":     req.Method,
-		"host":       req.Host,
-		"remoteAddr": req.RemoteAddr,
-		"func":       "SignOut",
-		"userID":     req.Context().Value("userID"),
-		"auth":       req.Context().Value("authorized"),
-	})
+	ctxLogger := log.LoggerWithAuth("SignOut", req)
 	ctxLogger.Info("===========================================")
 
 	currentSession, err := req.Cookie(config.Get().CookieConfig.CookieName)
@@ -102,7 +88,7 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 	err = session.DeleteToken(currentSession.Value)
 	if err != nil && err.Error() == session.NoTokenFound {
 		// bad token
-		log.Println(errors.Wrap(err, "cannot delete token from current session, user cookie will set expired"))
+		ctxLogger.Error(errors.Wrap(err, "cannot delete token from current session, user cookie will set expired"))
 	} else if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, err.Error())
 
@@ -147,15 +133,7 @@ type UserInfoResponse struct {
 // @Failure 401 {object} controllers.errorResponse
 // @Router /api/user [get]
 func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.WithFields(log.Fields{
-		"req":        req.URL,
-		"method":     req.Method,
-		"host":       req.Host,
-		"remoteAddr": req.RemoteAddr,
-		"func":       "GetUserFromSession",
-		"userID":     req.Context().Value("userID"),
-		"auth":       req.Context().Value("authorized"),
-	})
+	ctxLogger := log.LoggerWithAuth("GetUserFromSession", req)
 	ctxLogger.Info("===========================================")
 
 	id := req.Context().Value("userID").(string)
@@ -195,15 +173,7 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 // @Success 200 {string} ok message
 // @Router /api/session [get]
 func IsSessionValid(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.WithFields(log.Fields{
-		"req":        req.URL,
-		"method":     req.Method,
-		"host":       req.Host,
-		"remoteAddr": req.RemoteAddr,
-		"func":       "IsSessionValid",
-		"userID":     req.Context().Value("userID"),
-		"auth":       req.Context().Value("authorized"),
-	})
+	ctxLogger := log.LoggerWithAuth("IsSessionValid", req)
 	ctxLogger.Info("===========================================")
 
 	OkResponse(res, "session is valid")
