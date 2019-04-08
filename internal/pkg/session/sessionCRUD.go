@@ -23,6 +23,19 @@ func (us *UserSession) Insert() error {
 		return errors.Wrap(err, "collection not found")
 	}
 
+	// если юзер залогинин уже залогинин с другого устройства, обновляю ему сессию (не создаю новую)
+	usConflict, err := getCollisionSession(us.UserId)
+	// ошибки с отсутсвтем коллекции не может быть, тк проверено выше
+	if err == nil {
+		err = usConflict.UpdateToken(us.Token)
+		if err != nil {
+			return errors.Wrap(err, "error while updating exist session token")
+		}
+
+		return nil
+	}
+
+
 	err = col.Insert(us)
 	if err != nil {
 		return errors.Wrap(err, "error while adding user session")
@@ -32,6 +45,23 @@ func (us *UserSession) Insert() error {
 }
 
 func (us *UserSession) UpdateTime() error  {
+	us.CookieExpiredTime = time.Now().Add(config.Get().CookieConfig.CookieTimeHours.Duration)
+
+	col, err := database.GetCollection(collectionName)
+	if err != nil {
+		return errors.Wrap(err, "collection not found")
+	}
+
+	err = col.UpdateId(us.ID, us)
+	if err != nil {
+		return errors.Wrap(err, "error while updating value in DB")
+	}
+
+	return nil
+}
+
+func (us *UserSession) UpdateToken(newToken string) error {
+	us.Token = newToken
 	us.CookieExpiredTime = time.Now().Add(config.Get().CookieConfig.CookieTimeHours.Duration)
 
 	col, err := database.GetCollection(collectionName)
@@ -76,6 +106,22 @@ func GetSessionByToken(token string) (UserSession, error) {
 	err = col.Find(bson.M{"token": token}).One(&us)
 	if err != nil {
 		return UserSession{}, errors.Wrap(err, "token not found")
+	}
+
+	return us, nil
+}
+
+func getCollisionSession(id string) (UserSession, error) {
+	us := UserSession{}
+
+	col, err := database.GetCollection(collectionName)
+	if err != nil {
+		return UserSession{}, errors.Wrap(err, "collection not found")
+	}
+
+	err = col.Find(bson.M{"user_id": id}).One(&us)
+	if err != nil {
+		return UserSession{}, errors.Wrap(err, "user not found")
 	}
 
 	return us, nil
