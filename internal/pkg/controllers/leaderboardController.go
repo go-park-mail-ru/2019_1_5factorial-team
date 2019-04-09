@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/pkg/errors"
-	//log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
+
 	"net/http"
 	"strconv"
 )
@@ -30,14 +30,7 @@ type GetLeaderboardResponse struct {
 // @Failure 400 {object} controllers.errorResponse
 // @Router /user/score [get]
 func GetLeaderboard(res http.ResponseWriter, req *http.Request) {
-	//ctxLogger := log.WithFields(log.Fields{
-	//	"req":        req.URL,
-	//	"method":     req.Method,
-	//	"host":       req.Host,
-	//	"remoteAddr": req.RemoteAddr,
-	//	"func":       "GetLeaderboard",
-	//})
-	ctxLogger := log.LoggerWithoutAuth("GetLeaderboard", req)
+	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 	ctxLogger.Info("============================================")
 
 	query := req.URL.Query()

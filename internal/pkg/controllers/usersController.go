@@ -6,9 +6,9 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -74,7 +74,7 @@ func DropUserCookie(res http.ResponseWriter, req *http.Request) (int, error) {
 // @Failure 500 {object} controllers.errorResponse
 // @Router /api/user [post]
 func SignUp(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.LoggerWithoutAuth("SignUp", req)
+	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 	ctxLogger.Info("===========================================")
 
 	data := SingUpRequest{}
@@ -122,7 +122,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 // @Failure 500 {object} controllers.errorResponse
 // @Router /api/user/{id} [get]
 func GetUser(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.LoggerWithoutAuth("GetUser", req)
+	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 	ctxLogger.Info("============================================")
 
 	requestVariables := mux.Vars(req)
@@ -194,7 +194,7 @@ type ProfileUpdateResponse struct {
 // @Failure 500 {object} controllers.errorResponse
 // @Router /api/user [put]
 func UpdateProfile(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.LoggerWithAuth("UpdateProfile", req)
+	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 	ctxLogger.Info("===========================================")
 
 	data := ProfileUpdateRequest{}
@@ -241,7 +241,7 @@ type UsersCountInfoResponse struct {
 // @Success 200 {object} controllers.UsersCountInfoResponse
 // @Router /api/user/count [get]
 func UsersCountInfo(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.LoggerWithoutAuth("UsersCountInfo", req)
+	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 	ctxLogger.Info("============================================")
 
 	count, err := user.GetUsersCount()

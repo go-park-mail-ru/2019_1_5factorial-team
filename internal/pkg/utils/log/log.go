@@ -43,25 +43,23 @@ func InitLogs() {
 	}
 }
 
-func LoggerWithoutAuth(funcName string, req *http.Request) *logrus.Entry {
+func LoggerWithoutAuth(req *http.Request) *logrus.Entry {
 	ctxLogger := logrus.WithFields(logrus.Fields{
 		"req":        req.URL,
 		"method":     req.Method,
 		"host":       req.Host,
 		"remoteAddr": req.RemoteAddr,
-		"func":       funcName,
 	})
 
 	return ctxLogger
 }
 
-func LoggerWithAuth(funcName string, req *http.Request) *logrus.Entry {
+func LoggerWithAuth(req *http.Request) *logrus.Entry {
 	ctxLogger := logrus.WithFields(logrus.Fields{
 		"req":        req.URL,
 		"method":     req.Method,
 		"host":       req.Host,
 		"remoteAddr": req.RemoteAddr,
-		"func":       funcName,
 		"userID":     req.Context().Value("userID"),
 		"auth":       req.Context().Value("authorized"),
 	})

@@ -4,8 +4,8 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -30,7 +30,7 @@ type signInRequest struct {
 // @Failure 500 {object} controllers.errorResponse
 // @Router /session [post]
 func SignIn(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.LoggerWithoutAuth("SignIn", req)
+	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 	ctxLogger.Info("============================================")
 
 	data := signInRequest{}
@@ -73,7 +73,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 // @Failure 401 {object} controllers.errorResponse
 // @Router /session [delete]
 func SignOut(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.LoggerWithAuth("SignOut", req)
+	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 	ctxLogger.Info("===========================================")
 
 	currentSession, err := req.Cookie(config.Get().CookieConfig.CookieName)
@@ -133,7 +133,7 @@ type UserInfoResponse struct {
 // @Failure 401 {object} controllers.errorResponse
 // @Router /api/user [get]
 func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.LoggerWithAuth("GetUserFromSession", req)
+	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 	ctxLogger.Info("===========================================")
 
 	id := req.Context().Value("userID").(string)
@@ -173,7 +173,7 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 // @Success 200 {string} ok message
 // @Router /api/session [get]
 func IsSessionValid(res http.ResponseWriter, req *http.Request) {
-	ctxLogger := log.LoggerWithAuth("IsSessionValid", req)
+	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 	ctxLogger.Info("===========================================")
 
 	OkResponse(res, "session is valid")
