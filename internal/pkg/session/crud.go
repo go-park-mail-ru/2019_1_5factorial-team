@@ -1,7 +1,6 @@
 package session
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
 	"github.com/pkg/errors"
@@ -22,10 +21,8 @@ func (us *UserSession) Insert() error {
 		return errors.Wrap(err, "collection not found")
 	}
 
-	info, err := col.Upsert(bson.M{"user_id": us.UserId}, us)
-	fmt.Println(info)
-	fmt.Println(err)
-
+	// инфо по вставке (матчи, изменения не нужны)
+	_, err = col.Upsert(bson.M{"user_id": us.UserId}, us)
 	if err != nil {
 		return errors.Wrap(err, "error while adding user session")
 	}
@@ -34,24 +31,6 @@ func (us *UserSession) Insert() error {
 }
 
 func (us *UserSession) UpdateTime() error {
-	us.CookieExpiredTime = time.Now().Add(config.Get().CookieConfig.CookieTimeHours.Duration)
-
-	col, err := database.GetCollection(collectionName)
-	if err != nil {
-		return errors.Wrap(err, "collection not found")
-	}
-
-	err = col.UpdateId(us.ID, us)
-	if err != nil {
-		return errors.Wrap(err, "error while updating value in DB")
-	}
-
-	return nil
-}
-
-// UpdateToken обновляет токен текущей сессии юзера и сеттит ей новое время
-func (us *UserSession) UpdateToken(newToken string) error {
-	us.Token = newToken
 	us.CookieExpiredTime = time.Now().Add(config.Get().CookieConfig.CookieTimeHours.Duration)
 
 	col, err := database.GetCollection(collectionName)
