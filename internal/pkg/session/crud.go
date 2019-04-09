@@ -1,6 +1,7 @@
 package session
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
 	"github.com/pkg/errors"
@@ -9,34 +10,22 @@ import (
 )
 
 type UserSession struct {
-	ID                bson.ObjectId `bson:"_id"`
+	ID                bson.ObjectId `bson:"_id,omitempty"`
 	Token             string        `bson:"token"`
 	UserId            string        `bson:"user_id"`
 	CookieExpiredTime time.Time     `bson:"cookie_expired_time"`
 }
 
 func (us *UserSession) Insert() error {
-	us.ID = bson.NewObjectId()
-
 	col, err := database.GetCollection(collectionName)
 	if err != nil {
 		return errors.Wrap(err, "collection not found")
 	}
 
-	// если юзер залогинин уже залогинин с другого устройства, обновляю ему сессию (не создаю новую)
-	usConflict, err := getCollisionSession(us.UserId)
-	// ошибки с отсутсвтем коллекции не может быть, тк проверено выше
-	if err == nil {
-		err = usConflict.UpdateToken(us.Token)
-		if err != nil {
-			return errors.Wrap(err, "error while updating exist session token")
-		}
+	info, err := col.Upsert(bson.M{"user_id": us.UserId}, us)
+	fmt.Println(info)
+	fmt.Println(err)
 
-		return nil
-	}
-
-
-	err = col.Insert(us)
 	if err != nil {
 		return errors.Wrap(err, "error while adding user session")
 	}
@@ -44,7 +33,7 @@ func (us *UserSession) Insert() error {
 	return nil
 }
 
-func (us *UserSession) UpdateTime() error  {
+func (us *UserSession) UpdateTime() error {
 	us.CookieExpiredTime = time.Now().Add(config.Get().CookieConfig.CookieTimeHours.Duration)
 
 	col, err := database.GetCollection(collectionName)
@@ -60,6 +49,7 @@ func (us *UserSession) UpdateTime() error  {
 	return nil
 }
 
+// UpdateToken обновляет токен текущей сессии юзера и сеттит ей новое время
 func (us *UserSession) UpdateToken(newToken string) error {
 	us.Token = newToken
 	us.CookieExpiredTime = time.Now().Add(config.Get().CookieConfig.CookieTimeHours.Duration)
@@ -106,22 +96,6 @@ func GetSessionByToken(token string) (UserSession, error) {
 	err = col.Find(bson.M{"token": token}).One(&us)
 	if err != nil {
 		return UserSession{}, errors.Wrap(err, "token not found")
-	}
-
-	return us, nil
-}
-
-func getCollisionSession(id string) (UserSession, error) {
-	us := UserSession{}
-
-	col, err := database.GetCollection(collectionName)
-	if err != nil {
-		return UserSession{}, errors.Wrap(err, "collection not found")
-	}
-
-	err = col.Find(bson.M{"user_id": id}).One(&us)
-	if err != nil {
-		return UserSession{}, errors.Wrap(err, "user not found")
 	}
 
 	return us, nil

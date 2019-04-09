@@ -28,10 +28,10 @@ func InitConnection() {
 
 			//mongodb://mongo-user:27031,
 			fmt.Println(fmt.Sprintf("%s://%s:%s", "mongodb", val.Hostname, val.MongoPort))
-			
+
 			session, err = mgo.DialWithInfo(&mgo.DialInfo{
-				Addrs: []string{fmt.Sprintf("%s:%s", val.Hostname, val.MongoPort)},
-				Timeout: 10 * time.Second,
+				Addrs:    []string{fmt.Sprintf("%s:%s", val.Hostname, val.MongoPort)},
+				Timeout:  10 * time.Second,
 				Database: val.DatabaseName,
 			})
 			if err != nil {
