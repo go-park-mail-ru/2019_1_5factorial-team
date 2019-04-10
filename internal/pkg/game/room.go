@@ -1,6 +1,7 @@
 package game
 
 import (
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gameLogic"
 	"log"
 	"sync"
 	"time"
@@ -25,7 +26,8 @@ type ObjectState struct {
 
 type RoomState struct {
 	Players     []PlayerState
-	Objects     []ObjectState
+	// TODO(): сделать стак (первый призрак, всегда ближе к плееру)
+	Objects     []gameLogic.Ghost
 	CurrentTime time.Time
 }
 
@@ -72,7 +74,9 @@ func (r *Room) Run() {
 			r.playerCnt += 1
 
 			if r.playerCnt == r.MaxPlayers {
-				r.state.Objects = append(r.state.Objects, ObjectState{ID: "kek", Type: "gh", X: 100, Speed: -10})
+				//TODO(): аппендить призраков на каждом тике, но не больше заданного значения
+				//r.state.Objects = append(r.state.Objects, ObjectState{ID: "kek", Type: "gh", X: 100, Speed: -10})
+				r.state.Objects = append(r.state.Objects, gameLogic.NewGhost(100, 20, "kek", 10, 5))
 			}
 
 		case <-r.ticker.C:
@@ -86,10 +90,12 @@ func (r *Room) Run() {
 			// взять команды у плеера, обработать их
 			r.state.CurrentTime = time.Now()
 			for i := range r.state.Objects {
-				r.state.Objects[i].X += r.state.Objects[i].Speed
+				r.state.Objects[i].Move()
+
 				if r.state.Objects[i].X == 0 {
 					for i := range r.state.Players {
 						r.state.Players[i].HP -= 20
+						//TODO(): удалять призраков
 					}
 				}
 			}
