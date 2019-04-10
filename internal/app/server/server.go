@@ -54,6 +54,9 @@ func (mgs *MyGorgeousServer) Run() error {
 
 	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
+	// игра
+	routerLoginRequired.HandleFunc("/api/game/mp/ws", controllers.Play).Methods("GET", "OPTIONS")
+
 	err := http.ListenAndServe(address, router)
 	if err != nil {
 		return errors.Wrap(err, "server Run error")
