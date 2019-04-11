@@ -2,6 +2,7 @@ package game
 
 import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gameLogic"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"log"
 	"sync"
 	"time"
@@ -25,14 +26,15 @@ type ObjectState struct {
 }
 
 type RoomState struct {
-	Players     []PlayerState
+	Players []PlayerState
 	// TODO(): сделать стак (первый призрак, всегда ближе к плееру)
-	Objects     []gameLogic.Ghost
+	Objects     *gameLogic.GhostQueue
 	CurrentTime time.Time
 }
 
 type Room struct {
 	ID         string
+	game       *Game
 	MaxPlayers uint
 	Players    map[string]*Player
 	mu         *sync.Mutex
@@ -43,19 +45,24 @@ type Room struct {
 	playerCnt  uint
 }
 
-func NewRoom(maxPlayers uint) *Room {
+func NewRoom(maxPlayers uint, game *Game) *Room {
 	return &Room{
+		ID:         session.GenerateToken(),
+		game:       game,
 		MaxPlayers: maxPlayers,
 		Players:    make(map[string]*Player),
 		register:   make(chan *Player),
 		unregister: make(chan *Player),
+		mu:         &sync.Mutex{},
 		ticker:     time.NewTicker(1 * time.Second),
-		state:      &RoomState{},
+		state: &RoomState{
+			Objects: gameLogic.NewGhostStack(),
+		},
 	}
 }
 
 func (r *Room) Run() {
-	log.Println("room loop started")
+	log.Printf("room loop started ID=%s", r.ID)
 	for {
 		select {
 		case player := <-r.unregister:
@@ -75,8 +82,8 @@ func (r *Room) Run() {
 
 			if r.playerCnt == r.MaxPlayers {
 				//TODO(): аппендить призраков на каждом тике, но не больше заданного значения
-				//r.state.Objects = append(r.state.Objects, ObjectState{ID: "kek", Type: "gh", X: 100, Speed: -10})
-				r.state.Objects = append(r.state.Objects, gameLogic.NewGhost(100, 20, "kek", 10, 5))
+				r.state.Objects.PushBack(
+					gameLogic.NewGhost(100, 20, "kek", 10, 5))
 			}
 
 		case <-r.ticker.C:
@@ -84,19 +91,22 @@ func (r *Room) Run() {
 				continue
 			}
 
+			if r.state.Objects.Len() == 0 {
+				r.Close()
+			}
+
 			log.Println("tick")
 
 			// тут ваша игровая механика
 			// взять команды у плеера, обработать их
 			r.state.CurrentTime = time.Now()
-			for i := range r.state.Objects {
-				r.state.Objects[i].Move()
 
-				if r.state.Objects[i].X == 0 {
-					for i := range r.state.Players {
-						r.state.Players[i].HP -= 20
-						//TODO(): удалять призраков
-					}
+			f := r.state.Objects.MoveAllGhosts()
+			if f {
+				r.state.Objects.PopFront()
+
+				for i := range r.state.Players {
+					r.state.Players[i].HP -= 20
 				}
 			}
 
@@ -113,5 +123,16 @@ func (r *Room) AddPlayer(player *Player) {
 }
 
 func (r *Room) RemovePlayer(player *Player) {
+	//player.CloseConn()
 	r.unregister <- player
+}
+
+func (r *Room) Close() {
+	r.mu.Lock()
+	for _, player := range r.Players {
+		//r.RemovePlayer(player)
+		r.game.RemovePlayer(player)
+	}
+	r.mu.Unlock()
+	r.game.CloseRoom(r.ID)
 }
