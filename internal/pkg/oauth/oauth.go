@@ -1,7 +1,6 @@
 package oauth
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -11,7 +10,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-const DefaultPassword = " "
+const DefaultPassword = ""
+const PreCreateUserErrorString = "Invalid login"
 
 type Token struct {
 	Token string `json:"token"`
@@ -22,7 +22,9 @@ func OauthUser(token string, service string) (int, error, string, time.Time) {
 	client := &http.Client{}
 	request, err := http.NewRequest("GET", GetApiUrl(token, service), nil)
 	if err != nil {
-		return http.StatusBadRequest, errors.Wrap(err, "get api url with token "+string(token)+"and service "+string(service)), "", time.Time{}
+
+		return http.StatusBadRequest, errors.Wrapf(err, "get api url with token %q and service %q", token, service), "", time.Time{}
+
 	}
 
 	if service == "yandex" {
@@ -36,7 +38,7 @@ func OauthUser(token string, service string) (int, error, string, time.Time) {
 	}
 
 	contents, err := ioutil.ReadAll(response.Body)
-	if response.StatusCode != 200 || err != nil {
+	if response.StatusCode != http.StatusOK || err != nil {
 		return http.StatusInternalServerError, errors.Wrap(err, "body ReadAll error"), "", time.Time{}
 	}
 
@@ -44,10 +46,9 @@ func OauthUser(token string, service string) (int, error, string, time.Time) {
 	if err != nil {
 		return http.StatusForbidden, errors.Wrap(err, "err in get oauth user"), "", time.Time{}
 	}
-	fmt.Println(uuid)
-	fmt.Println(name)
+	// TODO(mrocumare) после прикручивания базы прописать GetUser и CreateUser
 	searchingUser, err := user.GetUser(uuid)
-	if err != nil {
+	if err != nil && errors.Cause(err).Error() == PreCreateUserErrorString {
 		searchingUser, err = user.CreateUser(name, uuid, DefaultPassword)
 		if err != nil {
 			return http.StatusBadRequest, errors.Wrap(err, "err in user data"), "", time.Time{}

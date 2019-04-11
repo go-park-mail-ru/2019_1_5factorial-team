@@ -13,6 +13,7 @@ func LoginFromGoogle(res http.ResponseWriter, req *http.Request) {
 	token := oauth.Token{}
 	status, err := ParseRequestIntoStruct(true, req, &token)
 	if err != nil {
+
 		ErrResponse(res, status, err.Error())
 
 		log.Println("\t", errors.Wrap(err, "ParseRequestIntoStruct error"))
@@ -21,6 +22,7 @@ func LoginFromGoogle(res http.ResponseWriter, req *http.Request) {
 
 	status, err, randToken, expiration := oauth.OauthUser(token.Token, "google")
 	if err != nil {
+
 		ErrResponse(res, status, err.Error())
 		log.Println("\t", err)
 	}

@@ -12,11 +12,13 @@ type GoogleUser struct {
 }
 
 type VkUser struct {
-	Response []struct {
-		ID       int    `json:"id"`
-		Name     string `json:"first_name"`
-		LastName string `json:"last_name"`
-	} `json:"response"`
+	ID       int    `json:"id"`
+	Name     string `json:"first_name"`
+	LastName string `json:"last_name"`
+}
+
+type VkResponse struct {
+	Users []VkUser `json:"response"`
 }
 
 type YandexUser struct {
@@ -27,12 +29,13 @@ func GetOauthUser(service string, contents []byte) (string, string, error) {
 
 	switch service {
 	case "vk":
-		userInfo := VkUser{}
+		userInfo := VkResponse{}
 		err := json.Unmarshal(contents, &userInfo)
 		if err != nil {
 			return "", "", errors.Wrap(err, "json parsing error")
 		}
-		vkEmail, vkLogin := GetVkData(strconv.Itoa((userInfo.Response)[0].ID), (userInfo.Response)[0].Name, (userInfo.Response)[0].LastName)
+		vkInfo := (userInfo.Users)[0]
+		vkEmail, vkLogin := getEmailAndLoginFromVK(strconv.Itoa(vkInfo.ID), vkInfo.Name, vkInfo.LastName)
 		return vkEmail, vkLogin, nil
 	case "yandex":
 		userInfo := YandexUser{}
@@ -40,7 +43,7 @@ func GetOauthUser(service string, contents []byte) (string, string, error) {
 		if err != nil {
 			return "", "", errors.Wrap(err, "json parsing error")
 		}
-		yandexNickname := GetNickname(userInfo.Email, service)
+		yandexNickname := getLoginFromEmail(userInfo.Email) + "_Y"
 		return userInfo.Email, yandexNickname, nil
 	case "google":
 		userInfo := GoogleUser{}
@@ -48,7 +51,7 @@ func GetOauthUser(service string, contents []byte) (string, string, error) {
 		if err != nil {
 			return "", "", errors.Wrap(err, "json parsing error")
 		}
-		googleNickname := GetNickname(userInfo.Email, service)
+		googleNickname := getLoginFromEmail(userInfo.Email) + "_G"
 		return userInfo.Email, googleNickname, nil
 	default:
 		err := errors.New("invalid service")

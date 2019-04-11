@@ -12,6 +12,7 @@ import (
 func LoginFromVK(res http.ResponseWriter, req *http.Request) {
 	token := oauth.Token{}
 	status, err := ParseRequestIntoStruct(true, req, &token)
+
 	if err != nil {
 		ErrResponse(res, status, err.Error())
 
