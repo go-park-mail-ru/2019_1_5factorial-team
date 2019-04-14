@@ -52,9 +52,9 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 
 	randToken, expiration, err := session.SetToken(u.ID.Hex())
 	if err != nil {
-		ErrResponse(res, http.StatusConflict, err.Error())
+		ErrResponse(res, http.StatusInternalServerError, err.Error())
 
-		log.Println("\t", errors.Wrap(err, "Already auth"))
+		ctxLogger.Error(errors.Wrap(err, "Set token returned error"))
 		return
 	}
 

@@ -98,6 +98,12 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	}
 
 	randToken, expiration, err := session.SetToken(u.ID.Hex())
+	if err != nil {
+		ErrResponse(res, http.StatusInternalServerError, err.Error())
+
+		ctxLogger.Error(errors.Wrap(err,"Set token returned err"))
+		return
+	}
 
 	cookie := session.CreateHttpCookie(randToken, expiration)
 
