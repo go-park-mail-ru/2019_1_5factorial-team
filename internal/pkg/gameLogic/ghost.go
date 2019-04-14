@@ -1,7 +1,6 @@
 package gameLogic
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -36,26 +35,26 @@ func (gh *Ghost) Move() {
 
 // стэк для удобства работы с призраками
 type GhostQueue struct {
-	items []Ghost
+	Items []Ghost `json:"Items"`
 	mu    *sync.Mutex
 }
 
 func NewGhostStack() *GhostQueue {
 	return &GhostQueue{
-		items: make([]Ghost, 0, 1),
+		Items: make([]Ghost, 0, 1),
 		mu:    &sync.Mutex{},
 	}
 }
 
 func (gs *GhostQueue) PushBack(item Ghost) {
 	gs.mu.Lock()
-	gs.items = append(gs.items, item)
+	gs.Items = append(gs.Items, item)
 	gs.mu.Unlock()
 }
 
 func (gs *GhostQueue) PopBack() {
 	gs.mu.Lock()
-	gs.items = gs.items[:len(gs.items)-1]
+	gs.Items = gs.Items[:len(gs.Items)-1]
 	gs.mu.Unlock()
 }
 
@@ -63,34 +62,34 @@ func (gs *GhostQueue) PopFront() {
 	gs.mu.Lock()
 	defer gs.mu.Unlock()
 
-	if len(gs.items) == 0 {
+	if len(gs.Items) == 0 {
 		return
 	}
-	gs.items = gs.items[1:]
+	gs.Items = gs.Items[1:]
 }
 
 // return true if first ghost reach player
 func (gs *GhostQueue) MoveAllGhosts() bool {
 	gs.mu.Lock()
-	fmt.Println("MoveAllGhosts lock")
+	//fmt.Println("MoveAllGhosts lock")
 	defer gs.mu.Unlock()
 
-	if len(gs.items) == 0 {
+	if len(gs.Items) == 0 {
 		return false
 	}
 
-	for i := 0; i < len(gs.items); i++ {
-		gs.items[i].Move()
-		fmt.Printf("%d moved\n", i)
+	for i := 0; i < len(gs.Items); i++ {
+		gs.Items[i].Move()
+		//fmt.Printf("%d moved\n", i)
 	}
 
-	fmt.Println("MoveAllGhosts unlock")
-	return gs.items[0].X == 0
+	//fmt.Println("MoveAllGhosts unlock")
+	return gs.Items[0].X == 0
 }
 
 func (gs *GhostQueue) Len() int {
 	gs.mu.Lock()
 	defer gs.mu.Unlock()
 
-	return len(gs.items)
+	return len(gs.Items)
 }

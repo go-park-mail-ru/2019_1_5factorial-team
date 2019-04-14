@@ -23,9 +23,9 @@ type Game struct {
 func NewGame(roomsCount uint32) *Game {
 	return &Game{
 		RoomsCount: roomsCount,
-		mu: &sync.Mutex{},
-		register: make(chan *Player),
-		rooms: make(map[string]*Room),
+		mu:         &sync.Mutex{},
+		register:   make(chan *Player),
+		rooms:      make(map[string]*Room),
 	}
 }
 
@@ -63,13 +63,10 @@ func (g *Game) RemovePlayer(player *Player) {
 func (g *Game) AddRoom(room *Room) {
 	g.mu.Lock()
 	g.rooms[room.ID] = room
-	//g.rooms = append(g.rooms, room)
 	g.mu.Unlock()
 }
 
-func (g *Game) CloseRoom(ID string)  {
-	log.Printf("room ID=%s closing", ID)
-
+func (g *Game) CloseRoom(ID string) {
 	g.mu.Lock()
 	delete(g.rooms, ID)
 	g.mu.Unlock()

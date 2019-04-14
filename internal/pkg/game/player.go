@@ -9,6 +9,7 @@ type Player struct {
 	conn *websocket.Conn
 	// если нужно хранить всю инфу по пользователю, то хранить User
 	ID         string
+	Score      int
 	room       *Room
 	in         chan *IncomeMessage
 	out        chan *Message
@@ -20,6 +21,7 @@ func NewPlayer(conn *websocket.Conn, id string) *Player {
 	return &Player{
 		conn:       conn,
 		ID:         id,
+		Score:      0,
 		in:         make(chan *IncomeMessage),
 		out:        make(chan *Message),
 		unregister: make(chan struct{}),
@@ -31,8 +33,9 @@ func (p *Player) Listen() {
 	go func() {
 		for {
 			select {
-			case <- p.stopListen:
+			case <-p.stopListen:
 				return
+
 			default:
 				message := &IncomeMessage{}
 				err := p.conn.ReadJSON(message)
@@ -53,10 +56,12 @@ func (p *Player) Listen() {
 
 	for {
 		select {
-		case <- p.unregister:
+		case <-p.unregister:
 			p.conn.Close()
+
 		case message := <-p.out:
 			p.conn.WriteJSON(message)
+
 		case message := <-p.in:
 			logrus.Printf("income: %#v", message)
 		}
