@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/mgo.v2"
 )
 
@@ -36,7 +36,7 @@ func InitConnection() {
 				Database: val.DatabaseName,
 			})
 			if err != nil {
-				log.Fatal(err)
+				logrus.Fatal(err)
 			}
 
 			collection := session.DB(val.DatabaseName).C(val.CollectionName)
@@ -46,7 +46,7 @@ func InitConnection() {
 				err = collection.DropCollection()
 				if err != nil {
 					session.Close()
-					log.Fatal("db truncate: ", err, val)
+					logrus.Fatal("db truncate: ", err, val)
 				}
 			}
 
