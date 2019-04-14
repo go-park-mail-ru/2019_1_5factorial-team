@@ -2,12 +2,13 @@ package database
 
 import (
 	"fmt"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
-	"github.com/pkg/errors"
-	"gopkg.in/mgo.v2"
-	"log"
 	"sync"
 	"time"
+
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/mgo.v2"
 )
 
 var session *mgo.Session

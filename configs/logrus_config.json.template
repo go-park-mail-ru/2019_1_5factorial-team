@@ -1,0 +1,11 @@
+{
+  "app_name": "",
+  "auth_token": "",
+  "target_id": "",
+  "async": true,
+  "timeout": "30s",
+
+  "disable_colors": false,
+  "full_timestamp": true,
+  "timestamp_format": "2006-01-02 15:04:05"
+}
