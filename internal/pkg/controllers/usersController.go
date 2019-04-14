@@ -214,7 +214,7 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 
 	userId := req.Context().Value("userID").(string)
 
-	err = user.UpdateUser(userId, data.Avatar, data.NewPassword, data.OldPassword)
+	err = user.UpdateUser(userId, data.Avatar, data.OldPassword, data.NewPassword)
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, err.Error())
 
