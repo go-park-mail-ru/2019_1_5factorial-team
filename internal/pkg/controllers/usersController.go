@@ -101,7 +101,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, err.Error())
 
-		ctxLogger.Error(errors.Wrap(err,"Set token returned err"))
+		ctxLogger.Error(errors.Wrap(err, "Set token returned err"))
 		return
 	}
 

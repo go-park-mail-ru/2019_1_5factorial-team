@@ -37,18 +37,19 @@ func (mgs *MyGorgeousServer) Run() error {
 	staticRouter.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	// main router with check cookie
-	router.Use(middleware.AuthMiddleware)
+	mainRouter := router.PathPrefix("").Subrouter()
+	mainRouter.Use(middleware.AuthMiddleware)
 
-	router.HandleFunc("/hello", controllers.HelloWorld).Methods("GET")
-	router.HandleFunc("/api/user", controllers.SignUp).Methods("POST", "OPTIONS")
-	router.HandleFunc("/api/user/{id:[0-9]+}", controllers.GetUser).Methods("GET", "OPTIONS")
-	router.HandleFunc("/api/user/score", controllers.GetLeaderboard).Methods("GET", "OPTIONS")
-	router.HandleFunc("/api/user/count", controllers.UsersCountInfo).Methods("GET", "OPTIONS")
-	router.HandleFunc("/api/session", controllers.SignIn).Methods("POST", "OPTIONS")
-	router.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
+	mainRouter.HandleFunc("/hello", controllers.HelloWorld).Methods("GET")
+	mainRouter.HandleFunc("/api/user", controllers.SignUp).Methods("POST", "OPTIONS")
+	mainRouter.HandleFunc("/api/user/{id:[0-9]+}", controllers.GetUser).Methods("GET", "OPTIONS")
+	mainRouter.HandleFunc("/api/user/score", controllers.GetLeaderboard).Methods("GET", "OPTIONS")
+	mainRouter.HandleFunc("/api/user/count", controllers.UsersCountInfo).Methods("GET", "OPTIONS")
+	mainRouter.HandleFunc("/api/session", controllers.SignIn).Methods("POST", "OPTIONS")
+	mainRouter.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
 
 	// routers with logged user
-	routerLoginRequired := router.PathPrefix("").Subrouter()
+	routerLoginRequired := mainRouter.PathPrefix("").Subrouter()
 	routerLoginRequired.Use(middleware.CheckLoginMiddleware)
 
 	routerLoginRequired.HandleFunc("/api/user", controllers.GetUserFromSession).Methods("GET", "OPTIONS")
