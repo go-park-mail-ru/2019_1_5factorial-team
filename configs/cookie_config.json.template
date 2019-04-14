@@ -1,0 +1,7 @@
+{
+  "cookie_name": "token",
+  "http_only": true,
+  "cookie_time_hours": 10,
+  "server_prefix": "/api",
+  "cookie_time": "10h"
+}

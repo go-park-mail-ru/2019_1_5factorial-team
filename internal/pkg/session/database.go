@@ -1,96 +1,85 @@
 package session
 
 import (
-	"fmt"
-	"github.com/pkg/errors"
-	"sync"
 	"time"
+
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
+	"github.com/pkg/errors"
 )
+
+var collectionName = "user_session"
 
 const NoTokenFound string = "token not found"
 
-type DatabaseToken struct {
-	UserId            int64
-	CookieExpiredTime time.Time
-	//CookieIssuedTime  time.Time
+func SetToken(id string) (string, time.Time, error) {
+	now := time.Now()
+
+	dt := UserSession{
+		Token:             GenerateToken(),
+		UserId:            id,
+		CookieExpiredTime: now.Add(config.Get().CookieConfig.CookieTimeHours.Duration),
+	}
+
+	err := dt.Insert()
+	if err != nil {
+		return "", time.Time{}, errors.Wrap(err, "cant create session")
+	}
+
+	return dt.Token, dt.CookieExpiredTime, nil
 }
 
-var once sync.Once
-var tokens map[string]DatabaseToken
-var mu *sync.Mutex
+func UpdateToken(token string) (UserSession, error) {
+	us, err := GetSessionByToken(token)
+	if err != nil {
+		return UserSession{}, errors.Wrap(err, "cant find token")
+	}
 
-func init() {
-	once.Do(func() {
-		fmt.Println("init tokens map")
-
-		tokens = make(map[string]DatabaseToken)
-		mu = &sync.Mutex{}
-	})
-}
-
-func SetToken(id int64) (string, time.Time, error) {
-	defer mu.Unlock()
-
-	token := GenerateToken()
-
-	mu.Lock()
-
-	// генерю токен, пока не найдет неиспользованный
-LOOP:
-	for {
-		if _, ok := tokens[token]; !ok {
-			break LOOP
+	exp := us.CheckExpireTime()
+	if exp >= 0 && exp <= 10*time.Minute {
+		err = us.UpdateTime()
+		if err != nil {
+			return UserSession{}, errors.Wrap(err, "UpdateToken error, cant update time")
+		}
+	} else if exp < 0 {
+		err = us.Delete()
+		if err != nil {
+			return UserSession{}, errors.Wrap(err, "UpdateToken error, can't delete expired token")
 		}
 	}
 
-	now := time.Now()
-	tokens[token] = DatabaseToken{
-		UserId:            id,
-		CookieExpiredTime: now.Add(CookieTimeHours * time.Hour),
-		//CookieIssuedTime:  now,
-	}
-
-	return token, now.Add(CookieTimeHours * time.Hour), nil
-}
-
-func UpdateToken(token string) (DatabaseToken, error) {
-	defer mu.Unlock()
-
-	mu.Lock()
-
-	// updating values in map not via ptrs
-	tmpToken := tokens[token]
-	tmpToken.CookieExpiredTime = time.Now().Add(CookieTimeHours * time.Hour)
-	tokens[token] = tmpToken
-
-	return tokens[token], nil
+	return us, nil
 }
 
 // при взятии токена, проверяет его на время
-func GetId(token string) (int64, error) {
-	defer mu.Unlock()
-	mu.Lock()
-
-	if i, ok := tokens[token]; !ok {
-		return 0, errors.New(NoTokenFound)
-	} else {
-		if i.CookieExpiredTime.Unix() < time.Now().Unix() {
-			return 0, errors.New("your's session has been expired, relogin please")
-		} else {
-			return i.UserId, nil
-		}
+func GetId(token string) (string, error) {
+	us, err := GetSessionByToken(token)
+	if err != nil {
+		return "", errors.Wrap(err, "GetId error")
 	}
+
+	exp := us.CheckExpireTime()
+	if exp < 0 {
+		err = us.Delete()
+		if err != nil {
+			return "", errors.Wrap(err, "cant delete expired token")
+		}
+
+		return "", errors.New("your token expired")
+	}
+
+	return us.UserId, nil
 }
 
 func DeleteToken(token string) error {
-	defer mu.Unlock()
-	mu.Lock()
-
-	if _, ok := tokens[token]; !ok {
-		return errors.New(NoTokenFound)
+	us, err := GetSessionByToken(token)
+	if err != nil {
+		return errors.Wrap(err, "DeleteToken error get token")
 	}
 
-	delete(tokens, token)
+	err = us.Delete()
+	if err != nil {
+		return errors.Wrap(err, "DeleteToken error delete token")
+	}
 
 	return nil
 }

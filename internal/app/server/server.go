@@ -1,27 +1,38 @@
 package server
 
 import (
+	"net/http"
+
 	_ "github.com/go-park-mail-ru/2019_1_5factorial-team/docs"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/fileproc"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-
 	"github.com/swaggo/http-swagger"
-	"net/http"
 )
 
-func Run(port string) error {
+type MyGorgeousServer struct {
+	port string
+}
 
-	address := ":" + port
+func New(port string) *MyGorgeousServer {
+	mgs := MyGorgeousServer{}
+	mgs.port = port
+
+	return &mgs
+}
+
+func (mgs *MyGorgeousServer) Run() error {
+
+	address := ":" + mgs.port
 	router := mux.NewRouter()
 	router.Use(middleware.CORSMiddleware)
 	router.Use(middleware.PanicMiddleware)
 
 	// routers for sharing static and swagger
 	staticRouter := router.PathPrefix("").Subrouter()
-	imgServer := http.FileServer(http.Dir(fileproc.UploadPath))
+	imgServer := http.FileServer(http.Dir(config.Get().StaticServerConfig.UploadPath))
 	staticRouter.PathPrefix("/static/").Handler(http.StripPrefix("/static/", imgServer))
 	staticRouter.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
