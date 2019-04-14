@@ -21,9 +21,9 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			ctx = context.WithValue(ctx, "authorized", authorized)
 
 			if authorized {
-				ctx = context.WithValue(ctx, "logger", log.LoggerWithAuth(req))
+				ctx = context.WithValue(ctx, "logger", log.LoggerWithAuth(req.WithContext(ctx)))
 			} else {
-				ctx = context.WithValue(ctx, "logger", log.LoggerWithoutAuth(req))
+				ctx = context.WithValue(ctx, "logger", log.LoggerWithoutAuth(req.WithContext(ctx)))
 			}
 
 			next.ServeHTTP(res, req.WithContext(ctx))
