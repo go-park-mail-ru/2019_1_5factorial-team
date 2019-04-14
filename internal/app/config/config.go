@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"log"
+	"github.com/sirupsen/logrus"
 	"strings"
 	"time"
 
@@ -40,6 +40,7 @@ func (d Duration) MarshalJSON() (b []byte, err error) {
 	return []byte(fmt.Sprintf(`"%s"`, d.String())), nil
 }
 
+// TODO(): вырезать CookieDuration здесь и в конфиге
 // структура конфига кук
 type CookieConfig struct {
 	CookieName      string   `json:"cookie_name"`
@@ -50,12 +51,32 @@ type CookieConfig struct {
 }
 
 // структура конфига базы юзеров
-type DBUserConfig struct {
+type DBConfig struct {
+	Hostname       string `json:"hostname"`
 	MongoPort      string `json:"mongo_port"`
 	DatabaseName   string `json:"database_name"`
 	CollectionName string `json:"collection_name"`
-	//GenerateFakeUsers bool   `json:"generate_fake_users"`
-	TruncateTable bool `json:"truncate_table"`
+	TruncateTable  bool   `json:"truncate_table"`
+}
+
+// структура конфига хука под тележку и основного лога
+type LogrusConfig struct {
+	// тг
+	AppName   string   `json:"app_name"`
+	AuthToken string   `json:"auth_token"`
+	TargetID  string   `json:"target_id"`
+	Async     bool     `json:"async"`
+	Timeout   Duration `json:"timeout"`
+
+	// socks5 для тг
+	ProxyNetwork string `json:"proxy_network"`
+	ProxyIP      string `json:"proxy_ip"`
+	ProxyPort    string `json:"proxy_port"`
+
+	// логрус
+	DisableColors   bool   `json:"disable_colors"`
+	FullTimestamp   bool   `json:"full_timestamp"`
+	TimestampFormat string `json:"timestamp_format"`
 }
 
 // TODO(): есть смысл объединить в 1 файл конфига
@@ -64,7 +85,8 @@ type ServerConfig struct {
 	StaticServerConfig StaticServerConfig
 	CORSConfig         CORSConfig
 	CookieConfig       CookieConfig
-	DBUserConfig       []DBUserConfig
+	DBConfig           []DBConfig
+	LogrusConfig       LogrusConfig
 
 	configPath string
 }
@@ -91,23 +113,33 @@ var configs = []valueAndPath{
 		to:   &instance.CookieConfig,
 	},
 	{
-		from: "db_user_config.json",
-		to: &instance.DBUserConfig,
+		from: "db_config.json",
+		to:   &instance.DBConfig,
+	},
+	{
+		from: "logrus_config.json",
+		to:   &instance.LogrusConfig,
 	},
 }
 
 // считывание всех конфигов по пути `configsDir`
 func Init(configsDir string) error {
-	log.Println("Configs->logs path = ", configsDir)
+	logrus.WithField("func", "config.Init").Info("logs path = ", configsDir)
 
 	for i, val := range configs {
 		err := config_reader.ReadConfigFile(configsDir, val.from, val.to)
 		if err != nil {
+			logrus.WithField("err", err.Error()).Error("config.Init")
+
 			return errors.Wrap(err, "error while reading config")
 		}
 
-		log.Println("Configs->", i, "config = ", val.to)
+		//log.Println("Configs->", i, "config = ", val.to)
+		logrus.WithField("func", "config.Init").
+			Infof("i = %d, from file = %s, config = %v", i, val.from, val.to)
 	}
+
+	instance.StaticServerConfig.MaxUploadSize = instance.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
 
 	return nil
 }

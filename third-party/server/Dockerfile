@@ -23,5 +23,5 @@ EXPOSE 5051
 
 RUN ls
 
-RUN go build cmd/server/main.go
+RUN go build -mod=vendor cmd/server/main.go
 CMD ./main
