@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/game"
 	"github.com/gorilla/websocket"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"log"
 	"net/http"
@@ -23,7 +25,16 @@ func Play(res http.ResponseWriter, req *http.Request) {
 
 	log.Print("connected to client")
 
-	player := game.NewPlayer(conn, req.Context().Value("userID").(string))
+	currentSession, err := req.Cookie(config.Get().CookieConfig.CookieName)
+	if err == http.ErrNoCookie {
+		// бесполезная проверка, так кука валидна, но по гостайлу нужна
+		ErrResponse(res, http.StatusUnauthorized, "not authorized")
+
+		ctxLogger.Error(errors.Wrap(err, "not authorized"))
+		return
+	}
+
+	player := game.NewPlayer(conn, currentSession.Value)
 	go player.Listen()
 	game.InstanceGame.AddPlayer(player)
 

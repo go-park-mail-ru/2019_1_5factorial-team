@@ -8,7 +8,7 @@ import (
 type Player struct {
 	conn *websocket.Conn
 	// если нужно хранить всю инфу по пользователю, то хранить User
-	ID         string
+	Token      string
 	Score      int
 	room       *Room
 	in         chan *IncomeMessage
@@ -17,10 +17,10 @@ type Player struct {
 	stopListen chan struct{}
 }
 
-func NewPlayer(conn *websocket.Conn, id string) *Player {
+func NewPlayer(conn *websocket.Conn, token string) *Player {
 	return &Player{
 		conn:       conn,
-		ID:         id,
+		Token:      token,
 		Score:      0,
 		in:         make(chan *IncomeMessage),
 		out:        make(chan *Message),
@@ -41,7 +41,7 @@ func (p *Player) Listen() {
 				err := p.conn.ReadJSON(message)
 				if websocket.IsUnexpectedCloseError(err) {
 					p.room.RemovePlayer(p)
-					logrus.Printf("player %s disconnected", p.ID)
+					logrus.Printf("player %s disconnected", p.Token)
 					return
 				}
 				if err != nil {

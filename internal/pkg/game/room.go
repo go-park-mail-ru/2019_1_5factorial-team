@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gameLogic"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
-	"log"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"sync"
 	"time"
 )
@@ -60,7 +60,7 @@ func NewRoom(maxPlayers uint, game *Game) *Room {
 		enemyEnd:   make(chan struct{}),
 
 		mu:     &sync.Mutex{},
-		ticker: time.NewTicker(1 * time.Second),
+		ticker: time.NewTicker(2 * time.Second),
 		state: &RoomState{
 			Objects: gameLogic.NewGhostStack(),
 		},
@@ -68,61 +68,52 @@ func NewRoom(maxPlayers uint, game *Game) *Room {
 }
 
 func (r *Room) Run() {
-	log.Printf("room loop started ID=%s", r.ID)
+	log.Printf("room loop started Token=%s", r.ID)
+//LOOP:
 	for {
 		select {
 		case <-r.dead:
 			log.Printf("room id=%s, players are dead", r.ID)
 			r.Close()
+			return
 
 		case <-r.enemyEnd:
 			log.Printf("room id=%s, enemy ends", r.ID)
 			r.Close()
+			return
 
 		case player := <-r.unregister:
 
-			delete(r.Players, player.ID)
-			log.Printf("player %s was removed from room", player.ID)
+			delete(r.Players, player.Token)
+			log.Printf("player %s was removed from room", player.Token)
 
 			// убираем вышедшему игроку очки, а оставшемуся очки делим на 2
 			for _, players := range r.Players {
-				players.SendMessage(&Message{"END", fmt.Sprintf("player %s has left, GAME OVER", player.ID)})
+				players.SendMessage(&Message{"END", fmt.Sprintf("player %s has left, GAME OVER", player.Token)})
 			}
 
 			r.state.Players = r.state.Players[:len(r.state.Players)-1]
 			r.playerCnt -= 1
 
 			r.Close()
+			return
 
 		case player := <-r.register:
-			r.Players[player.ID] = player
-			log.Printf("player %s joined", player.ID)
+			r.Players[player.Token] = player
+			log.Printf("player %s joined", player.Token)
 			player.SendMessage(&Message{"CONNECTED", nil})
 
-			r.state.Players = append(r.state.Players, gameLogic.NewPlayerCharacter(player.ID))
+			r.state.Players = append(r.state.Players, gameLogic.NewPlayerCharacter(player.Token))
 
 			r.playerCnt += 1
-
-			if r.playerCnt == r.MaxPlayers {
-				//TODO(): аппендить призраков на каждом тике, но не больше заданного значения
-				r.state.Objects.PushBack(
-					gameLogic.NewGhost(100, 20, "kek", 10, 5))
-				r.state.Objects.PushBack(
-					gameLogic.NewGhost(-110, 80, "kek1", 10, 5))
-				r.state.Objects.PushBack(
-					gameLogic.NewGhost(120, 80, "kek2", 10, 5))
-			}
 
 		case <-r.ticker.C:
 			if r.playerCnt != r.MaxPlayers {
 				continue
 			}
 
-			if r.state.Objects.Len() == 0 {
-				log.Println("enemy end")
-				r.Close()
-				//r.enemyEnd <- struct{}{}
-				//continue
+			if r.state.Objects.Len() <= 4 {
+				r.state.Objects.PushBack(gameLogic.NewRandomGhost())
 			}
 
 			log.Println("tick")
@@ -139,8 +130,13 @@ func (r *Room) Run() {
 					r.state.Players[i].HP -= 20
 
 					if r.state.Players[i].HP <= 0 {
-						r.dead <- &Player{}
-						//continue
+						log.Println("---===DEAD===---")
+						r.Close()
+						return
+
+						// на каналах не работает хз поч
+						//r.dead <- &Player{}
+						//continue LOOP
 					}
 				}
 			}
@@ -148,6 +144,8 @@ func (r *Room) Run() {
 			for _, player := range r.Players {
 				player.SendState(r.state)
 			}
+
+			r.PrintStates()
 		}
 	}
 }
@@ -171,4 +169,21 @@ func (r *Room) Close() {
 	}
 	r.mu.Unlock()
 	r.game.CloseRoom(r.ID)
+}
+
+func (r *Room) PrintStates() {
+	log.Printf("================= room id = %s =================", r.ID)
+
+	//log.Printf("players:")
+	//for i, val := range r.Players {
+	//	log.Printf("\t%s: %v", i, val)
+	//}
+
+	log.Printf("state:\t\nplayers:")
+	for i, val := range r.state.Players {
+		log.Printf("\t\t%d: %v", i, val)
+	}
+	log.Printf("\t\nghosts:\n%v", r.state.Objects)
+
+	log.Printf("================= =================")
 }

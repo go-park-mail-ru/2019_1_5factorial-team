@@ -11,8 +11,10 @@ import (
 )
 
 var (
-	Fatal = logrus.Fatalf
-	Warn  = logrus.Warn
+	Fatal   = logrus.Fatalf
+	Warn    = logrus.Warn
+	Printf  = logrus.Printf
+	Println = logrus.Println
 )
 
 func InitLogs() {

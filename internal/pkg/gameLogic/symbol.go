@@ -5,12 +5,10 @@ import "math/rand"
 type Symbol int
 
 const (
-	BottomTriangle Symbol = iota
-	TopTriangle
-	Square
-	Circle
-	VertLine
-	HorizLine
+	Top Symbol = iota
+	Left
+	Right
+	Bottom
 )
 
 func GenerateSybolsSlice(len int) []Symbol {

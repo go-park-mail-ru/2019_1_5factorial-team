@@ -52,7 +52,7 @@ LOOP:
 }
 
 func (g *Game) AddPlayer(player *Player) {
-	log.Printf("player %s queued to add", player.ID)
+	log.Printf("player %s queued to add", player.Token)
 	g.register <- player
 }
 
@@ -71,5 +71,5 @@ func (g *Game) CloseRoom(ID string) {
 	delete(g.rooms, ID)
 	g.mu.Unlock()
 
-	log.Printf("room ID=%s deleted", ID)
+	log.Printf("room Token=%s deleted", ID)
 }

@@ -1,22 +1,31 @@
 package gameLogic
 
 import (
+	"math/rand"
 	"sync"
 )
 
 type Ghost struct {
-	X       int      `json:"x"`
-	Speed   int      `json:"speed"`
-	Damage  uint32   `json:"damage"`
-	Sprite  string   `json:"sprite"`
+	X      int    `json:"x"`
+	Speed  int    `json:"speed"`
+	Damage uint32 `json:"damage"`
+	//Sprite  string   `json:"sprite"`
 	Symbols []Symbol `json:"symbols"`
 }
 
-func NewGhost(startPosition int, damage uint32, sprite string, speed int, symbolsLen int) Ghost {
+const (
+	DefaultSprite          = "kek"
+	DefaultStartPosition   = 100
+	DefaultMovementSpeed   = 10
+	DefaultLenSymbolsSlice = 4
+	DefaultDamage          = 20
+)
+
+func NewGhost(startPosition int, damage uint32, speed int, symbolsLen int) Ghost {
 	g := Ghost{
-		X:       startPosition,
-		Damage:  damage,
-		Sprite:  sprite,
+		X:      startPosition,
+		Damage: damage,
+		//Sprite:  sprite,
 		Symbols: GenerateSybolsSlice(symbolsLen),
 	}
 
@@ -25,6 +34,31 @@ func NewGhost(startPosition int, damage uint32, sprite string, speed int, symbol
 	} else {
 		g.Speed = speed
 	}
+
+	return g
+}
+
+func NewRandomGhost() Ghost {
+	g := Ghost{
+		X:      DefaultStartPosition,
+		Damage: DefaultDamage,
+		//Sprite:  sprite,
+		Symbols: GenerateSybolsSlice(DefaultLenSymbolsSlice),
+	}
+
+	// rand bool
+	kek := rand.Intn(100)
+	if kek%2 == 0 {
+		g.X *= -1
+	}
+
+	if g.X > 0 {
+		g.Speed = -DefaultMovementSpeed
+	} else {
+		g.Speed = DefaultMovementSpeed
+	}
+
+	//fmt.Println(g)
 
 	return g
 }
