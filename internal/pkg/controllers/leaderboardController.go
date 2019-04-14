@@ -3,7 +3,8 @@ package controllers
 import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/pkg/errors"
-	"log"
+	"github.com/sirupsen/logrus"
+
 	"net/http"
 	"strconv"
 )
@@ -29,10 +30,13 @@ type GetLeaderboardResponse struct {
 // @Failure 400 {object} controllers.errorResponse
 // @Router /user/score [get]
 func GetLeaderboard(res http.ResponseWriter, req *http.Request) {
-	log.Println("================", req.URL, req.Method, "GetLeaderboard", "================")
+	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
+	ctxLogger.Info("============================================")
 
 	query := req.URL.Query()
-	log.Println("\t query = ", query)
+
+	ctxLogger.Info("query = ", query)
+
 	limit, _ := strconv.Atoi(query.Get("limit"))
 	offset, _ := strconv.Atoi(query.Get("offset"))
 
@@ -40,15 +44,13 @@ func GetLeaderboard(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, err.Error())
 
-		log.Println("\t", errors.Wrap(err, "get leaderboard error"))
+		ctxLogger.Error(errors.Wrap(err, "get leaderboard error"))
 		return
 	}
 
 	OkResponse(res, GetLeaderboardResponse{
 		Scores: leaderboard,
 	})
-	log.Println("\t", "ok response GetLeaderboard")
-	for i, val := range leaderboard {
-		log.Printf("\t\t i = %d, nickname = %s, score = %d", i, val.Nickname, val.Score)
-	}
+
+	ctxLogger.Info("OK response = ", leaderboard)
 }

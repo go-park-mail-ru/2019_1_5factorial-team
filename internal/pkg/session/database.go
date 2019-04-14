@@ -1,9 +1,10 @@
 package session
 
 import (
+	"time"
+
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/pkg/errors"
-	"time"
 )
 
 var collectionName = "user_session"

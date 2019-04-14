@@ -65,6 +65,9 @@ cp ./../configs/static_server_config.json.template /etc/5factorial/static_server
 echo "-- user_faker_config"
 cp ./../configs/user_faker_config.json.template /etc/5factorial/user_faker_config.json
 
+echo "-- logrus_config"
+cp ./../configs/logrus_config.json.template /etc/5factorial/logrus_config.json
+
 echo "== OK"
 
 # /////////////////////////////////////////

@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"log"
+	"github.com/sirupsen/logrus"
 	"strings"
 	"time"
 
@@ -59,6 +59,26 @@ type DBConfig struct {
 	TruncateTable  bool   `json:"truncate_table"`
 }
 
+// структура конфига хука под тележку и основного лога
+type LogrusConfig struct {
+	// тг
+	AppName   string   `json:"app_name"`
+	AuthToken string   `json:"auth_token"`
+	TargetID  string   `json:"target_id"`
+	Async     bool     `json:"async"`
+	Timeout   Duration `json:"timeout"`
+
+	// socks5 для тг
+	ProxyNetwork string `json:"proxy_network"`
+	ProxyIP      string `json:"proxy_ip"`
+	ProxyPort    string `json:"proxy_port"`
+
+	// логрус
+	DisableColors   bool   `json:"disable_colors"`
+	FullTimestamp   bool   `json:"full_timestamp"`
+	TimestampFormat string `json:"timestamp_format"`
+}
+
 // TODO(): есть смысл объединить в 1 файл конфига
 // структура сервера, собирает все вышеперечисленные структуры
 type ServerConfig struct {
@@ -66,6 +86,7 @@ type ServerConfig struct {
 	CORSConfig         CORSConfig
 	CookieConfig       CookieConfig
 	DBConfig           []DBConfig
+	LogrusConfig       LogrusConfig
 
 	configPath string
 }
@@ -95,20 +116,30 @@ var configs = []valueAndPath{
 		from: "db_config.json",
 		to:   &instance.DBConfig,
 	},
+	{
+		from: "logrus_config.json",
+		to:   &instance.LogrusConfig,
+	},
 }
 
 // считывание всех конфигов по пути `configsDir`
 func Init(configsDir string) error {
-	log.Println("Configs->logs path = ", configsDir)
+	logrus.WithField("func", "config.Init").Info("logs path = ", configsDir)
 
 	for i, val := range configs {
 		err := config_reader.ReadConfigFile(configsDir, val.from, val.to)
 		if err != nil {
+			logrus.WithField("err", err.Error()).Error("config.Init")
+
 			return errors.Wrap(err, "error while reading config")
 		}
 
-		log.Println("Configs->", i, "config = ", val.to)
+		//log.Println("Configs->", i, "config = ", val.to)
+		logrus.WithField("func", "config.Init").
+			Infof("i = %d, from file = %s, config = %v", i, val.from, val.to)
 	}
+
+	instance.StaticServerConfig.MaxUploadSize = instance.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
 
 	return nil
 }

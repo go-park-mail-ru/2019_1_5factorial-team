@@ -13,7 +13,7 @@ import (
 // заполняем базу user, коллекция profile данными
 func main() {
 	configPath := flag.String("config", "/etc/5factorial/", "dir with server configs")
-	port := flag.String("port", "27017", "user db port")
+	port := flag.String("port", "27031", "user db port")
 
 	flag.Parse()
 

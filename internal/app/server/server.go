@@ -4,7 +4,6 @@ import (
 	_ "github.com/go-park-mail-ru/2019_1_5factorial-team/docs"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
@@ -19,8 +18,6 @@ type MyGorgeousServer struct {
 func New(port string) *MyGorgeousServer {
 	mgs := MyGorgeousServer{}
 	mgs.port = port
-
-	database.InitConnection()
 
 	return &mgs
 }
