@@ -1,120 +1,85 @@
 package session
 
 import (
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
-	"github.com/pkg/errors"
-	"gopkg.in/mgo.v2/bson"
-	"log"
 	"time"
+
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
+	"github.com/pkg/errors"
 )
 
 var collectionName = "user_session"
 
 const NoTokenFound string = "token not found"
 
-type DatabaseToken struct {
-	ID                bson.ObjectId `bson:"_id"`
-	Token             string        `bson:"token"`
-	UserId            string        `bson:"user_id"`
-	CookieExpiredTime time.Time     `bson:"cookie_expired_time"`
-}
-
 func SetToken(id string) (string, time.Time, error) {
 	now := time.Now()
 
-	dt := DatabaseToken{
-		ID:                bson.NewObjectId(),
+	dt := UserSession{
 		Token:             GenerateToken(),
 		UserId:            id,
 		CookieExpiredTime: now.Add(config.Get().CookieConfig.CookieTimeHours.Duration),
 	}
 
-	col, err := database.GetCollection(collectionName)
+	err := dt.Insert()
 	if err != nil {
-		return "", time.Time{}, errors.Wrap(err, "collection not found")
-	}
-
-	err = col.Insert(dt)
-	if err != nil {
-		return "", time.Time{}, errors.Wrap(err, "error while adding new user")
+		return "", time.Time{}, errors.Wrap(err, "cant create session")
 	}
 
 	return dt.Token, dt.CookieExpiredTime, nil
 }
 
-func UpdateToken(token string) (DatabaseToken, error) {
-	dt := DatabaseToken{}
-	col, err := database.GetCollection(collectionName)
+func UpdateToken(token string) (UserSession, error) {
+	us, err := GetSessionByToken(token)
 	if err != nil {
-		return DatabaseToken{}, errors.Wrap(err, "collection not found")
+		return UserSession{}, errors.Wrap(err, "cant find token")
 	}
 
-	err = col.Find(bson.M{"token": token}).One(&dt)
-	if err != nil {
-		return DatabaseToken{}, errors.Wrap(err, "token not found")
-	}
-
-	// если через 10 минут кука умрет, добавим ему времени
-	if dt.CookieExpiredTime.Sub(time.Now()) < 10*time.Minute && dt.CookieExpiredTime.Sub(time.Now()) > 0 {
-		dt.CookieExpiredTime = time.Now().Add(config.Get().CookieConfig.CookieTimeHours.Duration)
-
-		err = col.UpdateId(dt.ID, dt)
+	exp := us.CheckExpireTime()
+	if exp >= 0 && exp <= 10*time.Minute {
+		err = us.UpdateTime()
 		if err != nil {
-			return DatabaseToken{}, errors.Wrap(err, "error while updating value in DB")
+			return UserSession{}, errors.Wrap(err, "UpdateToken error, cant update time")
 		}
-	} else if dt.CookieExpiredTime.Sub(time.Now()) < 0 {
-		// убиваем истекшую куку, вряд ли такое случится (хз)
-		err = DeleteToken(dt.Token)
+	} else if exp < 0 {
+		err = us.Delete()
 		if err != nil {
-			return DatabaseToken{}, errors.Wrap(err, "cant delete expired token")
+			return UserSession{}, errors.Wrap(err, "UpdateToken error, can't delete expired token")
 		}
-
-		return DatabaseToken{}, errors.New("your token expired")
 	}
 
-	return dt, nil
+	return us, nil
 }
 
 // при взятии токена, проверяет его на время
 func GetId(token string) (string, error) {
-	dt := DatabaseToken{}
-	col, err := database.GetCollection(collectionName)
+	us, err := GetSessionByToken(token)
 	if err != nil {
-		return "", errors.Wrap(err, "collection not found")
+		return "", errors.Wrap(err, "GetId error")
 	}
 
-	err = col.Find(bson.M{"token": token}).One(&dt)
-	if err != nil {
-		return "", errors.Wrap(err, "token not found")
-	}
-
-	if dt.CookieExpiredTime.Sub(time.Now()) < 0 {
-		err = DeleteToken(dt.Token)
+	exp := us.CheckExpireTime()
+	if exp < 0 {
+		err = us.Delete()
 		if err != nil {
 			return "", errors.Wrap(err, "cant delete expired token")
 		}
 
-		log.Println(errors.New("your token expired"))
-
 		return "", errors.New("your token expired")
 	}
 
-	return dt.UserId, nil
+	return us.UserId, nil
 }
 
 func DeleteToken(token string) error {
-	dt := DatabaseToken{}
-	col, err := database.GetCollection(collectionName)
+	us, err := GetSessionByToken(token)
 	if err != nil {
-		return errors.Wrap(err, "collection not found")
+		return errors.Wrap(err, "DeleteToken error get token")
 	}
 
-	err = col.Find(bson.M{"token": token}).One(&dt)
+	err = us.Delete()
 	if err != nil {
-		return errors.Wrap(err, NoTokenFound)
+		return errors.Wrap(err, "DeleteToken error delete token")
 	}
 
-	err = col.RemoveId(dt.ID)
-	return err
+	return nil
 }

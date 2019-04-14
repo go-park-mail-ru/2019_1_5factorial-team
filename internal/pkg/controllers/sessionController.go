@@ -51,6 +51,12 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	}
 
 	randToken, expiration, err := session.SetToken(u.ID.Hex())
+	if err != nil {
+		ErrResponse(res, http.StatusConflict, err.Error())
+
+		log.Println("\t", errors.Wrap(err, "Already auth"))
+		return
+	}
 
 	cookie := session.CreateHttpCookie(randToken, expiration)
 
