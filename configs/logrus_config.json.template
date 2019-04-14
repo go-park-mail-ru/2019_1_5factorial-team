@@ -5,6 +5,10 @@
   "async": true,
   "timeout": "30s",
 
+  "proxy_network": "tcp",
+  "proxy_ip": "204.42.255.254",
+  "proxy_port": "1080",
+
   "disable_colors": false,
   "full_timestamp": true,
   "timestamp_format": "2006-01-02 15:04:05"

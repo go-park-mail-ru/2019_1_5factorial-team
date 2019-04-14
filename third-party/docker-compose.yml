@@ -6,8 +6,8 @@ services:
     command: mongod --port 27031
     image: mongo:4.0
 #    environment:
-#      MONGO_INITDB_ROOT_USERNAME: user
-#      MONGO_INITDB_ROOT_PASSWORD: user
+#      MONGO_INITDB_ROOT_USERNAME: 'user'
+#      MONGO_INITDB_ROOT_PASSWORD: 'user'
     volumes:
       - '/data/db/user:/data/db'  # /Users/smet_k/Desktop/test-mongo-db/user:/data/db
     ports:
@@ -18,29 +18,29 @@ services:
     command: mongod --port 27032
     image: mongo:4.0
 #    environment:
-#      MONGO_INITDB_ROOT_USERNAME: user
-#      MONGO_INITDB_ROOT_PASSWORD: user
+#      MONGO_INITDB_ROOT_USERNAME: 'user'
+#      MONGO_INITDB_ROOT_PASSWORD: 'user'
     volumes:
       - '/data/db/session:/data/db'  # /Users/smet_k/Desktop/test-mongo-db/session:/data/db
     ports:
       - '27052:27032' # map port to none standard port, to avoid conflicts with locally installed mongodb.
 
-  server-go:
-    container_name: 5factorial-back
-    restart: always
-    build:
-      context: ../.
-      dockerfile: ./third-party/server/Dockerfile
-    volumes:
-      - '/var/www/media/factorial:/var/www/media/factorial'
-      - '/etc/5factorial:/etc/5factorial'
-    ports:
-      - '5051:5051'
-    depends_on:
-      - mongo-user
-      - mongo-session
-#    logging:
-#      driver: "json-file"
-#      options:
-#        max-size: "1k"
-#        max-file: "3"
+#  server-go:
+#    container_name: 5factorial-back
+#    restart: always
+#    build:
+#      context: ../.
+#      dockerfile: ./third-party/server/Dockerfile
+#    volumes:
+#      - '/var/www/media/factorial:/var/www/media/factorial'
+#      - '/etc/5factorial:/etc/5factorial'
+#    ports:
+#      - '5051:5051'
+#    depends_on:
+#      - mongo-user
+#      - mongo-session
+##    logging:
+##      driver: "json-file"
+##      options:
+##        max-size: "1k"
+##        max-file: "3"

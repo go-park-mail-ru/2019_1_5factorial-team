@@ -67,6 +67,12 @@ type LogrusConfig struct {
 	TargetID  string   `json:"target_id"`
 	Async     bool     `json:"async"`
 	Timeout   Duration `json:"timeout"`
+
+	// socks5 для тг
+	ProxyNetwork string `json:"proxy_network"`
+	ProxyIP      string `json:"proxy_ip"`
+	ProxyPort    string `json:"proxy_port"`
+
 	// логрус
 	DisableColors   bool   `json:"disable_colors"`
 	FullTimestamp   bool   `json:"full_timestamp"`
