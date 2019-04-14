@@ -1,9 +1,11 @@
 package log
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/rossmcdonald/telegram_hook"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/net/proxy"
 	"net/http"
 	"os"
 )
@@ -28,11 +30,23 @@ func InitLogs() {
 	//})
 
 	if config.Get().LogrusConfig.AppName != "" {
+		// socks5 proxy for telegram
+		httpTransport := &http.Transport{}
+		httpClient := &http.Client{Transport: httpTransport}
+		dialer, err := proxy.SOCKS5(
+			config.Get().LogrusConfig.ProxyNetwork,
+			fmt.Sprintf("%s:%s", config.Get().LogrusConfig.ProxyIP, config.Get().LogrusConfig.ProxyPort),
+			nil,
+			proxy.Direct,
+		)
+		httpTransport.Dial = dialer.Dial
+
 		// тележка <3
-		hook, err := telegram_hook.NewTelegramHook(
+		hook, err := telegram_hook.NewTelegramHookWithClient(
 			config.Get().LogrusConfig.AppName,
 			config.Get().LogrusConfig.AuthToken,
 			config.Get().LogrusConfig.TargetID,
+			httpClient,
 			telegram_hook.WithAsync(config.Get().LogrusConfig.Async),
 			telegram_hook.WithTimeout(config.Get().LogrusConfig.Timeout.Duration),
 		)
@@ -40,6 +54,9 @@ func InitLogs() {
 			logrus.Fatalf("Encountered error when creating Telegram hook: %s", err)
 		}
 		logrus.AddHook(hook)
+
+		logrus.Warnf("logrus using telegram hook, acc = %s", config.Get().LogrusConfig.AppName)
+		logrus.Errorf("hello %s! I'm alive and ready to sent you errors", config.Get().LogrusConfig.TargetID)
 	}
 }
 

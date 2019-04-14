@@ -13,7 +13,6 @@ func main() {
 	configPath := flag.String("config", "/etc/5factorial/", "dir with server configs")
 	flag.Parse()
 
-	log.InitLogs()
 
 	log.Warn("server will start on port", *port)
 	log.Warn("config path:", *configPath)
@@ -22,6 +21,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+
+	log.InitLogs()
 
 	database.InitConnection()
 
