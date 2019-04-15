@@ -1,160 +1,114 @@
 package user
 
 import (
-	"fmt"
-	"math/rand"
-	"sort"
-	"sync"
-	"sync/atomic"
-
-	"github.com/manveru/faker"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
 	"github.com/pkg/errors"
+	"gopkg.in/mgo.v2/bson"
 )
 
-const DefaultAvatarLink = "../../../img/default.jpg"
+var collectionName = "profile"
 
-var once sync.Once
-var mu *sync.Mutex
-var users map[string]User
-var currentId int64
+func getUser(login string) (User, error) {
+	u := User{}
 
-func init() {
-	once.Do(func() {
-		fmt.Println("init users map")
+	col, err := database.GetCollection(collectionName)
+	if err != nil {
+		return User{}, errors.Wrap(err, "collection not found")
+	}
 
-		fake, _ := faker.New("en")
-		fake.Rand = rand.New(rand.NewSource(42))
-
-		users = make(map[string]User)
-
-		hash, _ := getPasswordHash("password")
-		users["kekkekkek"] = User{
-			Id:           0,
-			Email:        "kek.k.ek",
-			Nickname:     "kekkekkek",
-			HashPassword: hash,
-			Score:        100500,
-			AvatarLink:   DefaultAvatarLink,
-		}
-		mu = &sync.Mutex{}
-		currentId = 0
-
-		var id int64
-		// TODO(smet1): generate fake accs in func
-		for i := 0; i < 20; i++ {
-			id = getNextId()
-			nick := fake.FirstName()
-			hash, _ := getPasswordHash(nick)
-
-			fmt.Println("id:", id, ", Nick:", nick, ", Password:", nick)
-
-			users[nick] = User{
-				Id:           id,
-				Email:        fake.Email(),
-				Nickname:     nick,
-				HashPassword: hash,
-				Score:        rand.Int(),
-				AvatarLink:   DefaultAvatarLink,
-			}
-
-		}
-
-	})
-}
-
-func getUsers() map[string]User {
-	mu.Lock()
-	fmt.Println(users)
-	mu.Unlock()
-
-	return users
-}
-
-func GetUser(login string) (User, error) {
-	defer mu.Unlock()
-
-	mu.Lock()
-	if _, ok := users[login]; !ok {
+	err = col.Find(bson.M{"nickname": login}).One(&u)
+	if err != nil {
 		return User{}, errors.New("Invalid login")
-	} else {
-		return users[login], nil
-	}
-}
-
-func findUserById(id int64) (User, error) {
-	defer mu.Unlock()
-
-	mu.Lock()
-	for _, val := range users {
-		if val.Id == id {
-			return val, nil
-		}
 	}
 
-	return User{}, errors.New("user with this id not found")
+	return u, nil
 }
 
-func addUser(in User) error {
-	defer mu.Unlock()
-	mu.Lock()
+func findUserById(id string) (User, error) {
+	u := User{}
 
-	if _, ok := users[in.Nickname]; ok {
-		return errors.New("User with this nickname already exist")
+	col, err := database.GetCollection(collectionName)
+	if err != nil {
+		return User{}, errors.Wrap(err, "collection not found")
 	}
 
-	users[in.Nickname] = in
-
-	return nil
-}
-
-func PrintUsers() {
-	mu.Lock()
-
-	for i, val := range users {
-		fmt.Println("\t", i, val)
+	err = col.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&u)
+	if err != nil {
+		return User{}, errors.New("user with this id not found")
 	}
-	fmt.Println("----end----")
 
-	mu.Unlock()
+	return u, nil
 }
 
-func getNextId() int64 {
-	atomic.AddInt64(&currentId, 1)
+func addUser(nickname string, email string, password string) (User, error) {
+	hashPassword, err := GetPasswordHash(password)
+	if err != nil {
+		return User{}, errors.Wrap(err, "Hasher password error")
+	}
 
-	return currentId
+	dbu := User{
+		ID:           bson.NewObjectId(),
+		Email:        email,
+		Nickname:     nickname,
+		HashPassword: hashPassword,
+		Score:        0,
+		AvatarLink:   "",
+	}
+
+	col, err := database.GetCollection(collectionName)
+	if err != nil {
+		return User{}, errors.Wrap(err, "collection not found")
+	}
+
+	err = col.Insert(dbu)
+	if err != nil {
+		return User{}, errors.Wrap(err, "error while adding new user")
+	}
+
+	return dbu, nil
 }
 
 func updateDBUser(user User) error {
-	defer mu.Unlock()
-
-	mu.Lock()
-	if _, ok := users[user.Nickname]; !ok {
-		return errors.New("cannot find user")
+	col, err := database.GetCollection(collectionName)
+	if err != nil {
+		return errors.Wrap(err, "collection not found")
 	}
 
-	users[user.Nickname] = user
+	err = col.UpdateId(user.ID, user)
+	if err != nil {
+		return errors.Wrap(err, "error while updating value in DB")
+	}
+
 	return nil
 }
 
-type ByNameScore []User
-
-func (a ByNameScore) Len() int           { return len(a) }
-func (a ByNameScore) Less(i, j int) bool { return a[i].Score < a[j].Score }
-func (a ByNameScore) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-
-func getScores() []User {
-	mu.Lock()
+func getScores(limit int, skip int) ([]User, error) {
 	result := make([]User, 0, 1)
-	for _, val := range users {
-		result = append(result, val)
+	col, err := database.GetCollection(collectionName)
+	if err != nil {
+		return []User{}, errors.Wrap(err, "collection not found")
 	}
 
-	sort.Sort(ByNameScore(result))
+	err = col.Find(nil).Skip(skip).
+		Sort("-score", "nickname").
+		Limit(limit).All(&result)
+	if err != nil {
+		return nil, errors.Wrap(err, "cant query leaderboard")
+	}
 
-	mu.Unlock()
-	return result
+	return result, nil
 }
 
-func getUsersCount() int {
-	return len(users)
+func getUsersCount() (int, error) {
+	col, err := database.GetCollection(collectionName)
+	if err != nil {
+		return -1, errors.Wrap(err, "collection not found")
+	}
+
+	lenTable, err := col.Count()
+	if err != nil {
+		return -1, errors.Wrap(err, "cant count users")
+	}
+
+	return lenTable, nil
 }

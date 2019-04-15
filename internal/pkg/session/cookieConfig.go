@@ -1,30 +1,24 @@
 package session
 
 import (
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"net/http"
 	"time"
 )
 
-const (
-	CookieName      string = "token"
-	HttpOnly        bool   = true
-	CookieTimeHours        = 10
-	ServerPrefix    string = "/api"
-)
-
 func CreateHttpCookie(value string, expiration time.Time) *http.Cookie {
 	return &http.Cookie{
-		Path:     ServerPrefix,
-		Name:     CookieName,
+		Path:     config.Get().CookieConfig.ServerPrefix,
+		Name:     config.Get().CookieConfig.CookieName,
 		Value:    value,
 		Expires:  expiration,
-		HttpOnly: HttpOnly,
+		HttpOnly: config.Get().CookieConfig.HttpOnly,
 	}
 }
 
 func UpdateHttpCookie(cookie *http.Cookie, expiration time.Time) {
-	cookie.Path = ServerPrefix
-	cookie.Name = CookieName
+	cookie.Path = config.Get().CookieConfig.ServerPrefix
+	cookie.Name = config.Get().CookieConfig.CookieName
 	cookie.Expires = expiration
-	cookie.HttpOnly = HttpOnly
+	cookie.HttpOnly = config.Get().CookieConfig.HttpOnly
 }
