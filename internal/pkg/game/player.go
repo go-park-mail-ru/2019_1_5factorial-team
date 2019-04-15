@@ -1,6 +1,7 @@
 package game
 
 import (
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gameLogic"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
@@ -57,13 +58,34 @@ func (p *Player) Listen() {
 	for {
 		select {
 		case <-p.unregister:
-			p.conn.Close()
+			_ = p.conn.Close()
 
 		case message := <-p.out:
-			p.conn.WriteJSON(message)
+			_ = p.conn.WriteJSON(message)
 
 		case message := <-p.in:
-			logrus.Printf("income: %#v", message)
+			logrus.Printf("from player = %s, income: %#v", p.Token, message)
+
+			if message.Type != "MOVE" {
+				logrus.Println("not move")
+				_ = p.conn.WriteJSON(Message{
+					Type: "ERR",
+					Payload: "not valid input",
+				})
+
+				continue
+			}
+
+			button, err := gameLogic.MatchSymbol(message.Pressed)
+			if err != nil {
+				_ = p.conn.WriteJSON(Message{
+					Type: "ERR",
+					Payload: "not valid input",
+				})
+
+				continue
+			}
+			logrus.Println(button)
 		}
 	}
 }

@@ -69,7 +69,7 @@ func NewRoom(maxPlayers uint, game *Game) *Room {
 
 func (r *Room) Run() {
 	log.Printf("room loop started Token=%s", r.ID)
-//LOOP:
+	//LOOP:
 	for {
 		select {
 		case <-r.dead:
@@ -89,7 +89,8 @@ func (r *Room) Run() {
 
 			// убираем вышедшему игроку очки, а оставшемуся очки делим на 2
 			for _, players := range r.Players {
-				players.SendMessage(&Message{"END", fmt.Sprintf("player %s has left, GAME OVER", player.Token)})
+				players.SendMessage(&Message{"END",
+					fmt.Sprintf("player %s has left, GAME OVER", player.Token)})
 			}
 
 			r.state.Players = r.state.Players[:len(r.state.Players)-1]
@@ -145,7 +146,7 @@ func (r *Room) Run() {
 				player.SendState(r.state)
 			}
 
-			r.PrintStates()
+			//r.PrintStates()
 		}
 	}
 }

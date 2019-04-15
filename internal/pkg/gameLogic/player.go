@@ -1,17 +1,17 @@
 package gameLogic
 
 type PlayerCharacter struct {
-	Token  string `json:"id"`
+	Token string `json:"id"`
 	//Sprite string `json:"sprite"`
 	//X      int    `json:"x"`
-	HP     int    `json:"hp"`
+	HP int `json:"hp"`
 }
 
 func NewPlayerCharacter(token string) PlayerCharacter {
 	return PlayerCharacter{
-		Token:  token,
+		Token: token,
 		//Sprite: "default",
 		//X:      0,
-		HP:     100,
+		HP: 100,
 	}
 }

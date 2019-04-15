@@ -26,7 +26,7 @@ func NewGhost(startPosition int, damage uint32, speed int, symbolsLen int) Ghost
 		X:      startPosition,
 		Damage: damage,
 		//Sprite:  sprite,
-		Symbols: GenerateSybolsSlice(symbolsLen),
+		Symbols: GenerateSymbolsSlice(symbolsLen),
 	}
 
 	if g.X > 0 {
@@ -43,7 +43,7 @@ func NewRandomGhost() Ghost {
 		X:      DefaultStartPosition,
 		Damage: DefaultDamage,
 		//Sprite:  sprite,
-		Symbols: GenerateSybolsSlice(DefaultLenSymbolsSlice),
+		Symbols: GenerateSymbolsSlice(DefaultLenSymbolsSlice),
 	}
 
 	// rand bool

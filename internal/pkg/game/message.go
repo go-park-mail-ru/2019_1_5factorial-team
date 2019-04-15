@@ -1,15 +1,14 @@
 package game
 
-import (
-	"encoding/json"
-)
-
 type Message struct {
 	Type    string      `json:"type"`
 	Payload interface{} `json:"payload,omitempty"`
 }
 
 type IncomeMessage struct {
-	Type    string          `json:"type"`
-	Payload json.RawMessage `json:"payload,omitempty"`
+	Type    string `json:"type"`
+	//Player  string `json:"player"`
+	Pressed string `json:"pressed"`
 }
+
+//{"type": "MOVE", "pressed": "up"}
