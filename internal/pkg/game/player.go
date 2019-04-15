@@ -69,7 +69,7 @@ func (p *Player) Listen() {
 			if message.Type != "MOVE" {
 				logrus.Println("not move")
 				_ = p.conn.WriteJSON(Message{
-					Type: "ERR",
+					Type:    "ERR",
 					Payload: "not valid input",
 				})
 
@@ -79,13 +79,14 @@ func (p *Player) Listen() {
 			button, err := gameLogic.MatchSymbol(message.Pressed)
 			if err != nil {
 				_ = p.conn.WriteJSON(Message{
-					Type: "ERR",
+					Type:    "ERR",
 					Payload: "not valid input",
 				})
 
 				continue
 			}
 			logrus.Println(button)
+			p.room.playerInput <- &button
 		}
 	}
 }

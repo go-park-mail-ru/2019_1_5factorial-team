@@ -46,6 +46,9 @@ type Room struct {
 	ticker     *time.Ticker
 	state      *RoomState
 	playerCnt  uint
+
+	playersInputs []gameLogic.Symbol
+	playerInput   chan *gameLogic.Symbol
 }
 
 func NewRoom(maxPlayers uint, game *Game) *Room {
@@ -64,6 +67,9 @@ func NewRoom(maxPlayers uint, game *Game) *Room {
 		state: &RoomState{
 			Objects: gameLogic.NewGhostStack(),
 		},
+
+		playerInput:   make(chan *gameLogic.Symbol),
+		playersInputs: make([]gameLogic.Symbol, 0, 10),
 	}
 }
 
@@ -72,6 +78,9 @@ func (r *Room) Run() {
 	//LOOP:
 	for {
 		select {
+		case in := <-r.playerInput:
+			r.playersInputs = append(r.playersInputs, *in)
+
 		case <-r.dead:
 			log.Printf("room id=%s, players are dead", r.ID)
 			r.Close()
@@ -83,7 +92,6 @@ func (r *Room) Run() {
 			return
 
 		case player := <-r.unregister:
-
 			delete(r.Players, player.Token)
 			log.Printf("player %s was removed from room", player.Token)
 
@@ -111,6 +119,13 @@ func (r *Room) Run() {
 		case <-r.ticker.C:
 			if r.playerCnt != r.MaxPlayers {
 				continue
+			}
+
+			if len(r.playersInputs) != 0 {
+				for _, val := range r.playersInputs {
+					r.state.Objects.PopSymbol(val)
+				}
+				r.playersInputs = make([]gameLogic.Symbol, 0, 10)
 			}
 
 			if r.state.Objects.Len() <= 4 {
@@ -145,6 +160,8 @@ func (r *Room) Run() {
 			for _, player := range r.Players {
 				player.SendState(r.state)
 			}
+
+			fmt.Println(r.playersInputs)
 
 			//r.PrintStates()
 		}

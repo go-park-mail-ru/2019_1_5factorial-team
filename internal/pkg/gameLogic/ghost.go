@@ -121,6 +121,16 @@ func (gs *GhostQueue) MoveAllGhosts() bool {
 	return gs.Items[0].X == 0
 }
 
+func (gs *GhostQueue) PopSymbol(sym Symbol) {
+	gs.mu.Lock()
+	for i := range gs.Items {
+		if gs.Items[i].Symbols[0] == sym {
+			gs.Items[i].Symbols = gs.Items[i].Symbols[1:]
+		}
+	}
+	gs.mu.Unlock()
+}
+
 func (gs *GhostQueue) Len() int {
 	gs.mu.Lock()
 	defer gs.mu.Unlock()

@@ -6,7 +6,7 @@ type Message struct {
 }
 
 type IncomeMessage struct {
-	Type    string `json:"type"`
+	Type string `json:"type"`
 	//Player  string `json:"player"`
 	Pressed string `json:"pressed"`
 }
