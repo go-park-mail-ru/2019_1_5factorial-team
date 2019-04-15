@@ -14,11 +14,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
-	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
 )
 
 // 'Content-Type': 'application/json; charset=utf-8'
