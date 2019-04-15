@@ -40,9 +40,9 @@ func (mgs *MyGorgeousServer) Run() error {
 	mainRouter := router.PathPrefix("").Subrouter()
 	mainRouter.Use(middleware.AuthMiddleware)
 
-	router.HandleFunc("/api/session/oauth/google", controllers.LoginFromGoogle).Methods("POST", "OPTIONS")
-	router.HandleFunc("/api/session/oauth/vk", controllers.LoginFromVK).Methods("POST", "OPTIONS")
-	router.HandleFunc("/api/session/oauth/yandex", controllers.LoginFromYandex).Methods("POST", "OPTIONS")
+	mainRouter.HandleFunc("/api/session/oauth/google", controllers.LoginFromGoogle).Methods("POST", "OPTIONS")
+	mainRouter.HandleFunc("/api/session/oauth/vk", controllers.LoginFromVK).Methods("POST", "OPTIONS")
+	mainRouter.HandleFunc("/api/session/oauth/yandex", controllers.LoginFromYandex).Methods("POST", "OPTIONS")
 
 	mainRouter.HandleFunc("/hello", controllers.HelloWorld).Methods("GET")
 	mainRouter.HandleFunc("/api/user", controllers.SignUp).Methods("POST", "OPTIONS")

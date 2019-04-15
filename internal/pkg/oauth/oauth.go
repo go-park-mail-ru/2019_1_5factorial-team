@@ -47,7 +47,7 @@ func OauthUser(token string, service string) (int, error, string, time.Time) {
 		return http.StatusForbidden, errors.Wrap(err, "err in get oauth user"), "", time.Time{}
 	}
 	// TODO(mrocumare) после прикручивания базы прописать GetUser и CreateUser
-	searchingUser, err := user.GetUser(uuid)
+	searchingUser, err := user.IdentifyUser(uuid, DefaultPassword)
 	if err != nil && errors.Cause(err).Error() == PreCreateUserErrorString {
 		searchingUser, err = user.CreateUser(name, uuid, DefaultPassword)
 		if err != nil {
@@ -55,7 +55,7 @@ func OauthUser(token string, service string) (int, error, string, time.Time) {
 		}
 	}
 
-	randToken, expiration, err := session.SetToken(searchingUser.Id)
+	randToken, expiration, err := session.SetToken(searchingUser.ID.Hex())
 	if err != nil {
 		return http.StatusBadRequest, errors.Wrap(err, "err set token"), "", time.Time{}
 	}

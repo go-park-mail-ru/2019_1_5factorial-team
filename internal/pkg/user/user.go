@@ -27,7 +27,7 @@ func CreateUser(nickname string, email string, password string) (User, error) {
 }
 
 func IdentifyUser(login string, password string) (User, error) {
-	u, err := GetUser(login)
+	u, err := getUser(login)
 	if err != nil {
 		return User{}, errors.Wrap(err, "Can't find user")
 	}
