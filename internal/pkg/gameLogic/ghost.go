@@ -19,6 +19,10 @@ const (
 	DefaultMovementSpeed   = 10
 	DefaultLenSymbolsSlice = 4
 	DefaultDamage          = 20
+
+	// за 1 призрака при 4 символах, можно получить 100
+	ScoreKillGhost   = 60
+	ScoreMatchSymbol = 10
 )
 
 func NewGhost(startPosition int, damage uint32, speed int, symbolsLen int) Ghost {
@@ -105,7 +109,6 @@ func (gs *GhostQueue) PopFront() {
 // return true if first ghost reach player
 func (gs *GhostQueue) MoveAllGhosts() bool {
 	gs.mu.Lock()
-	//fmt.Println("MoveAllGhosts lock")
 	defer gs.mu.Unlock()
 
 	if len(gs.Items) == 0 {
@@ -114,30 +117,36 @@ func (gs *GhostQueue) MoveAllGhosts() bool {
 
 	for i := 0; i < len(gs.Items); i++ {
 		gs.Items[i].Move()
-		//fmt.Printf("%d moved\n", i)
 	}
 
-	//fmt.Println("MoveAllGhosts unlock")
 	return gs.Items[0].X == 0
 }
 
-func (gs *GhostQueue) PopSymbol(sym Symbol) {
+func (gs *GhostQueue) PopSymbol(sym Symbol) int {
 	gs.mu.Lock()
+	score := 0
+
 	newItems := make([]Ghost, 0, 1)
 	for i := range gs.Items {
 		if gs.Items[i].Symbols[0] == sym {
 			gs.Items[i].Symbols = gs.Items[i].Symbols[1:]
+
+			score += ScoreMatchSymbol
 		}
 		if len(gs.Items[i].Symbols) != 0 {
 			newItems = append(newItems, gs.Items[i])
+		} else {
+			score += ScoreKillGhost
 		}
 	}
 
 	if len(newItems) != 0 {
 		gs.Items = newItems
 	}
-	
+
 	gs.mu.Unlock()
+
+	return score
 }
 
 func (gs *GhostQueue) Len() int {

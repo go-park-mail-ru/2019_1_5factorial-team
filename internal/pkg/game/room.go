@@ -63,7 +63,7 @@ func NewRoom(maxPlayers uint, game *Game) *Room {
 		enemyEnd:   make(chan struct{}),
 
 		mu:     &sync.Mutex{},
-		ticker: time.NewTicker(2 * time.Second),
+		ticker: time.NewTicker(1 * time.Second),
 		state: &RoomState{
 			Objects: gameLogic.NewGhostStack(),
 		},
@@ -96,6 +96,9 @@ func (r *Room) Run() {
 			log.Printf("player %s was removed from room", player.Token)
 
 			// убираем вышедшему игроку очки, а оставшемуся очки делим на 2
+			// TODO(): добавить баланс (хочу очки деленные на 10 прибавлять к балансу)
+			// TODO(): записывать в борду максимальный счет
+
 			for _, players := range r.Players {
 				players.SendMessage(&Message{"END",
 					fmt.Sprintf("player %s has left, GAME OVER", player.Token)})
@@ -123,7 +126,13 @@ func (r *Room) Run() {
 
 			if len(r.playersInputs) != 0 {
 				for _, val := range r.playersInputs {
-					r.state.Objects.PopSymbol(val)
+					val := r.state.Objects.PopSymbol(val)
+
+					fmt.Printf("score = %d\n", val)
+
+					for i := range r.state.Players {
+						r.state.Players[i].Score += val
+					}
 				}
 				r.playersInputs = make([]gameLogic.Symbol, 0, 10)
 			}
@@ -180,6 +189,14 @@ func (r *Room) RemovePlayer(player *Player) {
 
 func (r *Room) Close() {
 	r.mu.Lock()
+
+	// добавляю юзерам очки их персонажей
+	for _, p := range r.state.Players {
+		if _, ok := r.Players[p.Token]; ok {
+			r.Players[p.Token].Score = p.Score
+		}
+	}
+
 	for _, player := range r.Players {
 		//r.RemovePlayer(player)
 		player.SendMessage(&Message{"END", fmt.Sprintf("GAME OVER your score = %d", player.Score)})
