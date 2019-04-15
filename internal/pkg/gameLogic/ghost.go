@@ -47,7 +47,7 @@ func NewRandomGhost() Ghost {
 	}
 
 	// rand bool
-	kek := rand.Intn(100)
+	kek := rand.Intn(300)
 	if kek%2 == 0 {
 		g.X *= -1
 	}
@@ -123,11 +123,20 @@ func (gs *GhostQueue) MoveAllGhosts() bool {
 
 func (gs *GhostQueue) PopSymbol(sym Symbol) {
 	gs.mu.Lock()
+	newItems := make([]Ghost, 0, 1)
 	for i := range gs.Items {
 		if gs.Items[i].Symbols[0] == sym {
 			gs.Items[i].Symbols = gs.Items[i].Symbols[1:]
 		}
+		if len(gs.Items[i].Symbols) != 0 {
+			newItems = append(newItems, gs.Items[i])
+		}
 	}
+
+	if len(newItems) != 0 {
+		gs.Items = newItems
+	}
+	
 	gs.mu.Unlock()
 }
 
