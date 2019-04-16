@@ -76,7 +76,7 @@ var testsGetUserFromSession = []TestCases{
 		expectedRes:    `{"email":"kek.k.ek","nickname":"kekkekkek","score":100500,"avatar_link":"../../../img/default.jpg"}`,
 		expectedStatus: http.StatusOK,
 		authCtx:        true,
-		userIDCtx:      0,
+		userIDCtx:      "0",
 	},
 	{
 		routerPath:     "/api/user",
@@ -87,7 +87,7 @@ var testsGetUserFromSession = []TestCases{
 		expectedRes:    `{"error":"not authorized: http: named cookie not present"}`,
 		expectedStatus: http.StatusUnauthorized,
 		authCtx:        true,
-		userIDCtx:      -1,
+		userIDCtx:      "-1",
 	},
 }
 

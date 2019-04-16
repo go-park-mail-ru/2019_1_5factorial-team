@@ -1,0 +1,24 @@
+version: '3'
+services:
+  #  TODO(): авторизация при подключении к бд
+  mongo-user:
+    container_name: 5factorial-user-mongo
+    command: mongod --port 27031
+    image: mongo:4.0
+    #    environment:
+    #      MONGO_INITDB_ROOT_USERNAME: 'user'
+    #      MONGO_INITDB_ROOT_PASSWORD: 'user'
+    volumes:
+    ports:
+      - '27061:27031' # map port to none standard port, to avoid conflicts with locally installed mongodb.
+
+  mongo-session:
+    container_name: 5factorial-session-mongo
+    command: mongod --port 27032
+    image: mongo:4.0
+    #    environment:
+    #      MONGO_INITDB_ROOT_USERNAME: 'user'
+    #      MONGO_INITDB_ROOT_PASSWORD: 'user'
+    volumes:
+    ports:
+      - '27062:27032' # map port to none standard port, to avoid conflicts with locally installed mongodb.
