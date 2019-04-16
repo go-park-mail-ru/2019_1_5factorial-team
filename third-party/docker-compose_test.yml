@@ -8,7 +8,6 @@ services:
     #    environment:
     #      MONGO_INITDB_ROOT_USERNAME: 'user'
     #      MONGO_INITDB_ROOT_PASSWORD: 'user'
-    volumes:
     ports:
       - '27061:27031' # map port to none standard port, to avoid conflicts with locally installed mongodb.
 
@@ -19,6 +18,5 @@ services:
     #    environment:
     #      MONGO_INITDB_ROOT_USERNAME: 'user'
     #      MONGO_INITDB_ROOT_PASSWORD: 'user'
-    volumes:
     ports:
       - '27062:27032' # map port to none standard port, to avoid conflicts with locally installed mongodb.

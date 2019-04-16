@@ -33,7 +33,7 @@ var testsSignIn = []TestCases{
 		url:            "/api/session",
 		body:           strings.NewReader(`{"loginOrEmail": "kek@email.kek"}`),
 		urlValues:      "",
-		expectedRes:    `{"error":"already auth"}`,
+		expectedRes:    `{"error":"already auth, ctx.authorized shouldn't be true"}`,
 		expectedStatus: http.StatusBadRequest,
 		authCtx:        true,
 	},
@@ -60,6 +60,7 @@ var testsSignIn = []TestCases{
 }
 
 func TestSignIn(t *testing.T) {
+	//MainInit()
 	err := testHandler(SignIn, testsSignIn, t)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -67,16 +68,17 @@ func TestSignIn(t *testing.T) {
 }
 
 var testsGetUserFromSession = []TestCases{
+	// authCtx может быть только тру из-за миддлвара
 	{
 		routerPath:     "/api/user",
 		method:         "GET",
 		url:            "/api/user",
 		body:           nil,
 		urlValues:      "",
-		expectedRes:    `{"email":"kek.k.ek","nickname":"kekkekkek","score":100500,"avatar_link":"../../../img/default.jpg"}`,
-		expectedStatus: http.StatusOK,
+		expectedRes:    `{"error":"invalid empty id"}`,
+		expectedStatus: http.StatusBadRequest,
 		authCtx:        true,
-		userIDCtx:      "0",
+		userIDCtx:      "",
 	},
 	{
 		routerPath:     "/api/user",
@@ -92,6 +94,7 @@ var testsGetUserFromSession = []TestCases{
 }
 
 func TestGetUserFromSession(t *testing.T) {
+	//MainInit()
 	err := testHandler(GetUserFromSession, testsGetUserFromSession, t)
 	if err != nil {
 		t.Errorf(err.Error())

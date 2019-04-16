@@ -3,6 +3,7 @@ package user
 import (
 	"fmt"
 	"github.com/manveru/faker"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/mgo.v2/bson"
 	"math/rand"
 )
@@ -32,17 +33,20 @@ func GenerateUsers(config FakeUsersConfig) []User {
 	})
 
 	for i := 0; i < config.UsersCount; i++ {
+		id := bson.NewObjectId()
 		nick := fake.FirstName()
 		hash, _ := GetPasswordHash(nick)
 
 		u = append(u, User{
-			ID:           bson.NewObjectId(),
+			ID:           id,
 			Email:        fake.Email(),
 			Nickname:     nick,
 			HashPassword: hash,
 			Score:        rand.Intn(config.MaxScore),
 			AvatarLink:   "",
 		})
+
+		logrus.Println(i, "| id:", id, ", Nick:", nick, ", Password:", nick)
 	}
 
 	fmt.Println("---=== GENERATE FAKE USERS DONE ===---")
