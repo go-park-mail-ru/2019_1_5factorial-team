@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gameLogic"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"sync"
 	"time"
@@ -194,6 +195,18 @@ func (r *Room) Close() {
 	for _, p := range r.state.Players {
 		if _, ok := r.Players[p.Token]; ok {
 			r.Players[p.Token].Score = p.Score
+
+			id, err := session.GetId(p.Token)
+			if err != nil {
+				// TODO(): я хз че тут сделать
+				r.Players[p.Token].Score = 0
+			}
+
+			err = user.UpdateScore(id, p.Score)
+			if err != nil {
+				// TODO(): я хз че тут сделать x2
+				r.Players[p.Token].Score = 0
+			}
 		}
 	}
 
