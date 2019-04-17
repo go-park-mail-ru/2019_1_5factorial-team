@@ -17,6 +17,7 @@ func init() {
 type Game struct {
 	RoomsCount uint32
 	mu         *sync.Mutex
+	searchMu   *sync.Mutex
 	register   chan *Player
 	rooms      map[string]*Room
 	emptyRooms map[string]*Room
@@ -26,6 +27,7 @@ func NewGame(roomsCount uint32) *Game {
 	return &Game{
 		RoomsCount: roomsCount,
 		mu:         &sync.Mutex{},
+		searchMu:   &sync.Mutex{},
 		register:   make(chan *Player, 10),
 		rooms:      make(map[string]*Room),
 		emptyRooms: make(map[string]*Room),
@@ -38,6 +40,7 @@ func (g *Game) Run() {
 LOOP:
 	for player := range g.register {
 		//player := <-g.register
+		g.searchMu.Lock()
 		fmt.Println("len empty rooms = ", len(g.emptyRooms))
 		for _, room := range g.emptyRooms {
 			if len(room.Players) < int(room.MaxPlayers) {
@@ -52,6 +55,7 @@ LOOP:
 		go room.Run()
 
 		room.AddPlayer(player)
+		g.searchMu.Unlock()
 	}
 }
 
