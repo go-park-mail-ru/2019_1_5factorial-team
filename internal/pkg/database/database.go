@@ -43,6 +43,7 @@ func InitConnection() {
 
 			// очистка коллекции по конфигу
 			if n, _ := collection.Count(); n != 0 && val.TruncateTable {
+				logrus.Warn("truncating db", val.CollectionName)
 				err = collection.DropCollection()
 				if err != nil {
 					session.Close()

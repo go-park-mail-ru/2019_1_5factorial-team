@@ -144,6 +144,12 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 	ctxLogger.Info("===========================================")
 
 	id := req.Context().Value("userID").(string)
+	if id == "" {
+		ErrResponse(res, http.StatusBadRequest, errors.New("invalid empty id").Error())
+
+		ctxLogger.Error(errors.New("invalid empty id"))
+		return
+	}
 	u, err := user.GetUserById(id)
 	if err != nil {
 		// проверка на невалидный айди юзера
