@@ -84,11 +84,16 @@ func (g *Game) MakeRoomFull(room *Room) {
 	g.mu.Lock()
 	//delete(g.emptyRooms, room.ID)
 	g.emptyRooms[room.ID] = nil
+	g.rooms[room.ID] = room
 	g.mu.Unlock()
 }
 
 func (g *Game) CloseRoom(ID string) {
 	g.mu.Lock()
+	if _, ok := g.rooms[ID]; !ok {
+		fmt.Println("deleted empty room")
+		delete(g.emptyRooms, ID)
+	}
 	delete(g.rooms, ID)
 	g.mu.Unlock()
 
