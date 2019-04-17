@@ -142,7 +142,7 @@ func (gs *GhostQueue) PopSymbol(sym Symbol) int {
 	if len(newItems) != 0 {
 		gs.Items = newItems
 	}
-	
+
 	return score
 }
 

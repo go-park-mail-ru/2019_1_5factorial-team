@@ -97,7 +97,7 @@ func (r *Room) Run() {
 			log.Printf("player %s was removed from room", player.Token)
 
 			// убираем вышедшему игроку очки, а оставшемуся очки делим на 2
-			// TODO(): добавить баланс (хочу очки деленные на 10 прибавлять к балансу)
+			// TODO(): добавить баланс (хочу очки деленные на 100 прибавлять к балансу)
 			// TODO(): записывать в борду максимальный счет
 
 			for _, players := range r.Players {
@@ -139,16 +139,7 @@ func (r *Room) Run() {
 			}
 
 			if len(r.playersInputs) != 0 {
-				for _, val := range r.playersInputs {
-					val := r.state.Objects.PopSymbol(val)
-
-					fmt.Printf("score = %d\n", val)
-
-					for i := range r.state.Players {
-						r.state.Players[i].Score += val
-					}
-				}
-				r.playersInputs = make([]gameLogic.Symbol, 0, 10)
+				r.rakePlayerInputs()
 			}
 
 			if r.state.Objects.Len() <= 4 {
@@ -156,10 +147,6 @@ func (r *Room) Run() {
 			}
 
 			log.Println("tick")
-
-			// тут ваша игровая механика
-			// взять команды у плеера, обработать их
-			r.state.currentTime = time.Now()
 
 			f := r.state.Objects.MoveAllGhosts()
 			if f {
@@ -183,12 +170,21 @@ func (r *Room) Run() {
 			for _, player := range r.Players {
 				player.SendState(r.state)
 			}
-
-			fmt.Println(r.playersInputs)
-
-			//r.PrintStates()
 		}
 	}
+}
+
+func (r *Room) rakePlayerInputs() {
+	for _, val := range r.playersInputs {
+		val := r.state.Objects.PopSymbol(val)
+
+		fmt.Printf("score = %d\n", val)
+
+		for i := range r.state.Players {
+			r.state.Players[i].Score += val
+		}
+	}
+	r.playersInputs = make([]gameLogic.Symbol, 0, 10)
 }
 
 func (r *Room) AddPlayer(player *Player) {
