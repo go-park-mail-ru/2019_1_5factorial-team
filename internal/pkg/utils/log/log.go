@@ -17,7 +17,6 @@ var (
 	Println = logrus.Println
 
 	Error = logrus.Error
-
 )
 
 func InitLogs() {
