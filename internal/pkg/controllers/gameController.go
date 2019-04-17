@@ -6,7 +6,6 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"log"
 	"net/http"
 )
 
@@ -23,8 +22,6 @@ func Play(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	log.Print("connected to client")
-
 	currentSession, err := req.Cookie(config.Get().CookieConfig.CookieName)
 	if err == http.ErrNoCookie {
 		// бесполезная проверка, так кука валидна, но по гостайлу нужна
@@ -37,6 +34,4 @@ func Play(res http.ResponseWriter, req *http.Request) {
 	player := game.NewPlayer(conn, currentSession.Value)
 	go player.Listen()
 	game.InstanceGame.AddPlayer(player)
-
-	log.Print("Play exit")
 }
