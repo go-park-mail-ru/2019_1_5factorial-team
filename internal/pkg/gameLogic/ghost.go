@@ -71,7 +71,7 @@ func (gh *Ghost) Move() {
 
 // стэк для удобства работы с призраками
 type GhostQueue struct {
-	Items []Ghost `json:"Items"`
+	Items []Ghost `json:"items"`
 	mu    *sync.Mutex
 }
 
