@@ -9,7 +9,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-	"github.com/swaggo/http-swagger"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type MyGorgeousServer struct {
@@ -40,6 +40,10 @@ func (mgs *MyGorgeousServer) Run() error {
 	mainRouter := router.PathPrefix("").Subrouter()
 	mainRouter.Use(middleware.AuthMiddleware)
 
+	mainRouter.HandleFunc("/api/session/oauth/google", controllers.LoginFromGoogle).Methods("POST", "OPTIONS")
+	mainRouter.HandleFunc("/api/session/oauth/vk", controllers.LoginFromVK).Methods("POST", "OPTIONS")
+	mainRouter.HandleFunc("/api/session/oauth/yandex", controllers.LoginFromYandex).Methods("POST", "OPTIONS")
+
 	mainRouter.HandleFunc("/hello", controllers.HelloWorld).Methods("GET")
 	mainRouter.HandleFunc("/api/user", controllers.SignUp).Methods("POST", "OPTIONS")
 	mainRouter.HandleFunc("/api/user/{id:[0-9]+}", controllers.GetUser).Methods("GET", "OPTIONS")
@@ -58,7 +62,7 @@ func (mgs *MyGorgeousServer) Run() error {
 	routerLoginRequired.HandleFunc("/api/session", controllers.SignOut).Methods("DELETE", "OPTIONS")
 
 	// игра
-	routerLoginRequired.HandleFunc("/api/game/mp/ws", controllers.Play).Methods("GET", "OPTIONS")
+	routerLoginRequired.HandleFunc("/api/game/ws", controllers.Play).Methods("GET", "OPTIONS")
 
 	err := http.ListenAndServe(address, router)
 	if err != nil {

@@ -1,20 +1,18 @@
 package gameLogic
 
 import (
-	"math/rand"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/random"
 	"sync"
 )
 
 type Ghost struct {
-	X      int    `json:"x"`
-	Speed  int    `json:"speed"`
-	Damage uint32 `json:"damage"`
-	//Sprite  string   `json:"sprite"`
+	X       int      `json:"x"`
+	Speed   int      `json:"speed"`
+	Damage  uint32   `json:"damage"`
 	Symbols []Symbol `json:"symbols"`
 }
 
 const (
-	DefaultSprite          = "kek"
 	DefaultStartPosition   = 100
 	DefaultMovementSpeed   = 10
 	DefaultLenSymbolsSlice = 4
@@ -27,9 +25,8 @@ const (
 
 func NewGhost(startPosition int, damage uint32, speed int, symbolsLen int) Ghost {
 	g := Ghost{
-		X:      startPosition,
-		Damage: damage,
-		//Sprite:  sprite,
+		X:       startPosition,
+		Damage:  damage,
 		Symbols: GenerateSymbolsSlice(symbolsLen),
 	}
 
@@ -44,15 +41,12 @@ func NewGhost(startPosition int, damage uint32, speed int, symbolsLen int) Ghost
 
 func NewRandomGhost() Ghost {
 	g := Ghost{
-		X:      DefaultStartPosition,
-		Damage: DefaultDamage,
-		//Sprite:  sprite,
+		X:       DefaultStartPosition,
+		Damage:  DefaultDamage,
 		Symbols: GenerateSymbolsSlice(DefaultLenSymbolsSlice),
 	}
 
-	// rand bool
-	kek := rand.Intn(300)
-	if kek%2 == 0 {
+	if random.RandBool() {
 		g.X *= -1
 	}
 
@@ -61,8 +55,6 @@ func NewRandomGhost() Ghost {
 	} else {
 		g.Speed = DefaultMovementSpeed
 	}
-
-	//fmt.Println(g)
 
 	return g
 }
@@ -73,7 +65,7 @@ func (gh *Ghost) Move() {
 
 // стэк для удобства работы с призраками
 type GhostQueue struct {
-	Items []Ghost `json:"Items"`
+	Items []Ghost `json:"items"`
 	mu    *sync.Mutex
 }
 
@@ -124,6 +116,7 @@ func (gs *GhostQueue) MoveAllGhosts() bool {
 
 func (gs *GhostQueue) PopSymbol(sym Symbol) int {
 	gs.mu.Lock()
+	defer gs.mu.Unlock()
 	score := 0
 
 	newItems := make([]Ghost, 0, 1)
@@ -143,8 +136,6 @@ func (gs *GhostQueue) PopSymbol(sym Symbol) int {
 	if len(newItems) != 0 {
 		gs.Items = newItems
 	}
-
-	gs.mu.Unlock()
 
 	return score
 }
