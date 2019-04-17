@@ -69,8 +69,8 @@ func (p *Player) Listen() {
 			err := p.conn.WriteJSON(message)
 			if err != nil {
 				logrus.Error("p.Listen cant send message", err.Error())
+				p.CloseConn()
 			}
-			p.CloseConn()
 
 		case message := <-p.in:
 			logrus.Printf("from player = %s, income: %#v", p.Token, message)

@@ -138,34 +138,7 @@ func (r *Room) Run() {
 				continue
 			}
 
-			if len(r.playersInputs) != 0 {
-				r.rakePlayerInputs()
-			}
-
-			if r.state.Objects.Len() <= 4 {
-				r.state.Objects.PushBack(gameLogic.NewRandomGhost())
-			}
-
-			log.Println("tick")
-
-			f := r.state.Objects.MoveAllGhosts()
-			if f {
-				r.state.Objects.PopFront()
-
-				for i := range r.state.Players {
-					r.state.Players[i].HP -= 20
-
-					if r.state.Players[i].HP <= 0 {
-						log.Println("---===DEAD===---")
-						r.Close()
-						return
-
-						// на каналах не работает хз поч
-						//r.dead <- &Player{}
-						//continue LOOP
-					}
-				}
-			}
+			r.updateRoomState()
 
 			for _, player := range r.Players {
 				player.SendState(r.state)
@@ -185,6 +158,37 @@ func (r *Room) rakePlayerInputs() {
 		}
 	}
 	r.playersInputs = make([]gameLogic.Symbol, 0, 10)
+}
+
+func (r *Room) updateRoomState() {
+	if len(r.playersInputs) != 0 {
+		r.rakePlayerInputs()
+	}
+
+	if r.state.Objects.Len() <= 4 {
+		r.state.Objects.PushBack(gameLogic.NewRandomGhost())
+	}
+
+	log.Println("tick")
+
+	f := r.state.Objects.MoveAllGhosts()
+	if f {
+		r.state.Objects.PopFront()
+
+		for i := range r.state.Players {
+			r.state.Players[i].HP -= 20
+
+			if r.state.Players[i].HP <= 0 {
+				log.Println("---===DEAD===---")
+				r.Close()
+				return
+
+				// на каналах не работает хз поч
+				//r.dead <- &Player{}
+				//continue LOOP
+			}
+		}
+	}
 }
 
 func (r *Room) AddPlayer(player *Player) {
