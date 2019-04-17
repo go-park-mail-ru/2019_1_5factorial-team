@@ -93,45 +93,11 @@ func (r *Room) Run() {
 			return
 
 		case player := <-r.unregister:
-			delete(r.Players, player.Token)
-			log.Printf("player %s was removed from room", player.Token)
-
-			// убираем вышедшему игроку очки, а оставшемуся очки делим на 2
-			// TODO(): добавить баланс (хочу очки деленные на 100 прибавлять к балансу)
-			// TODO(): записывать в борду максимальный счет
-
-			for _, players := range r.Players {
-				players.SendMessage(&Message{
-					Type:    MessageEnd,
-					Payload: fmt.Sprintf("player %s has left, GAME OVER", player.Token),
-				})
-			}
-
-			r.state.Players = r.state.Players[:len(r.state.Players)-1]
-			r.playerCnt -= 1
-
-			r.Close()
+			r.endGame(player)
 			return
 
 		case player := <-r.register:
-			r.Players[player.Token] = player
-			log.Printf("player %s joined", player.Token)
-			player.SendMessage(&Message{
-				Type:    MessageConnect,
-				Payload: nil,
-			})
-
-			npc, err := gameLogic.NewPlayerCharacter(player.Token)
-			if err != nil {
-				log.Error(err.Error(), "cant create character in room, closing")
-
-				r.Close()
-				return
-			}
-
-			r.state.Players = append(r.state.Players, npc)
-
-			r.playerCnt += 1
+			r.addPlayerToState(player)
 
 		case <-r.ticker.C:
 			if r.playerCnt != r.MaxPlayers {
@@ -145,6 +111,48 @@ func (r *Room) Run() {
 			}
 		}
 	}
+}
+
+func (r *Room) endGame(player *Player) {
+	delete(r.Players, player.Token)
+	log.Printf("player %s was removed from room", player.Token)
+
+	// убираем вышедшему игроку очки, а оставшемуся очки делим на 2
+	// TODO(): добавить баланс (хочу очки деленные на 100 прибавлять к балансу)
+	// TODO(): записывать в борду максимальный счет
+
+	for _, players := range r.Players {
+		players.SendMessage(&Message{
+			Type:    MessageEnd,
+			Payload: fmt.Sprintf("player %s has left, GAME OVER", player.Token),
+		})
+	}
+
+	r.state.Players = r.state.Players[:len(r.state.Players)-1]
+	r.playerCnt -= 1
+
+	r.Close()
+}
+
+func (r *Room) addPlayerToState(player *Player) {
+	r.Players[player.Token] = player
+	log.Printf("player %s joined", player.Token)
+	player.SendMessage(&Message{
+		Type:    MessageConnect,
+		Payload: nil,
+	})
+
+	npc, err := gameLogic.NewPlayerCharacter(player.Token)
+	if err != nil {
+		log.Error(err.Error(), "cant create character in room, closing")
+
+		r.Close()
+		return
+	}
+
+	r.state.Players = append(r.state.Players, npc)
+
+	r.playerCnt += 1
 }
 
 func (r *Room) rakePlayerInputs() {
