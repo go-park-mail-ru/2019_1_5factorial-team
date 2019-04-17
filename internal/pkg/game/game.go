@@ -2,7 +2,7 @@ package game
 
 import (
 	"fmt"
-	"log"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"sync"
 )
 
@@ -39,7 +39,6 @@ func (g *Game) Run() {
 
 LOOP:
 	for player := range g.register {
-		//player := <-g.register
 		g.searchMu.Lock()
 		fmt.Println("len empty rooms = ", len(g.emptyRooms))
 		for _, room := range g.emptyRooms {
@@ -82,7 +81,6 @@ func (g *Game) AddEmptyRoom(room *Room) {
 
 func (g *Game) MakeRoomFull(room *Room) {
 	g.mu.Lock()
-	//delete(g.emptyRooms, room.ID)
 	g.emptyRooms[room.ID] = nil
 	g.rooms[room.ID] = room
 	g.mu.Unlock()
@@ -91,7 +89,7 @@ func (g *Game) MakeRoomFull(room *Room) {
 func (g *Game) CloseRoom(ID string) {
 	g.mu.Lock()
 	if _, ok := g.rooms[ID]; !ok {
-		fmt.Println("deleted empty room")
+		log.Println("deleted empty room")
 		delete(g.emptyRooms, ID)
 	}
 	delete(g.rooms, ID)

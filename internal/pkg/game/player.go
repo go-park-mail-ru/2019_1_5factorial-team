@@ -2,8 +2,8 @@ package game
 
 import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gameLogic"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/gorilla/websocket"
-	"github.com/sirupsen/logrus"
 )
 
 type Player struct {
@@ -41,11 +41,11 @@ func (p *Player) ListenMessages() {
 			err := p.conn.ReadJSON(message)
 			if websocket.IsUnexpectedCloseError(err) {
 				p.room.RemovePlayer(p)
-				logrus.Printf("player %s disconnected", p.Token)
+				log.Printf("player %s disconnected", p.Token)
 				return
 			}
 			if err != nil {
-				logrus.Printf("cannot read json")
+				log.Println("cannot read json")
 				continue
 			}
 
@@ -62,30 +62,32 @@ func (p *Player) Listen() {
 		case <-p.unregister:
 			err := p.conn.Close()
 			if err != nil {
-				logrus.Error("p.Listen cant close connection", err.Error())
+				log.Error("p.Listen cant close connection", err.Error())
 			}
 
 		case message := <-p.out:
 			err := p.conn.WriteJSON(message)
 			if err != nil {
-				logrus.Error("p.Listen cant send message", err.Error())
+				log.Error("p.Listen cant send message", err.Error())
+
 				p.CloseConn()
 			}
 
 		case message := <-p.in:
-			logrus.Printf("from player = %s, income: %#v", p.Token, message)
+			log.Printf("from player = %s, income: %#v", p.Token, message)
 
 			if message.Type != "MOVE" {
-				logrus.Println("not move")
+				log.Println("not valid user input")
+
 				err := p.conn.WriteJSON(Message{
 					Type:    MessageErr,
 					Payload: "not valid input",
 				})
-
 				if err != nil {
-					logrus.Error("p.Listen cant send message", err.Error())
+					log.Error("p.Listen cant send message", err.Error())
+
+					p.CloseConn()
 				}
-				p.CloseConn()
 
 				continue
 			}
@@ -96,15 +98,14 @@ func (p *Player) Listen() {
 					Type:    MessageErr,
 					Payload: "not valid input",
 				})
-
 				if err != nil {
-					logrus.Error("p.Listen cant send message", err.Error())
+					log.Error("p.Listen cant send message", err.Error())
+
+					p.CloseConn()
 				}
-				p.CloseConn()
 
 				continue
 			}
-			logrus.Println(button)
 			p.room.playerInput <- &button
 		}
 	}
@@ -124,5 +125,4 @@ func (p *Player) SendMessage(message *Message) {
 func (p *Player) CloseConn() {
 	p.unregister <- struct{}{}
 	p.stopListen <- struct{}{}
-	//_ = p.conn.Close()
 }

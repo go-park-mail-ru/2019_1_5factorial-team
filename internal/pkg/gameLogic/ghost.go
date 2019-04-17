@@ -6,15 +6,13 @@ import (
 )
 
 type Ghost struct {
-	X      int    `json:"x"`
-	Speed  int    `json:"speed"`
-	Damage uint32 `json:"damage"`
-	//Sprite  string   `json:"sprite"`
+	X       int      `json:"x"`
+	Speed   int      `json:"speed"`
+	Damage  uint32   `json:"damage"`
 	Symbols []Symbol `json:"symbols"`
 }
 
 const (
-	DefaultSprite          = "kek"
 	DefaultStartPosition   = 100
 	DefaultMovementSpeed   = 10
 	DefaultLenSymbolsSlice = 4
@@ -27,9 +25,8 @@ const (
 
 func NewGhost(startPosition int, damage uint32, speed int, symbolsLen int) Ghost {
 	g := Ghost{
-		X:      startPosition,
-		Damage: damage,
-		//Sprite:  sprite,
+		X:       startPosition,
+		Damage:  damage,
 		Symbols: GenerateSymbolsSlice(symbolsLen),
 	}
 
@@ -44,9 +41,8 @@ func NewGhost(startPosition int, damage uint32, speed int, symbolsLen int) Ghost
 
 func NewRandomGhost() Ghost {
 	g := Ghost{
-		X:      DefaultStartPosition,
-		Damage: DefaultDamage,
-		//Sprite:  sprite,
+		X:       DefaultStartPosition,
+		Damage:  DefaultDamage,
 		Symbols: GenerateSymbolsSlice(DefaultLenSymbolsSlice),
 	}
 
@@ -59,8 +55,6 @@ func NewRandomGhost() Ghost {
 	} else {
 		g.Speed = DefaultMovementSpeed
 	}
-
-	//fmt.Println(g)
 
 	return g
 }

@@ -76,7 +76,7 @@ func NewRoom(maxPlayers uint, game *Game) *Room {
 
 func (r *Room) Run() {
 	log.Printf("room loop started Token=%s", r.ID)
-	//LOOP:
+
 	for {
 		select {
 		case in := <-r.playerInput:
@@ -117,7 +117,7 @@ func (r *Room) endGame(player *Player) {
 	delete(r.Players, player.Token)
 	log.Printf("player %s was removed from room", player.Token)
 
-	// убираем вышедшему игроку очки, а оставшемуся очки делим на 2
+	// TODO(): убираем вышедшему игроку очки, а оставшемуся очки делим на 2
 	// TODO(): добавить баланс (хочу очки деленные на 100 прибавлять к балансу)
 	// TODO(): записывать в борду максимальный счет
 
@@ -136,7 +136,9 @@ func (r *Room) endGame(player *Player) {
 
 func (r *Room) addPlayerToState(player *Player) {
 	r.Players[player.Token] = player
+
 	log.Printf("player %s joined", player.Token)
+
 	player.SendMessage(&Message{
 		Type:    MessageConnect,
 		Payload: nil,
@@ -158,8 +160,6 @@ func (r *Room) addPlayerToState(player *Player) {
 func (r *Room) rakePlayerInputs() {
 	for _, val := range r.playersInputs {
 		val := r.state.Objects.PopSymbol(val)
-
-		fmt.Printf("score = %d\n", val)
 
 		for i := range r.state.Players {
 			r.state.Players[i].Score += val
@@ -187,7 +187,6 @@ func (r *Room) updateRoomState() {
 			r.state.Players[i].HP -= 20
 
 			if r.state.Players[i].HP <= 0 {
-				log.Println("---===DEAD===---")
 				r.Close()
 				return
 
@@ -219,14 +218,20 @@ func (r *Room) Close() {
 
 			id, err := session.GetId(p.Token)
 			if err != nil {
-				// TODO(): я хз че тут сделать
+				log.Error("cant get player id from session, token=%s, err=%s", p.Token, err.Error())
+
 				r.Players[p.Token].Score = 0
+				continue
 			}
 
 			err = user.UpdateScore(id, p.Score)
 			if err != nil {
+				log.Error("cant update user score, user id=%s, token=%s, score=%d, err=%s",
+					id, p.Token, p.Score, err.Error())
+
 				// TODO(): я хз че тут сделать x2
 				r.Players[p.Token].Score = 0
+				continue
 			}
 		}
 	}
