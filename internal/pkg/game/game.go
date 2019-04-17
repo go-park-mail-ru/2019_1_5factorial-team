@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"log"
 	"sync"
 )
@@ -18,14 +19,16 @@ type Game struct {
 	mu         *sync.Mutex
 	register   chan *Player
 	rooms      map[string]*Room
+	emptyRooms map[string]*Room
 }
 
 func NewGame(roomsCount uint32) *Game {
 	return &Game{
 		RoomsCount: roomsCount,
 		mu:         &sync.Mutex{},
-		register:   make(chan *Player),
+		register:   make(chan *Player, 10),
 		rooms:      make(map[string]*Room),
+		emptyRooms: make(map[string]*Room),
 	}
 }
 
@@ -33,18 +36,19 @@ func (g *Game) Run() {
 	log.Println("main loop started")
 
 LOOP:
-	for {
-		player := <-g.register
-
-		for _, room := range g.rooms {
+	for player := range g.register {
+		//player := <-g.register
+		fmt.Println("len empty rooms = ", len(g.emptyRooms))
+		for _, room := range g.emptyRooms {
 			if len(room.Players) < int(room.MaxPlayers) {
 				room.AddPlayer(player)
+				g.MakeRoomFull(room)
 				continue LOOP
 			}
 		}
 
 		room := NewRoom(2, g)
-		g.AddRoom(room)
+		g.AddEmptyRoom(room)
 		go room.Run()
 
 		room.AddPlayer(player)
@@ -63,6 +67,19 @@ func (g *Game) RemovePlayer(player *Player) {
 func (g *Game) AddRoom(room *Room) {
 	g.mu.Lock()
 	g.rooms[room.ID] = room
+	g.mu.Unlock()
+}
+
+func (g *Game) AddEmptyRoom(room *Room) {
+	g.mu.Lock()
+	g.emptyRooms[room.ID] = room
+	g.mu.Unlock()
+}
+
+func (g *Game) MakeRoomFull(room *Room) {
+	g.mu.Lock()
+	//delete(g.emptyRooms, room.ID)
+	g.emptyRooms[room.ID] = nil
 	g.mu.Unlock()
 }
 

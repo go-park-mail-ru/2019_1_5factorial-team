@@ -58,7 +58,7 @@ func (mgs *MyGorgeousServer) Run() error {
 	routerLoginRequired.HandleFunc("/api/session", controllers.SignOut).Methods("DELETE", "OPTIONS")
 
 	// игра
-	routerLoginRequired.HandleFunc("/api/game/mp/ws", controllers.Play).Methods("GET", "OPTIONS")
+	routerLoginRequired.HandleFunc("/api/game/ws", controllers.Play).Methods("GET", "OPTIONS")
 
 	err := http.ListenAndServe(address, router)
 	if err != nil {
