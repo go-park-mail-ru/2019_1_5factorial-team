@@ -122,6 +122,7 @@ func (gs *GhostQueue) MoveAllGhosts() bool {
 
 func (gs *GhostQueue) PopSymbol(sym Symbol) int {
 	gs.mu.Lock()
+	defer gs.mu.Unlock()
 	score := 0
 
 	newItems := make([]Ghost, 0, 1)
@@ -141,9 +142,7 @@ func (gs *GhostQueue) PopSymbol(sym Symbol) int {
 	if len(newItems) != 0 {
 		gs.Items = newItems
 	}
-
-	gs.mu.Unlock()
-
+	
 	return score
 }
 
