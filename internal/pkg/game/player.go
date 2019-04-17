@@ -30,30 +30,32 @@ func NewPlayer(conn *websocket.Conn, token string) *Player {
 	}
 }
 
-func (p *Player) Listen() {
-	go func() {
-		for {
-			select {
-			case <-p.stopListen:
+func (p *Player) ListenMessages() {
+	for {
+		select {
+		case <-p.stopListen:
+			return
+
+		default:
+			message := &IncomeMessage{}
+			err := p.conn.ReadJSON(message)
+			if websocket.IsUnexpectedCloseError(err) {
+				p.room.RemovePlayer(p)
+				logrus.Printf("player %s disconnected", p.Token)
 				return
-
-			default:
-				message := &IncomeMessage{}
-				err := p.conn.ReadJSON(message)
-				if websocket.IsUnexpectedCloseError(err) {
-					p.room.RemovePlayer(p)
-					logrus.Printf("player %s disconnected", p.Token)
-					return
-				}
-				if err != nil {
-					logrus.Printf("cannot read json")
-					continue
-				}
-
-				p.in <- message
 			}
+			if err != nil {
+				logrus.Printf("cannot read json")
+				continue
+			}
+
+			p.in <- message
 		}
-	}()
+	}
+}
+
+func (p *Player) Listen() {
+	go p.ListenMessages()
 
 	for {
 		select {
