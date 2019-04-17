@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"strings"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/config_reader"
 	"github.com/pkg/errors"
