@@ -1,7 +1,7 @@
 package gameLogic
 
 import (
-	"math/rand"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/random"
 	"sync"
 )
 
@@ -50,9 +50,7 @@ func NewRandomGhost() Ghost {
 		Symbols: GenerateSymbolsSlice(DefaultLenSymbolsSlice),
 	}
 
-	// rand bool
-	kek := rand.Intn(300)
-	if kek%2 == 0 {
+	if random.RandBool() {
 		g.X *= -1
 	}
 
