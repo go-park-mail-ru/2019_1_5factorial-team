@@ -116,7 +116,15 @@ func (r *Room) Run() {
 			log.Printf("player %s joined", player.Token)
 			player.SendMessage(&Message{"CONNECTED", nil})
 
-			r.state.Players = append(r.state.Players, gameLogic.NewPlayerCharacter(player.Token))
+			npc, err := gameLogic.NewPlayerCharacter(player.Token)
+			if err != nil {
+				log.Error(err.Error(), "cant create character in room, closing")
+
+				r.Close()
+				return
+			}
+
+			r.state.Players = append(r.state.Players, npc)
 
 			r.playerCnt += 1
 

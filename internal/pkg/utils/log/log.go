@@ -15,6 +15,9 @@ var (
 	Warn    = logrus.Warn
 	Printf  = logrus.Printf
 	Println = logrus.Println
+
+	Error = logrus.Error
+
 )
 
 func InitLogs() {
