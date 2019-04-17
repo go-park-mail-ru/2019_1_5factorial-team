@@ -101,8 +101,10 @@ func (r *Room) Run() {
 			// TODO(): записывать в борду максимальный счет
 
 			for _, players := range r.Players {
-				players.SendMessage(&Message{"END",
-					fmt.Sprintf("player %s has left, GAME OVER", player.Token)})
+				players.SendMessage(&Message{
+					Type:    MessageEnd,
+					Payload: fmt.Sprintf("player %s has left, GAME OVER", player.Token),
+				})
 			}
 
 			r.state.Players = r.state.Players[:len(r.state.Players)-1]
@@ -114,7 +116,10 @@ func (r *Room) Run() {
 		case player := <-r.register:
 			r.Players[player.Token] = player
 			log.Printf("player %s joined", player.Token)
-			player.SendMessage(&Message{"CONNECTED", nil})
+			player.SendMessage(&Message{
+				Type:    MessageConnect,
+				Payload: nil,
+			})
 
 			npc, err := gameLogic.NewPlayerCharacter(player.Token)
 			if err != nil {
@@ -219,10 +224,13 @@ func (r *Room) Close() {
 	}
 
 	for _, player := range r.Players {
-		//r.RemovePlayer(player)
-		player.SendMessage(&Message{"END", fmt.Sprintf("GAME OVER your score = %d", player.Score)})
+		player.SendMessage(&Message{
+			Type:    MessageEnd,
+			Payload: fmt.Sprintf("GAME OVER your score = %d", player.Score),
+		})
 		r.game.RemovePlayer(player)
 	}
+
 	r.mu.Unlock()
 	r.game.CloseRoom(r.ID)
 }

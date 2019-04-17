@@ -60,30 +60,47 @@ func (p *Player) Listen() {
 	for {
 		select {
 		case <-p.unregister:
-			_ = p.conn.Close()
+			err := p.conn.Close()
+			if err != nil {
+				logrus.Error("p.Listen cant close connection", err.Error())
+			}
 
 		case message := <-p.out:
-			_ = p.conn.WriteJSON(message)
+			err := p.conn.WriteJSON(message)
+			if err != nil {
+				logrus.Error("p.Listen cant send message", err.Error())
+			}
+			p.CloseConn()
 
 		case message := <-p.in:
 			logrus.Printf("from player = %s, income: %#v", p.Token, message)
 
 			if message.Type != "MOVE" {
 				logrus.Println("not move")
-				_ = p.conn.WriteJSON(Message{
-					Type:    "ERR",
+				err := p.conn.WriteJSON(Message{
+					Type:    MessageErr,
 					Payload: "not valid input",
 				})
+
+				if err != nil {
+					logrus.Error("p.Listen cant send message", err.Error())
+				}
+				p.CloseConn()
 
 				continue
 			}
 
 			button, err := gameLogic.MatchSymbol(message.Pressed)
 			if err != nil {
-				_ = p.conn.WriteJSON(Message{
-					Type:    "ERR",
+				err = p.conn.WriteJSON(Message{
+					Type:    MessageErr,
 					Payload: "not valid input",
 				})
+
+				if err != nil {
+					logrus.Error("p.Listen cant send message", err.Error())
+				}
+				p.CloseConn()
 
 				continue
 			}
@@ -94,7 +111,10 @@ func (p *Player) Listen() {
 }
 
 func (p *Player) SendState(state *RoomState) {
-	p.out <- &Message{"STATE", state}
+	p.out <- &Message{
+		Type:    MessageState,
+		Payload: state,
+	}
 }
 
 func (p *Player) SendMessage(message *Message) {

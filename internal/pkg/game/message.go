@@ -1,12 +1,22 @@
 package game
 
+type MessageType string
+
+const (
+	MessageState   MessageType = "STATE"
+	MessageErr     MessageType = "ERR"
+	MessageMove    MessageType = "MOVE"
+	MessageConnect MessageType = "CONNECTED"
+	MessageEnd     MessageType = "END"
+)
+
 type Message struct {
-	Type    string      `json:"type"`
+	Type    MessageType `json:"type"`
 	Payload interface{} `json:"payload,omitempty"`
 }
 
 type IncomeMessage struct {
-	Type string `json:"type"`
+	Type MessageType `json:"type"`
 	//Player  string `json:"player"`
 	Pressed string `json:"pressed"`
 }
