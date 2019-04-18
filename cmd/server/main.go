@@ -6,7 +6,6 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 )
 
@@ -28,8 +27,6 @@ func main() {
 	database.InitConnection()
 
 	s := server.New(*port)
-
-	go session.CleanSession()
 
 	err = s.Run()
 	if err != nil {
