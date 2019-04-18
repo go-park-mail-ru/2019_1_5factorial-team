@@ -15,6 +15,7 @@ var session *mgo.Session
 
 var collections map[string]*mgo.Collection
 
+// TODO(): delete Once
 var once sync.Once
 var mu *sync.Mutex
 

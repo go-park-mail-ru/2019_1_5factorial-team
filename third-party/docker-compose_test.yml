@@ -10,6 +10,8 @@ services:
     #      MONGO_INITDB_ROOT_PASSWORD: 'user'
     ports:
       - '27061:27031' # map port to none standard port, to avoid conflicts with locally installed mongodb.
+    logging:
+      driver: "none"
 
   mongo-session:
     container_name: 5factorial-session-mongo
@@ -20,3 +22,5 @@ services:
     #      MONGO_INITDB_ROOT_PASSWORD: 'user'
     ports:
       - '27062:27032' # map port to none standard port, to avoid conflicts with locally installed mongodb.
+    logging:
+      driver: "none"
