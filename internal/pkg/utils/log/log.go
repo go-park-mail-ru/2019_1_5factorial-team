@@ -6,6 +6,7 @@ import (
 	"github.com/rossmcdonald/telegram_hook"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/proxy"
+	"math/rand"
 	"net/http"
 	"os"
 )
@@ -66,6 +67,7 @@ func InitLogs() {
 
 func LoggerWithoutAuth(req *http.Request) *logrus.Entry {
 	ctxLogger := logrus.WithFields(logrus.Fields{
+		"ID_log":     generateID(),
 		"req":        req.URL,
 		"method":     req.Method,
 		"host":       req.Host,
@@ -77,6 +79,7 @@ func LoggerWithoutAuth(req *http.Request) *logrus.Entry {
 
 func LoggerWithAuth(req *http.Request) *logrus.Entry {
 	ctxLogger := logrus.WithFields(logrus.Fields{
+		"ID_log":     generateID(),
 		"req":        req.URL,
 		"method":     req.Method,
 		"host":       req.Host,
@@ -86,4 +89,8 @@ func LoggerWithAuth(req *http.Request) *logrus.Entry {
 	})
 
 	return ctxLogger
+}
+
+func generateID() interface{} {
+	return rand.Intn(1000)
 }

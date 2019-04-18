@@ -11,7 +11,6 @@ import (
 
 func Play(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	ctxLogger.Info("============================================")
 
 	upgrader := websocket.Upgrader{}
 

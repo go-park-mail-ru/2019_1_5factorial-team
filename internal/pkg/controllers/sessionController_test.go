@@ -100,3 +100,37 @@ func TestGetUserFromSession(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 }
+
+var testsSignOut = []TestCases{
+	// authCtx может быть только тру из-за миддлвара
+	{
+		routerPath:     "/api/session",
+		method:         "DELETE",
+		url:            "/api/session",
+		body:           nil,
+		urlValues:      "",
+		expectedRes:    `{"error":"not authorized"}`,
+		expectedStatus: http.StatusUnauthorized,
+		authCtx:        true,
+		userIDCtx:      "",
+	},
+	{
+		routerPath:     "/api/session",
+		method:         "DELETE",
+		url:            "/api/session",
+		body:           nil,
+		urlValues:      "",
+		expectedRes:    `{"error":"not authorized"}`,
+		expectedStatus: http.StatusUnauthorized,
+		authCtx:        false,
+		userIDCtx:      "",
+	},
+}
+
+func TestSignOut(t *testing.T) {
+	//MainInit()
+	err := testHandler(SignOut, testsSignOut, t)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+}

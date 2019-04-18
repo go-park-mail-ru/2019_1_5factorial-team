@@ -32,7 +32,6 @@ type signInRequest struct {
 // @Router /session [post]
 func SignIn(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	ctxLogger.Info("============================================")
 
 	data := signInRequest{}
 	status, err := ParseRequestIntoStruct(true, req, &data)
@@ -81,7 +80,6 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 // @Router /session [delete]
 func SignOut(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	ctxLogger.Info("===========================================")
 
 	currentSession, err := req.Cookie(config.Get().CookieConfig.CookieName)
 	if err == http.ErrNoCookie {
@@ -141,7 +139,6 @@ type UserInfoResponse struct {
 // @Router /api/user [get]
 func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	ctxLogger.Info("===========================================")
 
 	id := req.Context().Value("userID").(string)
 	if id == "" {
@@ -187,7 +184,6 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 // @Router /api/session [get]
 func IsSessionValid(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	ctxLogger.Info("===========================================")
 
 	OkResponse(res, "session is valid")
 	ctxLogger.Info("session is valid")

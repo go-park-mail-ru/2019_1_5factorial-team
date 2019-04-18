@@ -31,7 +31,6 @@ type GetLeaderboardResponse struct {
 // @Router /user/score [get]
 func GetLeaderboard(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	ctxLogger.Info("============================================")
 
 	query := req.URL.Query()
 
