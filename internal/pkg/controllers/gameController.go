@@ -13,7 +13,13 @@ func Play(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 	ctxLogger.Info("============================================")
 
-	upgrader := websocket.Upgrader{}
+	upgrader := websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
 
 	conn, err := upgrader.Upgrade(res, req, http.Header{"Upgrade": []string{"websocket"}})
 	if err != nil {
