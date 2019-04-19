@@ -24,12 +24,11 @@ func RemoveSession(port *string) {
 	}
 
 	collection := session.DB("user_session").C("user_session")
-
 	_, err = collection.RemoveAll(bson.M{"cookie_expired_time": bson.M{"$lt": time.Now()}})
+
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "error remove session"))
 	}
-
 	session.Close()
 
 }
