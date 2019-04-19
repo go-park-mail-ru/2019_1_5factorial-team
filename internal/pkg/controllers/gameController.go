@@ -21,7 +21,8 @@ func Play(res http.ResponseWriter, req *http.Request) {
 		},
 	}
 
-	conn, err := upgrader.Upgrade(res, req, http.Header{"Upgrade": []string{"websocket"}})
+	//conn, err := upgrader.Upgrade(res, req, http.Header{"Upgrade": []string{"websocket"}})
+	conn, err := upgrader.Upgrade(res, req, nil)
 	if err != nil {
 		ctxLogger.Printf("error while connecting: %s", err)
 		res.WriteHeader(http.StatusInternalServerError)
