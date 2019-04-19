@@ -32,6 +32,10 @@ func findUserById(id string) (User, error) {
 		return User{}, errors.Wrap(err, "collection not found")
 	}
 
+	if !bson.IsObjectIdHex(id) {
+		return User{}, errors.New("id isn't mongo's hex")
+	}
+
 	err = col.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&u)
 	if err != nil {
 		return User{}, errors.New("user with this id not found")

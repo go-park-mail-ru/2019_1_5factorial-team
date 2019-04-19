@@ -171,7 +171,7 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 		AvatarLink: searchingUser.AvatarLink,
 	})
 
-	ctxLogger.Info("OK response\n\t--email = %v,\n\t--nickname = %v,\n\t--score = %v,\n\t--avatarLink = %v",
+	ctxLogger.Infof("OK response\n\t--email = %v,\n\t--nickname = %v,\n\t--score = %v,\n\t--avatarLink = %v",
 		searchingUser.Email, searchingUser.Nickname, searchingUser.Score, searchingUser.AvatarLink)
 }
 

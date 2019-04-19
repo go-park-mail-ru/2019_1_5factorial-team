@@ -4,7 +4,8 @@ require (
 	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc
 	github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf
 	github.com/go-chi/chi v4.0.2+incompatible // indirect
-	github.com/gorilla/mux v1.7.1
+	github.com/gorilla/mux v1.7.0
+	github.com/gorilla/websocket v1.4.0
 	github.com/manveru/faker v0.0.0-20171103152722-9fbc68a78c4d
 	github.com/manveru/gobdd v0.0.0-20131210092515-f1a17fdd710b // indirect
 	github.com/pkg/errors v0.8.1

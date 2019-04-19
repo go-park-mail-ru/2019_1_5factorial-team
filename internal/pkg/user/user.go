@@ -156,3 +156,20 @@ func GetUsersCount() (int, error) {
 
 	return usersCount, nil
 }
+
+func UpdateScore(id string, score int) error {
+	u, err := findUserById(id)
+	if err != nil {
+		return errors.Wrap(err, "cant update score")
+	}
+
+	if u.Score < score {
+		u.Score = score
+		err = updateDBUser(u)
+		if err != nil {
+			return errors.Wrap(err, "cant update user score")
+		}
+	}
+
+	return nil
+}
