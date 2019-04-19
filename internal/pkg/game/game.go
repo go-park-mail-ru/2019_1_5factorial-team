@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"sync"
 )
@@ -39,8 +38,8 @@ func (g *Game) Run() {
 
 LOOP:
 	for player := range g.register {
-		g.searchMu.Lock()
-		fmt.Println("len empty rooms = ", len(g.emptyRooms))
+		//g.searchMu.Lock()
+		log.Println("len empty rooms = ", len(g.emptyRooms))
 		for _, room := range g.emptyRooms {
 			if len(room.Players) < int(room.MaxPlayers) {
 				room.AddPlayer(player)
@@ -54,7 +53,7 @@ LOOP:
 		go room.Run()
 
 		room.AddPlayer(player)
-		g.searchMu.Unlock()
+		//g.searchMu.Unlock()
 	}
 }
 
