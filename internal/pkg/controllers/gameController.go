@@ -36,6 +36,8 @@ func Play(res http.ResponseWriter, req *http.Request) {
 		ctxLogger.Error(errors.Wrap(err, "not authorized"))
 		return
 	}
+	
+	ctxLogger.Warn(err)
 
 	player := game.NewPlayer(conn, currentSession.Value)
 	go player.Listen()
