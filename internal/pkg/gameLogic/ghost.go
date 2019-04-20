@@ -2,6 +2,7 @@ package gameLogic
 
 import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/random"
+	"log"
 	"sync"
 )
 
@@ -118,6 +119,12 @@ func (gs *GhostQueue) PopSymbol(sym Symbol) int {
 	gs.mu.Lock()
 	defer gs.mu.Unlock()
 	score := 0
+
+	if len(gs.Items) == 0 {
+		log.Println("len = 0, ret score = 0")
+
+		return 0
+	}
 
 	newItems := make([]Ghost, 0, 1)
 	for i := range gs.Items {
