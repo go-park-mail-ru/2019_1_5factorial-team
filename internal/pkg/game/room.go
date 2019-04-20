@@ -229,7 +229,6 @@ func (r *Room) Close() {
 				log.Error("cant update user score, user id=%s, token=%s, score=%d, err=%s",
 					id, p.Token, p.Score, err.Error())
 
-				// TODO(): я хз че тут сделать x2
 				r.Players[p.Token].Score = 0
 				continue
 			}

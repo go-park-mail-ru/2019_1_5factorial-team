@@ -41,7 +41,6 @@ LOOP:
 		//g.searchMu.Lock()
 		log.Println("len empty rooms = ", len(g.emptyRooms))
 		for _, room := range g.emptyRooms {
-			log.Println("range g.emptyRooms ", room, *room, &room)
 
 			if len(room.Players) < int(room.MaxPlayers) {
 				room.AddPlayer(player)
@@ -84,7 +83,7 @@ func (g *Game) MakeRoomFull(room *Room) {
 	g.mu.Lock()
 	g.emptyRooms[room.ID] = nil
 	delete(g.emptyRooms, room.ID)
-	
+
 	g.rooms[room.ID] = room
 	g.mu.Unlock()
 }

@@ -39,13 +39,14 @@ func (p *Player) ListenMessages() {
 		default:
 			message := &IncomeMessage{}
 			err := p.conn.ReadJSON(message)
-			if websocket.IsUnexpectedCloseError(err) {
+			if websocket.IsUnexpectedCloseError(err) || websocket.IsCloseError(err) {
 				p.room.RemovePlayer(p)
 				log.Printf("player %s disconnected", p.Token)
+
 				return
-			}
-			if err != nil {
-				log.Println("cannot read json")
+			} else if err != nil {
+				log.Printf("cannot read json, err = %s", err.Error())
+
 				continue
 			}
 
