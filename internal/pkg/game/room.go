@@ -174,7 +174,7 @@ func (r *Room) updateRoomState() {
 		r.rakePlayerInputs()
 	}
 
-	if r.state.Objects.Len() <= 4 {
+	if r.state.Objects.Len() <= 2 {
 		r.state.Objects.PushBack(gameLogic.NewRandomGhost())
 	}
 

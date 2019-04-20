@@ -14,10 +14,11 @@ type Ghost struct {
 }
 
 const (
-	DefaultStartPosition   = 100
-	DefaultMovementSpeed   = 10
+	DefaultRightPosition   = 1440
+	DefaultLeftPosition    = 0
+	DefaultMovementSpeed   = 100
 	DefaultLenSymbolsSlice = 4
-	DefaultDamage          = 20
+	DefaultDamage          = 1
 
 	// за 1 призрака при 4 символах, можно получить 100
 	ScoreKillGhost   = 60
@@ -42,20 +43,25 @@ func NewGhost(startPosition int, damage uint32, speed int, symbolsLen int) Ghost
 
 func NewRandomGhost() Ghost {
 	g := Ghost{
-		X:       DefaultStartPosition,
+		//X:       DefaultRightPosition,
 		Damage:  DefaultDamage,
 		Symbols: GenerateSymbolsSlice(DefaultLenSymbolsSlice),
 	}
 
 	if random.RandBool() {
-		g.X *= -1
+		g.X = DefaultLeftPosition
+		g.Speed = DefaultMovementSpeed
+	} else {
+		g.X = DefaultRightPosition
+		g.Speed = -DefaultMovementSpeed
+
 	}
 
-	if g.X > 0 {
-		g.Speed = -DefaultMovementSpeed
-	} else {
-		g.Speed = DefaultMovementSpeed
-	}
+	//if g.X > 0 {
+	//	g.Speed = -DefaultMovementSpeed
+	//} else {
+	//	g.Speed = DefaultMovementSpeed
+	//}
 
 	return g
 }
@@ -112,7 +118,7 @@ func (gs *GhostQueue) MoveAllGhosts() bool {
 		gs.Items[i].Move()
 	}
 
-	return gs.Items[0].X == 0
+	return gs.Items[0].X == (DefaultRightPosition-DefaultLeftPosition)/2
 }
 
 func (gs *GhostQueue) PopSymbol(sym Symbol) int {
