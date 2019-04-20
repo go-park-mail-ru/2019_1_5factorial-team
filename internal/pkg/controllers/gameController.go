@@ -13,9 +13,16 @@ func Play(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 	ctxLogger.Info("============================================")
 
-	upgrader := websocket.Upgrader{}
+	upgrader := websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
 
-	conn, err := upgrader.Upgrade(res, req, http.Header{"Upgrade": []string{"websocket"}})
+	//conn, err := upgrader.Upgrade(res, req, http.Header{"Upgrade": []string{"websocket"}})
+	conn, err := upgrader.Upgrade(res, req, nil)
 	if err != nil {
 		ctxLogger.Printf("error while connecting: %s", err)
 		res.WriteHeader(http.StatusInternalServerError)
@@ -30,6 +37,8 @@ func Play(res http.ResponseWriter, req *http.Request) {
 		ctxLogger.Error(errors.Wrap(err, "not authorized"))
 		return
 	}
+	
+	ctxLogger.Warn(err)
 
 	player := game.NewPlayer(conn, currentSession.Value)
 	go player.Listen()
