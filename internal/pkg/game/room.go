@@ -80,6 +80,7 @@ func (r *Room) Run() {
 	for {
 		select {
 		case in := <-r.playerInput:
+			// TODO(): если игра не началась или закончилась, но юзер шлет мувы, то они записываются
 			r.playersInputs = append(r.playersInputs, *in)
 
 		case <-r.dead:

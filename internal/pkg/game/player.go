@@ -4,6 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gameLogic"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/gorilla/websocket"
+	"net"
 )
 
 type Player struct {
@@ -44,8 +45,18 @@ func (p *Player) ListenMessages() {
 				log.Printf("player %s disconnected", p.Token)
 
 				return
+
 			} else if err != nil {
 				log.Printf("cannot read json, err = %s", err.Error())
+
+				if e, ok := err.(*net.OpError); ok {
+					if e.Temporary() || e.Timeout() {
+						// I don't think these actually happen, but we would want to continue if they did...
+						continue
+					} else if e.Err.Error() == "use of closed network connection" { // happens very frequently
+						return
+					}
+				}
 
 				continue
 			}
@@ -66,10 +77,12 @@ func (p *Player) Listen() {
 				log.Error("p.Listen cant close connection", err.Error())
 			}
 
+			break
+
 		case message := <-p.out:
 			err := p.conn.WriteJSON(message)
 			if err != nil {
-				log.Error("p.Listen cant send message", err.Error())
+				log.Error("p.Listen cant send message ", err.Error())
 
 				p.CloseConn()
 			}

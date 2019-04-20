@@ -7,7 +7,7 @@ import (
 )
 
 type PlayerCharacter struct {
-	Token string `json:"id"`
+	Token string `json:"-"`
 	HP    int    `json:"hp"`
 	Score int    `json:"score"`
 	Nick  string `json:"nick"`
