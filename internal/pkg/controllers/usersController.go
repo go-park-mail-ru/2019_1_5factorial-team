@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/validator"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -22,9 +22,9 @@ import (
 //	"email":
 // 	"password":
 type SingUpRequest struct {
-	Login    string `json:"login" 		valid:"alphanum,required~Login is blank"`
-	Email    string `json:"email"  		valid:"email,required~Email is blank"`
-	Password string `json:"password" 	valid:"alphanum,required~Password is blank"`
+	Login    string `json:"login"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type SignUpResponse struct {
@@ -89,10 +89,10 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// TODO(smet1): валидация на данные, правда ли мыло - мыло, а самолет - вертолет?
-	_, err = govalidator.ValidateStruct(data)
-	if err != nil {
-		ErrResponse(res, http.StatusBadRequest, err.Error())
-		ctxLogger.Error(errors.Wrap(err, "Invalid input data"))
+	flagValidUser := validator.ValidNewUser(data.Login, data.Email, data.Password)
+	if !flagValidUser {
+		ErrResponse(res, http.StatusBadRequest, "invalid user data")
+		ctxLogger.Error(errors.Wrap(err, "err in user data"))
 		return
 	}
 
@@ -180,9 +180,9 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 //	"old_password":
 // 	"new_password":
 type ProfileUpdateRequest struct {
-	Avatar      string `json:"avatar" 			valid:"-"`
-	OldPassword string `json:"old_password" 	valid:"-"`
-	NewPassword string `json:"new_password" 	valid:"alphanum,required~NewPassword is blank"`
+	Avatar      string `json:"avatar"`
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
 }
 
 // 'Content-Type': 'application/json; charset=utf-8'
@@ -220,10 +220,11 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		ctxLogger.Error(errors.Wrap(err, "ParseRequestIntoStruct error"))
 		return
 	}
-	_, err = govalidator.ValidateStruct(data)
-	if err != nil {
-		ErrResponse(res, http.StatusBadRequest, err.Error())
-		ctxLogger.Error(errors.Wrap(err, "Invalid new password"))
+
+	flagValidNewPassword := validator.ValidUpdatePassword(data.NewPassword)
+	if !flagValidNewPassword {
+		ErrResponse(res, http.StatusBadRequest, "invalid new password")
+		ctxLogger.Error(errors.Wrap(err, "err in user data"))
 		return
 	}
 

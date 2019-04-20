@@ -4,18 +4,17 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 )
 
 type GoogleUser struct {
-	Email string `json:"email" 			valid:"email,required~Email is blank"`
+	Email string `json:"email"`
 }
 
 type VkUser struct {
-	ID       int    `json:"id" 			valid:"alphanum,required~ID is blank"`
-	Name     string `json:"first_name"  valid:"alphanum,required~Name is blank"`
-	LastName string `json:"last_name"	valid:"alphanum,required~LastName is blank"`
+	ID       int    `json:"id"`
+	Name     string `json:"first_name"`
+	LastName string `json:"last_name"`
 }
 
 type VkResponse struct {
@@ -23,7 +22,7 @@ type VkResponse struct {
 }
 
 type YandexUser struct {
-	Email string `json:"default_email" 	valid:"email,required~Email is blank"`
+	Email string `json:"default_email"`
 }
 
 func GetOauthUser(service string, contents []byte) (string, string, error) {
@@ -35,10 +34,7 @@ func GetOauthUser(service string, contents []byte) (string, string, error) {
 		if err != nil {
 			return "", "", errors.Wrap(err, "json parsing error")
 		}
-		_, err = govalidator.ValidateStruct(userInfo)
-		if err != nil {
-			return "", "", errors.Wrap(err, "Invalid input vkUser data")
-		}
+
 		vkInfo := (userInfo.Users)[0]
 		vkEmail, vkLogin := getEmailAndLoginFromVK(strconv.Itoa(vkInfo.ID), vkInfo.Name, vkInfo.LastName)
 		return vkEmail, vkLogin, nil
@@ -48,10 +44,7 @@ func GetOauthUser(service string, contents []byte) (string, string, error) {
 		if err != nil {
 			return "", "", errors.Wrap(err, "json parsing error")
 		}
-		_, err = govalidator.ValidateStruct(userInfo)
-		if err != nil {
-			return "", "", errors.Wrap(err, "Invalid input yandexUser data")
-		}
+
 		yandexNickname := getLoginFromEmail(userInfo.Email) + "_Y"
 		return userInfo.Email, yandexNickname, nil
 	case "google":
@@ -59,10 +52,6 @@ func GetOauthUser(service string, contents []byte) (string, string, error) {
 		err := json.Unmarshal(contents, &userInfo)
 		if err != nil {
 			return "", "", errors.Wrap(err, "json parsing error")
-		}
-		_, err = govalidator.ValidateStruct(userInfo)
-		if err != nil {
-			return "", "", errors.Wrap(err, "Invalid input googleUser data")
 		}
 		googleNickname := getLoginFromEmail(userInfo.Email) + "_G"
 		return userInfo.Email, googleNickname, nil

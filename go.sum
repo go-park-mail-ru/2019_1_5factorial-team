@@ -75,6 +75,8 @@ github.com/swaggo/http-swagger v0.0.0-20190324132102-654001218d89/go.mod h1:eycb
 github.com/swaggo/swag v1.4.0/go.mod h1:hog2WgeMOrQ/LvQ+o1YGTeT+vWVrbi0SiIslBtxKTyM=
 github.com/swaggo/swag v1.5.0 h1:haK8VG3hj+v/c8hQ4f3U+oYpkdI/26m9LAUTXHOv+2U=
 github.com/swaggo/swag v1.5.0/go.mod h1:+xZrnu5Ut3GcUkKAJm9spnOooIS1WB1cUOkLNPrvrE0=
+github.com/thedevsaddam/govalidator v1.9.6 h1:hWLpGOHkDjzM+uQh4xankDUm8dgXaRft/B1/sDAShKU=
+github.com/thedevsaddam/govalidator v1.9.6/go.mod h1:Ilx8u7cg5g3LXbSS943cx5kczyNuUn7LH/cK5MYuE90=
 github.com/ugorji/go v1.1.2/go.mod h1:hnLbHMwcvSihnDhEfx2/BzKp2xb0Y+ErdfYcrs9tkJQ=
 github.com/ugorji/go/codec v0.0.0-20181209151446-772ced7fd4c2/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
 github.com/ugorji/go/codec v0.0.0-20190320090025-2dc34c0b8780/go.mod h1:iT03XoTwV7xq/+UGwKO3UbC1nNNlopQiY61beSdrtOA=
