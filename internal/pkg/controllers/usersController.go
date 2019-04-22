@@ -18,7 +18,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const MONGO_CONFLICT_CODE = 11000
+const MongoConflictCode = 11000
 
 // 'Content-Type': 'application/json; charset=utf-8'
 // 	"login":
@@ -95,7 +95,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 
 	u, err := user.CreateUser(data.Login, data.Email, data.Password)
 	if err != nil {
-		if errors.Cause(err).(*mgo.LastError).Code == MONGO_CONFLICT_CODE {
+		if errors.Cause(err).(*mgo.LastError).Code == MongoConflictCode {
 			if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Login) {
 				ErrResponse(res, http.StatusConflict, "login conflict")
 
