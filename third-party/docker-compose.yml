@@ -25,22 +25,22 @@ services:
     ports:
       - '27052:27032' # map port to none standard port, to avoid conflicts with locally installed mongodb.
 
-  server-go:
-    container_name: 5factorial-back
-    restart: always
-    build:
-      context: ../.
-      dockerfile: ./third-party/server/Dockerfile
-    volumes:
-      - '/var/www/media/factorial:/var/www/media/factorial'
-      - '/etc/5factorial:/etc/5factorial'
-    ports:
-      - '5051:5051'
-    depends_on:
-      - mongo-user
-      - mongo-session
-#    logging:
-#      driver: "json-file"
-#      options:
-#        max-size: "1k"
-#        max-file: "3"
+#  server-go:
+#    container_name: 5factorial-back
+#    restart: always
+#    build:
+#      context: ../.
+#      dockerfile: ./third-party/server/Dockerfile
+#    volumes:
+#      - '/var/www/media/factorial:/var/www/media/factorial'
+#      - '/etc/5factorial:/etc/5factorial'
+#    ports:
+#      - '5051:5051'
+#    depends_on:
+#      - mongo-user
+#      - mongo-session
+##    logging:
+##      driver: "json-file"
+##      options:
+##        max-size: "1k"
+##        max-file: "3"

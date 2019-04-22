@@ -16,7 +16,7 @@ type PlayerCharacter struct {
 func NewPlayerCharacter(token string) (PlayerCharacter, error) {
 	pc := PlayerCharacter{
 		Token: token,
-		HP:    300,
+		HP:    5,
 		Score: 0,
 	}
 

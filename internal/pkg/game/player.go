@@ -35,9 +35,13 @@ func (p *Player) ListenMessages() {
 	for {
 		select {
 		case <-p.stopListen:
+			log.Println("len stopListen", len(p.stopListen))
+			log.Printf("%s, stop listen", p.Token)
 			return
 
 		default:
+			log.Printf("player %s ListenMessage default", p.Token)
+
 			message := &IncomeMessage{}
 			err := p.conn.ReadJSON(message)
 			if websocket.IsUnexpectedCloseError(err) || websocket.IsCloseError(err) {
@@ -54,7 +58,9 @@ func (p *Player) ListenMessages() {
 						// I don't think these actually happen, but we would want to continue if they did...
 						continue
 					} else if e.Err.Error() == "use of closed network connection" { // happens very frequently
-						return
+						// не знаю что тут сделать, выкинуть его из комнаты или шо?
+						p.stopListen <- struct{}{}
+						continue
 					}
 				}
 
@@ -73,11 +79,12 @@ func (p *Player) Listen() {
 		select {
 		case <-p.unregister:
 			err := p.conn.Close()
+			log.Printf("close connection on player %s", p.Token)
 			if err != nil {
 				log.Error("p.Listen cant close connection", err.Error())
 			}
 
-			break
+			return
 
 		case message := <-p.out:
 			err := p.conn.WriteJSON(message)
@@ -85,6 +92,7 @@ func (p *Player) Listen() {
 				log.Error("p.Listen cant send message ", err.Error())
 
 				p.CloseConn()
+				//return
 			}
 
 		case message := <-p.in:
@@ -98,7 +106,7 @@ func (p *Player) Listen() {
 					Payload: "not valid input",
 				})
 				if err != nil {
-					log.Error("p.Listen cant send message", err.Error())
+					log.Error("p.Listen cant send message before match symbol", err.Error())
 
 					p.CloseConn()
 				}
@@ -113,7 +121,7 @@ func (p *Player) Listen() {
 					Payload: "not valid input",
 				})
 				if err != nil {
-					log.Error("p.Listen cant send message", err.Error())
+					log.Error("p.Listen cant send message in match symbol", err.Error())
 
 					p.CloseConn()
 				}
@@ -138,5 +146,5 @@ func (p *Player) SendMessage(message *Message) {
 
 func (p *Player) CloseConn() {
 	p.unregister <- struct{}{}
-	p.stopListen <- struct{}{}
+	//p.stopListen <- struct{}{}
 }

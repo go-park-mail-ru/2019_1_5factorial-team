@@ -39,7 +39,7 @@ func (g *Game) Run() {
 LOOP:
 	for player := range g.register {
 		//g.searchMu.Lock()
-		log.Println("len empty rooms = ", len(g.emptyRooms))
+		log.Printf("len empty rooms = %d, len full rooms = %d", len(g.emptyRooms), len(g.rooms))
 		for _, room := range g.emptyRooms {
 
 			if len(room.Players) < int(room.MaxPlayers) {

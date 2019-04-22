@@ -12,21 +12,6 @@ import (
 
 // ось X (-100; 100) => игроки стоят в нуле
 
-// X - середина
-type PlayerState struct {
-	ID string
-	X  int
-	HP int
-}
-
-// X - середина
-type ObjectState struct {
-	ID    string
-	Type  string
-	X     int
-	Speed int
-}
-
 // нужон ли тайм?
 type RoomState struct {
 	Players     []gameLogic.PlayerCharacter
@@ -174,7 +159,7 @@ func (r *Room) updateRoomState() {
 		r.rakePlayerInputs()
 	}
 
-	if r.state.Objects.Len() <= 2 {
+	if r.state.Objects.Len() < 2 {
 		r.state.Objects.PushBack(gameLogic.NewRandomGhost())
 	}
 
@@ -185,7 +170,7 @@ func (r *Room) updateRoomState() {
 		r.state.Objects.PopFront()
 
 		for i := range r.state.Players {
-			r.state.Players[i].HP -= 20
+			r.state.Players[i].HP -= gameLogic.DefaultDamage
 
 			if r.state.Players[i].HP <= 0 {
 				r.Close()
@@ -211,6 +196,8 @@ func (r *Room) RemovePlayer(player *Player) {
 
 func (r *Room) Close() {
 	r.mu.Lock()
+
+	r.ticker.Stop()
 
 	// добавляю юзерам очки их персонажей
 	for _, p := range r.state.Players {
@@ -241,6 +228,7 @@ func (r *Room) Close() {
 			Type:    MessageEnd,
 			Payload: fmt.Sprintf("GAME OVER your score = %d", player.Score),
 		})
+		// по идеи убирать игрока надо здесь, а не через game
 		r.game.RemovePlayer(player)
 	}
 

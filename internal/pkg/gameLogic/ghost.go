@@ -16,7 +16,7 @@ type Ghost struct {
 const (
 	DefaultRightPosition   = 1440
 	DefaultLeftPosition    = 0
-	DefaultMovementSpeed   = 100
+	DefaultMovementSpeed   = 240
 	DefaultLenSymbolsSlice = 4
 	DefaultDamage          = 1
 
