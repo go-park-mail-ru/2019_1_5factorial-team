@@ -3,9 +3,11 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/mgo.v2"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
@@ -81,7 +83,6 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	data := SingUpRequest{}
 	status, err := ParseRequestIntoStruct(true, req, &data)
 	if err != nil {
-		ErrResponse(res, status, err.Error())
 
 		ctxLogger.Error(errors.Wrap(err, "ParseRequestIntoStruct error"))
 		return
@@ -92,8 +93,22 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 
 	u, err := user.CreateUser(data.Login, data.Email, data.Password)
 	if err != nil {
-		ErrResponse(res, http.StatusBadRequest, err.Error())
+		//ErrResponse(res, http.StatusBadRequest, errors.Cause(err).Error())
+		if errors.Cause(err).(*mgo.LastError).Code == 11000 {
 
+			if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Login) {
+				ErrResponse(res, http.StatusConflict, "login conflict")
+
+				return
+
+			} else if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Email) {
+				ErrResponse(res, http.StatusConflict, "email conflict")
+
+				return
+			}
+		}
+
+		ErrResponse(res, status, err.Error())
 		ctxLogger.Error(errors.Wrap(err, "err in user data"))
 		return
 	}
