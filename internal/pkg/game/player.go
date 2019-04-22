@@ -40,7 +40,7 @@ func (p *Player) ListenMessages() {
 			return
 
 		default:
-			log.Printf("player %s ListenMessage default", p.Token)
+			//log.Printf("player %s ListenMessage default", p.Token)
 
 			message := &IncomeMessage{}
 			err := p.conn.ReadJSON(message)

@@ -65,6 +65,10 @@ func (r *Room) Run() {
 	for {
 		select {
 		case in := <-r.playerInput:
+			if r.playerCnt != r.MaxPlayers {
+				log.Println("skip player input, bcs game not started, waiting second player")
+				continue
+			}
 			// TODO(): если игра не началась или закончилась, но юзер шлет мувы, то они записываются
 			r.playersInputs = append(r.playersInputs, *in)
 
@@ -144,6 +148,9 @@ func (r *Room) addPlayerToState(player *Player) {
 }
 
 func (r *Room) rakePlayerInputs() {
+	log.Println("rake", r.state.Players[0].HP, r.state.Players[1].HP)
+
+	log.Println("===")
 	for _, val := range r.playersInputs {
 		val := r.state.Objects.PopSymbol(val)
 
@@ -151,6 +158,8 @@ func (r *Room) rakePlayerInputs() {
 			r.state.Players[i].Score += val
 		}
 	}
+	log.Println("===")
+
 	r.playersInputs = make([]gameLogic.Symbol, 0, 10)
 }
 
@@ -161,18 +170,41 @@ func (r *Room) updateRoomState() {
 
 	if r.state.Objects.Len() < 2 {
 		r.state.Objects.PushBack(gameLogic.NewRandomGhost())
+		log.Println("added new ghost")
+		log.Println(r.state.Objects)
 	}
-
-	log.Println("tick")
 
 	f := r.state.Objects.MoveAllGhosts()
 	if f {
-		r.state.Objects.PopFront()
+		deletedGhost := r.state.Objects.PopFront()
 
-		for i := range r.state.Players {
-			r.state.Players[i].HP -= gameLogic.DefaultDamage
+		//for i := range r.state.Players {
+		//	r.state.Players[i].HP -= gameLogic.DefaultDamage
+		//
+		//	if r.state.Players[i].HP <= 0 {
+		//		r.Close()
+		//		return
+		//
+		//		// на каналах не работает хз поч
+		//		//r.dead <- &Player{}
+		//		//continue LOOP
+		//	}
+		//}
+		if deletedGhost.Speed > 0 {
+			r.state.Players[0].HP -= gameLogic.DefaultDamage
 
-			if r.state.Players[i].HP <= 0 {
+			if r.state.Players[0].HP <= 0 {
+				r.Close()
+				return
+
+				// на каналах не работает хз поч
+				//r.dead <- &Player{}
+				//continue LOOP
+			}
+		} else if deletedGhost.Speed < 0 {
+			r.state.Players[1].HP -= gameLogic.DefaultDamage
+
+			if r.state.Players[1].HP <= 0 {
 				r.Close()
 				return
 
@@ -182,6 +214,12 @@ func (r *Room) updateRoomState() {
 			}
 		}
 	}
+
+	log.Println("tick")
+}
+
+func (r *Room) SendMessageAllPlayers()  {
+
 }
 
 func (r *Room) AddPlayer(player *Player) {

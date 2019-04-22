@@ -95,14 +95,17 @@ func (gs *GhostQueue) PopBack() {
 	gs.mu.Unlock()
 }
 
-func (gs *GhostQueue) PopFront() {
+func (gs *GhostQueue) PopFront() Ghost {
 	gs.mu.Lock()
 	defer gs.mu.Unlock()
 
 	if len(gs.Items) == 0 {
-		return
+		return Ghost{}
 	}
+
+	retVal := gs.Items[0]
 	gs.Items = gs.Items[1:]
+	return retVal
 }
 
 // return true if first ghost reach player
@@ -134,6 +137,12 @@ func (gs *GhostQueue) PopSymbol(sym Symbol) int {
 
 	newItems := make([]Ghost, 0, 1)
 	for i := range gs.Items {
+		log.Println(gs.Items[i])
+		if len(gs.Items[i].Symbols) == 0 {
+			log.Println("bug")
+			continue
+		}
+
 		if gs.Items[i].Symbols[0] == sym {
 			gs.Items[i].Symbols = gs.Items[i].Symbols[1:]
 
