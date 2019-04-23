@@ -51,10 +51,11 @@ func (c *Chat) Start() {
 
 		case registerUser := <-c.register:
 			registerUser.ChatPtr = c
+			registerUser.SendLastMessages()
 			c.Users[registerUser.Nickname] = registerUser
 
 		case <-c.ticker.C:
-			c.SendMessages()
+			c.BroadcastSendMessages()
 
 		case message := <-c.messagesChan:
 			c.messages = append(c.messages, Message{
@@ -73,11 +74,15 @@ func (c *Chat) RemoveUser(user *User) {
 	c.unregister <- user
 }
 
-func (c *Chat) SendMessages() {
+func (c *Chat) BroadcastSendMessages() {
+	if len(c.messages) == 0 {
+		return
+	}
+
 	for _, mes := range c.messages {
 		for _, user := range c.Users {
 			// send mess to user
-			log.Printf("send mes = %#v to user = %#v", mes, user)
+			log.Printf("send mes = %v to user = %s", mes, user.Nickname)
 			user.out <- &mes
 		}
 	}

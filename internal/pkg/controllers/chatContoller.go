@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-func ConnectToChat(res http.ResponseWriter, req *http.Request) {
+func ConnectToGlobalChat(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 
 	upgrader := websocket.Upgrader{

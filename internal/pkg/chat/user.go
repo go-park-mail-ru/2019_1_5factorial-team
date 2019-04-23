@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+const LastMessagesLimit = 50
+
 type User struct {
 	conn       *websocket.Conn
 	ID         string
@@ -71,6 +73,7 @@ func (u *User) ListenIncome() {
 
 			} else if err != nil {
 				log.Printf("cannot read json, err = %s", err.Error())
+				u.SendErr(err.Error())
 
 				if e, ok := err.(*net.OpError); ok {
 					if e.Temporary() || e.Timeout() {
@@ -87,11 +90,18 @@ func (u *User) ListenIncome() {
 			}
 
 			if message.Text == "" || message.Text == " " {
+				u.SendErr("empty text field")
 				continue
 			}
 
 			message.From = u.Nickname
 			message.Time = time.Now()
+			err = message.Insert()
+			if err != nil {
+				// TODO(): отправить юзеру сообщение, что мессаж не отправился
+				u.SendErr(err.Error())
+				continue
+			}
 			u.in <- message
 		}
 	}
@@ -103,10 +113,11 @@ func (u *User) Listen() {
 	for {
 		select {
 		case <-u.unregister:
+			u.ChatPtr.RemoveUser(u)
 			err := u.conn.Close()
-			log.Printf("close connection on user %#v", u)
+			log.Printf("close connection on user %v", u)
 			if err != nil {
-				log.Error("p.Listen cant close connection", err.Error())
+				log.Error("u.Listen cant close connection", err.Error())
 			}
 
 			return
@@ -121,7 +132,7 @@ func (u *User) Listen() {
 			}
 
 		case message := <-u.in:
-			log.Printf("from player = %s, income: %#v", u, message)
+			log.Printf("from user = %s, income: %v", u.Nickname, message)
 
 			u.ChatPtr.messagesChan <- *message
 		}
@@ -131,4 +142,33 @@ func (u *User) Listen() {
 func (u *User) CloseConn() {
 	u.unregister <- struct{}{}
 	//p.stopListen <- struct{}{}
+}
+
+func (u *User) SendErr(error string) {
+	u.out <- &Message{
+		Type: MessageErr,
+		Payload: ErrMessage{
+			Error: error,
+		},
+	}
+}
+
+func (u *User) SendLastMessages() {
+	mes, err := GetLastMessages(LastMessagesLimit)
+	if err != nil {
+		log.Error(errors.Wrapf(err, "user %s cant get last messages on connect", u.Nickname))
+	}
+
+	for _, val := range mes {
+		err := u.conn.WriteJSON(Message{
+			Type:    MessageExist,
+			Payload: val,
+		})
+		if err != nil {
+			log.Error("u.Listen cant send message ", err.Error())
+
+			u.CloseConn()
+			//return
+		}
+	}
 }
