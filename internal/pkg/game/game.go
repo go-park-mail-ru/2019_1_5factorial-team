@@ -2,6 +2,7 @@ package game
 
 import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
+	"github.com/sirupsen/logrus"
 	"sync"
 )
 
@@ -10,7 +11,18 @@ var InstanceGame *Game
 func init() {
 	// игра крутится как отдельная сущность всегда
 	InstanceGame = NewGame(10)
-	go InstanceGame.Run()
+	go PanicWorker(InstanceGame.Run)
+}
+
+func PanicWorker(job func()) {
+	defer func() {
+		if err := recover(); err != nil {
+			//log.Println("OOOOOPA PANIC recovered", err)
+			logrus.WithField("err", err).Error("OOOOOPA PANIC in game, recovered")
+		}
+	}()
+
+	job()
 }
 
 type Game struct {
@@ -51,7 +63,7 @@ LOOP:
 
 		room := NewRoom(2, g)
 		g.AddEmptyRoom(room)
-		go room.Run()
+		go PanicWorker(room.Run)
 
 		room.AddPlayer(player)
 		//g.searchMu.Unlock()

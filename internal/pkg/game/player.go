@@ -73,7 +73,7 @@ func (p *Player) ListenMessages() {
 }
 
 func (p *Player) Listen() {
-	go p.ListenMessages()
+	go PanicWorker(p.ListenMessages)
 
 	for {
 		select {
