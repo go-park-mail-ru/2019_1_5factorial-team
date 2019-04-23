@@ -218,7 +218,7 @@ func (r *Room) updateRoomState() {
 	log.Println("tick")
 }
 
-func (r *Room) SendMessageAllPlayers()  {
+func (r *Room) SendMessageAllPlayers() {
 
 }
 

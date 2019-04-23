@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/game"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -36,10 +37,10 @@ func Play(res http.ResponseWriter, req *http.Request) {
 		ctxLogger.Error(errors.Wrap(err, "not authorized"))
 		return
 	}
-	
+
 	ctxLogger.Warn(err)
 
 	player := game.NewPlayer(conn, currentSession.Value)
-	go player.Listen()
+	go panicWorker.PanicWorker(player.Listen)
 	game.InstanceGame.AddPlayer(player)
 }
