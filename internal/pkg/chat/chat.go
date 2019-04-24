@@ -50,6 +50,11 @@ func (c *Chat) Start() {
 			delete(c.Users, unregisterUser.Nickname)
 
 		case registerUser := <-c.register:
+			registerUser.out <- &Message{
+				Type: MessageConnect,
+				Payload: nil,
+			}
+
 			registerUser.ChatPtr = c
 			registerUser.SendLastMessages()
 			c.Users[registerUser.Nickname] = registerUser
