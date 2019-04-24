@@ -6,6 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/validator"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -40,6 +41,13 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 		ErrResponse(res, status, err.Error())
 
 		ctxLogger.Error(errors.Wrap(err, "ParseRequestIntoStruct error"))
+		return
+	}
+
+	flagValidUser := validator.ValidLogin(data.Login, data.Password)
+	if !flagValidUser {
+		ErrResponse(res, http.StatusBadRequest, "invalid user data")
+		ctxLogger.Error(errors.Wrap(err, "err in user data"))
 		return
 	}
 
