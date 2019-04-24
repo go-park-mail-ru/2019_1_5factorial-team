@@ -10,7 +10,7 @@ func PanicMiddleware(next http.Handler) http.Handler {
 		defer func() {
 			if err := recover(); err != nil {
 				//log.Println("OOOOOPA PANIC recovered", err)
-				logrus.WithField("err", err).Error("OOOOOPA PANIC, recovered")
+				logrus.WithField("err", err).Error("OOOOOPA PANIC MIDDLEWARE, recovered")
 				http.Error(res, "some error happened", http.StatusInternalServerError)
 			}
 		}()

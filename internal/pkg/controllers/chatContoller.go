@@ -46,4 +46,5 @@ func ConnectToGlobalChat(res http.ResponseWriter, req *http.Request) {
 	}
 	go panicWorker.PanicWorker(user.Listen)
 	chat.InstanceChat.AddUser(user)
+	//chat2.InstanceChat.InstanceChat.AddUser(user)
 }

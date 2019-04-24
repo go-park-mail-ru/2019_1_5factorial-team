@@ -9,11 +9,17 @@ import (
 
 var InstanceChat *Chat
 
-func init() {
-	// игра крутится как отдельная сущность всегда
+func Start()  {
+	//игра крутится как отдельная сущность всегда
 	InstanceChat = NewChat(20)
 	go panicWorker.PanicWorker(InstanceChat.Start)
 }
+
+//func init() {
+//	// игра крутится как отдельная сущность всегда
+//	InstanceChat = NewChat(20)
+//	go panicWorker.PanicWorker(InstanceChat.Start)
+//}
 
 type Chat struct {
 	mu           *sync.Mutex
@@ -51,7 +57,7 @@ func (c *Chat) Start() {
 
 		case registerUser := <-c.register:
 			registerUser.out <- &Message{
-				Type: MessageConnect,
+				Type:    MessageConnect,
 				Payload: nil,
 			}
 
