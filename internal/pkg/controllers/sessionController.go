@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"google.golang.org/grpc"
 	"net/http"
+	"time"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
@@ -55,8 +56,9 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	}
 
 	////////// test
+	// TODO(): есть ли смысл всегда держать коннект открытым? (если перенести создание коннекта в server, то будет циклический импорт)
 	grcpConn, err := grpc.Dial(
-		"127.0.0.1:5000",
+		"auth-go:5000",
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -72,15 +74,20 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	}
 	ctxLogger.Println(cookieGRPC)
 	////////////
-	randToken, expiration, err := session.SetToken(u.ID.Hex())
+	//randToken, expiration, err := session.SetToken(u.ID.Hex())
+	//if err != nil {
+	//	ErrResponse(res, http.StatusInternalServerError, err.Error())
+	//
+	//	ctxLogger.Error(errors.Wrap(err, "Set token returned error"))
+	//	return
+	//}
+
+	//cookie := session.CreateHttpCookie(randToken, expiration)
+	timeCookie, err := time.Parse(time.RFC3339, cookieGRPC.Expiration)
 	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, err.Error())
-
-		ctxLogger.Error(errors.Wrap(err, "Set token returned error"))
-		return
+		ctxLogger.Fatal(err)
 	}
-
-	cookie := session.CreateHttpCookie(randToken, expiration)
+	cookie := session.CreateHttpCookie(cookieGRPC.Token, timeCookie)
 
 	http.SetCookie(res, cookie)
 	OkResponse(res, "ok auth")

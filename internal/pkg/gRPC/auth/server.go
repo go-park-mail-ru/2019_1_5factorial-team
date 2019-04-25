@@ -8,6 +8,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"net"
+	"time"
 )
 
 type Auth struct {
@@ -35,6 +36,6 @@ func (a *Auth) CreateSession(ctx context.Context, userID *UserID) (*Cookie, erro
 
 	return &Cookie{
 		Token: randToken,
-		Expiration: expiration.String(),
+		Expiration: expiration.Format(time.RFC3339),
 	}, nil
 }

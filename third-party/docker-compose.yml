@@ -70,3 +70,17 @@ services:
       - '5052:5052'
     depends_on:
       - mongo-chat-global
+
+  auth-go:
+    container_name: 5factorial-back-auth
+    restart: always
+    build:
+      context: ../.
+      dockerfile: ./third-party/auth/Dockerfile
+    volumes:
+      - '/etc/5factorial:/etc/5factorial'
+#    ports:
+#      - '5052:5052'
+    depends_on:
+      - mongo-user
+      - mongo-session

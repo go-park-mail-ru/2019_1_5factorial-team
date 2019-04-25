@@ -2,7 +2,6 @@ package server
 
 import (
 	_ "github.com/go-park-mail-ru/2019_1_5factorial-team/docs"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
@@ -82,7 +81,7 @@ func (mgs *MyGorgeousServer) Run() error {
 	// chat
 	//routerLoginRequired.HandleFunc("/api/chat/global/ws", controllers.ConnectToGlobalChat).Methods("GET", "OPTIONS")
 
-	go auth.Run()
+	//go auth.Run()
 	// TODO(): вынести порт grpc в константы
 	//CreateAuthClient("5000")
 
