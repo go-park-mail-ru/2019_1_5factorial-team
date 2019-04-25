@@ -1,17 +1,18 @@
 package server
 
 import (
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/auth"
-	"net/http"
-
 	_ "github.com/go-park-mail-ru/2019_1_5factorial-team/docs"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"net/http"
 )
+
+//var AuthGRPC session.AuthCheckerClient
 
 type MyGorgeousServer struct {
 	port string
@@ -23,6 +24,19 @@ func New(port string) *MyGorgeousServer {
 
 	return &mgs
 }
+
+//func CreateAuthClient(port string) {
+//	grcpConn, err := grpc.Dial(
+//		"127.0.0.1:"+port,
+//		grpc.WithInsecure(),
+//	)
+//	if err != nil {
+//		log.Error(errors.New("cant connect to grpc"))
+//	}
+//	defer grcpConn.Close()
+//
+//	AuthGRPC = session.NewAuthCheckerClient(grcpConn)
+//}
 
 func (mgs *MyGorgeousServer) Run() error {
 
@@ -69,6 +83,8 @@ func (mgs *MyGorgeousServer) Run() error {
 	//routerLoginRequired.HandleFunc("/api/chat/global/ws", controllers.ConnectToGlobalChat).Methods("GET", "OPTIONS")
 
 	go auth.Run()
+	// TODO(): вынести порт grpc в константы
+	//CreateAuthClient("5000")
 
 	err := http.ListenAndServe(address, router)
 	if err != nil {

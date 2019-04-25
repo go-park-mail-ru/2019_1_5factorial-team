@@ -1,9 +1,13 @@
 package controllers
 
 import (
+	"context"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
+	"google.golang.org/grpc"
 	"net/http"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
+	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/pkg/errors"
@@ -50,6 +54,24 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	////////// test
+	grcpConn, err := grpc.Dial(
+		"127.0.0.1:5000",
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		log.Error(errors.New("cant connect to grpc"))
+	}
+	defer grcpConn.Close()
+
+	AuthGRPC := grpcAuth.NewAuthCheckerClient(grcpConn)
+	ctx := context.Background()
+	cookieGRPC, err := AuthGRPC.CreateSession(ctx, &grpcAuth.UserID{ID:u.ID.Hex()})
+	if err != nil {
+		ctxLogger.Fatal(err)
+	}
+	ctxLogger.Println(cookieGRPC)
+	////////////
 	randToken, expiration, err := session.SetToken(u.ID.Hex())
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, err.Error())
