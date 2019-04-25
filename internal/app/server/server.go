@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/auth"
 	"net/http"
 
 	_ "github.com/go-park-mail-ru/2019_1_5factorial-team/docs"
@@ -66,6 +67,8 @@ func (mgs *MyGorgeousServer) Run() error {
 
 	// chat
 	//routerLoginRequired.HandleFunc("/api/chat/global/ws", controllers.ConnectToGlobalChat).Methods("GET", "OPTIONS")
+
+	go auth.Run()
 
 	err := http.ListenAndServe(address, router)
 	if err != nil {

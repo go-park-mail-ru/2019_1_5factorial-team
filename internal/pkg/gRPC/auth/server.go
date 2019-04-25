@@ -14,7 +14,7 @@ type Auth struct {
 }
 
 func GRPCServer() error {
-	port := "5052"
+	port := "5000"
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Error(err)
