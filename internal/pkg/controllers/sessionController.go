@@ -1,13 +1,13 @@
 package controllers
 
 import (
+	"fmt"
 
 	"net/http"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/validator"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -45,18 +45,9 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-<<<<<<< HEAD
-	u, err := user.IdentifyUser(data.LoginOrEmail, data.Password)
-=======
-	flagValidUser := validator.ValidLogin(data.Login, data.Password)
-	if !flagValidUser {
-		ErrResponse(res, http.StatusBadRequest, "invalid user data")
-		ctxLogger.Error(errors.Wrap(err, "err in user data"))
-		return
-	}
 
-	u, err := user.IdentifyUser(data.Login, data.Password)
->>>>>>> 48bdeb521c4189e2760d120e567fb65213637fcc
+	fmt.Println("-------------------------------------------->", data.LoginOrEmail, data.Password)
+	u, err := user.IdentifyUser(data.LoginOrEmail, data.Password)
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, "Wrong password or login")
 

@@ -2,8 +2,8 @@ package validator
 
 import "regexp"
 
-const _EXP_EMAIL = `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`
-const _EXP_LOGIN_PASSWORD = `^[a-z0-9._-]{4,20}$`
+const _EXP_EMAIL = `^[a-zA-Z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`
+const _EXP_LOGIN_PASSWORD = `^[a-zA-Z0-9._-]{4,20}$`
 
 func ValidNewUser(login string, email string, password string) bool {
 
@@ -18,11 +18,4 @@ func ValidUpdatePassword(password string) bool {
 	expLopPassw := regexp.MustCompile(_EXP_LOGIN_PASSWORD)
 	return expLopPassw.MatchString(password)
 }
-func ValidLogin(login string, password string) bool {
 
-	expLopPassw := regexp.MustCompile(_EXP_LOGIN_PASSWORD)
-	if expLopPassw.MatchString(login) && expLopPassw.MatchString(password) {
-		return true
-	}
-	return false
-}
