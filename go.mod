@@ -2,6 +2,7 @@ module github.com/go-park-mail-ru/2019_1_5factorial-team
 
 require (
 	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc
+	github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf // indirect
 	github.com/go-chi/chi v4.0.2+incompatible // indirect
 	github.com/gorilla/mux v1.7.0
 	github.com/gorilla/websocket v1.4.0
@@ -13,6 +14,7 @@ require (
 	github.com/swaggo/files v0.0.0-20190110041405-30649e0721f8 // indirect
 	github.com/swaggo/http-swagger v0.0.0-20190324132102-654001218d89
 	github.com/swaggo/swag v1.5.0
+	github.com/thedevsaddam/govalidator v1.9.6 // indirect
 	golang.org/x/crypto v0.0.0-20190411191339-88737f569e3a
 	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce

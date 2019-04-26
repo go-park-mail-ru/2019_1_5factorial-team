@@ -34,6 +34,7 @@ func GetOauthUser(service string, contents []byte) (string, string, error) {
 		if err != nil {
 			return "", "", errors.Wrap(err, "json parsing error")
 		}
+
 		vkInfo := (userInfo.Users)[0]
 		vkEmail, vkLogin := getEmailAndLoginFromVK(strconv.Itoa(vkInfo.ID), vkInfo.Name, vkInfo.LastName)
 		return vkEmail, vkLogin, nil
@@ -43,6 +44,7 @@ func GetOauthUser(service string, contents []byte) (string, string, error) {
 		if err != nil {
 			return "", "", errors.Wrap(err, "json parsing error")
 		}
+
 		yandexNickname := getLoginFromEmail(userInfo.Email) + "_Y"
 		return userInfo.Email, yandexNickname, nil
 	case "google":
