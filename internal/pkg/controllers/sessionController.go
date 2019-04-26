@@ -1,6 +1,7 @@
 package controllers
 
 import (
+
 	"net/http"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
@@ -15,7 +16,7 @@ import (
 // 	"password":
 // пока только логин, без почты
 type signInRequest struct {
-	Login    string `json:"loginOrEmail"`
+	LoginOrEmail    string `json:"loginOrEmail"`
 	Password string `json:"password"`
 }
 
@@ -43,7 +44,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	u, err := user.IdentifyUser(data.Login, data.Password)
+	u, err := user.IdentifyUser(data.LoginOrEmail, data.Password)
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, "Wrong password or login")
 
