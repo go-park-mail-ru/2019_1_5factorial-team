@@ -1,11 +1,14 @@
 package game
 
 import (
+	"context"
+	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gameLogic"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
+	"github.com/pkg/errors"
 	"sync"
 	"time"
 )
@@ -237,26 +240,43 @@ func (r *Room) Close() {
 
 	r.ticker.Stop()
 
-	// добавляю юзерам очки их персонажей
-	for _, p := range r.state.Players {
-		if _, ok := r.Players[p.Token]; ok {
-			r.Players[p.Token].Score = p.Score
+	grpcConn, err := grpcAuth.CreateConnection()
+	if err != nil {
+		log.Error(errors.Wrap(err, "cant connect to auth grpc, NewUser"))
+	}
+	defer grpcConn.Close()
 
-			id, err := session.GetId(p.Token)
-			if err != nil {
-				log.Error("cant get player id from session, token=%s, err=%s", p.Token, err.Error())
+	AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
+	ctx := context.Background()
 
-				r.Players[p.Token].Score = 0
-				continue
-			}
+	if err == nil {
+		// добавляю юзерам очки их персонажей
+		for _, p := range r.state.Players {
+			if _, ok := r.Players[p.Token]; ok {
+				r.Players[p.Token].Score = p.Score
 
-			err = user.UpdateScore(id, p.Score)
-			if err != nil {
-				log.Error("cant update user score, user id=%s, token=%s, score=%d, err=%s",
-					id, p.Token, p.Score, err.Error())
+				//id, err := session.GetId(p.Token)
+				//if err != nil {
+				//	log.Error("cant get player id from session, token=%s, err=%s", p.Token, err.Error())
+				//
+				//	r.Players[p.Token].Score = 0
+				//	continue
+				//}
+				uID, err := AuthGRPC.GetIDFromSession(ctx, &grpcAuth.Cookie{Token: p.Token, Expiration: ""})
+				if err != nil {
+					log.Error(errors.Wrap(err, "cant create user, GetID"))
+					r.Players[p.Token].Score = 0
+					continue
+				}
 
-				r.Players[p.Token].Score = 0
-				continue
+				err = user.UpdateScore(uID.ID, p.Score)
+				if err != nil {
+					log.Error("cant update user score, user id=%s, token=%s, score=%d, err=%s",
+						uID.ID, p.Token, p.Score, err.Error())
+
+					r.Players[p.Token].Score = 0
+					continue
+				}
 			}
 		}
 	}

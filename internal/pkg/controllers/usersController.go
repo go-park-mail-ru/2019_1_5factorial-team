@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
+	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/gorilla/mux"
@@ -98,15 +100,44 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	randToken, expiration, err := session.SetToken(u.ID.Hex())
+	//randToken, expiration, err := session.SetToken(u.ID.Hex())
+	//if err != nil {
+	//	ErrResponse(res, http.StatusInternalServerError, err.Error())
+	//
+	//	ctxLogger.Error(errors.Wrap(err, "Set token returned err"))
+	//	return
+	//}
+	//
+	//cookie := session.CreateHttpCookie(randToken, expiration)
+	// TODO(): есть ли смысл всегда держать коннект открытым? (если перенести создание коннекта в server, то будет циклический импорт)
+	grpcConn, err := grpcAuth.CreateConnection()
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, err.Error())
 
-		ctxLogger.Error(errors.Wrap(err, "Set token returned err"))
+		ctxLogger.Error(errors.Wrap(err, "cant get connection to auth service"))
+		return
+	}
+	defer grpcConn.Close()
+
+	AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
+	ctx := context.Background()
+	cookieGRPC, err := AuthGRPC.CreateSession(ctx, &grpcAuth.UserID{ID: u.ID.Hex()})
+	if err != nil {
+		ErrResponse(res, http.StatusInternalServerError, err.Error())
+
+		ctxLogger.Error(errors.Wrap(err, "Set token from grpc returned error"))
 		return
 	}
 
-	cookie := session.CreateHttpCookie(randToken, expiration)
+	timeCookie, err := time.Parse(time.RFC3339, cookieGRPC.Expiration)
+	if err != nil {
+		ErrResponse(res, http.StatusInternalServerError, err.Error())
+
+		ctxLogger.Error(errors.Wrap(err, "cant convert time from string"))
+		return
+	}
+
+	cookie := session.CreateHttpCookie(cookieGRPC.Token, timeCookie)
 
 	http.SetCookie(res, cookie)
 	OkResponse(res, "signUp ok")

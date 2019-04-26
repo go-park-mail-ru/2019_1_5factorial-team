@@ -20,5 +20,4 @@ service AuthChecker {
     rpc DeleteSession (Cookie) returns (Nothing) {}
     rpc UpdateSession (Cookie) returns (Cookie) {}
     rpc GetIDFromSession (Cookie) returns (UserID) {}
-//    rpc Check (SessionID) returns (Session) {}
 }

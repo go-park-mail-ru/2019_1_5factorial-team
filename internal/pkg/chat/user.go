@@ -1,7 +1,8 @@
 package chat
 
 import (
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
+	"context"
+	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
@@ -27,13 +28,27 @@ type User struct {
 }
 
 func NewUser(conn *websocket.Conn, token string) (*User, error) {
-	ID, err := session.GetId(token)
+	grpcConn, err := grpcAuth.CreateConnection()
+	if err != nil {
+		log.Error(errors.Wrap(err, "cant connect to auth grpc, NewUser"))
+		return nil, nil
+	}
+	defer grpcConn.Close()
+
+	AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
+	ctx := context.Background()
+	uID, err := AuthGRPC.GetIDFromSession(ctx, &grpcAuth.Cookie{Token: token, Expiration: ""})
 	if err != nil {
 		log.Error(errors.Wrap(err, "cant create user, GetID"))
 		return nil, nil
 	}
+	//ID, err := session.GetId(token)
+	//if err != nil {
+	//	log.Error(errors.Wrap(err, "cant create user, GetID"))
+	//	return nil, nil
+	//}
 
-	u, err := user.GetUserById(ID)
+	u, err := user.GetUserById(uID.ID)
 	if err != nil {
 		log.Error(errors.Wrap(err, "cant create user, GetUserById"))
 		return nil, nil

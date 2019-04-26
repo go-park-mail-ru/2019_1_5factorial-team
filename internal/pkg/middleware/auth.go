@@ -91,7 +91,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			}
 			//if err != nil {
 			//	TODO(): переделать на ErrResponse
-				//http.Error(res, "relogin, please", http.StatusInternalServerError)
+			//http.Error(res, "relogin, please", http.StatusInternalServerError)
 			//}
 
 			session.UpdateHttpCookie(cookie, timeCookie)
