@@ -9,7 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func Run()  {
+func Run() {
+	// TODO(): кушать только необходимые коннекшены к базам
 	port := flag.String("port", "5000", "chat-server will start on this port")
 	configPath := flag.String("config", "/etc/5factorial/", "dir with server configs")
 	flag.Parse()

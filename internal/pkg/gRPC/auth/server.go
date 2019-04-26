@@ -11,7 +11,27 @@ import (
 	"time"
 )
 
+const (
+	address = "auth-go"
+	port = "5000"
+)
+
 type Auth struct {
+}
+
+func CreateConnection() (*grpc.ClientConn, error) {
+	grcpConn, err := grpc.Dial(
+		fmt.Sprintf("%s:%s", address, port),
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		log.Error(errors.Wrap(err, "cant connect to grpc"))
+
+		return nil, errors.Wrap(err, "cant connect to grpc")
+	}
+	//defer grcpConn.Close()
+
+	return grcpConn, nil
 }
 
 func GRPCServer() error {
@@ -35,7 +55,7 @@ func (a *Auth) CreateSession(ctx context.Context, userID *UserID) (*Cookie, erro
 	}
 
 	return &Cookie{
-		Token: randToken,
+		Token:      randToken,
 		Expiration: expiration.Format(time.RFC3339),
 	}, nil
 }

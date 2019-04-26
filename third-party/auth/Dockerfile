@@ -19,7 +19,7 @@ WORKDIR /server
 COPY . .
 
 # Объявлем порт сервера
-EXPOSE 5000
+#EXPOSE 5000
 
 RUN go build -mod=vendor cmd/auth/main.go
 

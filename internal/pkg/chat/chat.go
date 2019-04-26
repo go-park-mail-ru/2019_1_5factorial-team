@@ -9,7 +9,7 @@ import (
 
 var InstanceChat *Chat
 
-func Start()  {
+func Start() {
 	//игра крутится как отдельная сущность всегда
 	InstanceChat = NewChat(20)
 	go panicWorker.PanicWorker(InstanceChat.Start)

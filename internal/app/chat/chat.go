@@ -13,7 +13,7 @@ import (
 
 type MyGorgeousChat struct {
 	//InstanceChat *chat.Chat
-	port         string
+	port string
 }
 
 func New(port string) *MyGorgeousChat {
