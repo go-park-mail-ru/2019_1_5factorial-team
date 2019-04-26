@@ -67,9 +67,11 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	ctx := context.Background()
 	cookieGRPC, err := AuthGRPC.CreateSession(ctx, &grpcAuth.UserID{ID: u.ID.Hex()})
 	if err != nil {
-		ctxLogger.Fatal(err)
+		ErrResponse(res, http.StatusInternalServerError, err.Error())
+
+		ctxLogger.Error(errors.Wrap(err, "Set token from grpc returned error"))
+		return
 	}
-	ctxLogger.Println(cookieGRPC)
 
 	timeCookie, err := time.Parse(time.RFC3339, cookieGRPC.Expiration)
 	if err != nil {
@@ -111,7 +113,20 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = session.DeleteToken(currentSession.Value)
+	// TODO(): есть ли смысл всегда держать коннект открытым? (если перенести создание коннекта в server, то будет циклический импорт)
+	grpcConn, err := grpcAuth.CreateConnection()
+	if err != nil {
+		ErrResponse(res, http.StatusInternalServerError, err.Error())
+
+		ctxLogger.Error(errors.Wrap(err, "cant get connection to auth service"))
+		return
+	}
+	defer grpcConn.Close()
+
+	AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
+	ctx := context.Background()
+	_, err = AuthGRPC.DeleteSession(ctx, &grpcAuth.Cookie{Token: currentSession.Value, Expiration: ""})
+	//err = session.DeleteToken(currentSession.Value)
 	if err != nil && err.Error() == session.NoTokenFound {
 		// bad token
 		ctxLogger.Error(errors.Wrap(err, "cannot delete token from current session, user cookie will set expired"))

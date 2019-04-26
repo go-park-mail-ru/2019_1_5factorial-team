@@ -13,8 +13,11 @@ message UserID {
     string ID = 1;
 }
 
+message Nothing {}
+
 service AuthChecker {
     rpc CreateSession (UserID) returns (Cookie) {}
+    rpc DeleteSession (Cookie) returns (Nothing) {}
 //    rpc Check (SessionID) returns (Session) {}
 //    rpc Delete (SessionID) returns (Nothing) {}
 }

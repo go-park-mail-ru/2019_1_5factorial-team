@@ -59,3 +59,13 @@ func (a *Auth) CreateSession(ctx context.Context, userID *UserID) (*Cookie, erro
 		Expiration: expiration.Format(time.RFC3339),
 	}, nil
 }
+
+func (a *Auth) DeleteSession(ctx context.Context, cookie *Cookie) (*Nothing, error) {
+	err := session.DeleteToken(cookie.Token)
+	if err != nil {
+		return &Nothing{}, err
+	}
+	return &Nothing{}, nil
+}
+
+// getid from session
