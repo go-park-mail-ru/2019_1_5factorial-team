@@ -18,6 +18,7 @@ message Nothing {}
 service AuthChecker {
     rpc CreateSession (UserID) returns (Cookie) {}
     rpc DeleteSession (Cookie) returns (Nothing) {}
+    rpc UpdateSession (Cookie) returns (Cookie) {}
+    rpc GetIDFromSession (Cookie) returns (UserID) {}
 //    rpc Check (SessionID) returns (Session) {}
-//    rpc Delete (SessionID) returns (Nothing) {}
 }

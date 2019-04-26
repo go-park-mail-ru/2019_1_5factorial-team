@@ -3,8 +3,10 @@ package middleware
 import (
 	"context"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
+	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
@@ -37,24 +39,62 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		uId, err := session.GetId(cookie.Value)
+		//uId, err := session.GetId(cookie.Value)
+		grpcConn, err := grpcAuth.CreateConnection()
+		if err != nil {
+			http.Error(res, "relogin, please", http.StatusInternalServerError)
+
+			logrus.Error(errors.Wrap(err, "cant get connection to auth service"))
+			return
+		}
+		defer grpcConn.Close()
+
+		AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
+		ctxGRPC := context.Background()
+		uId, err := AuthGRPC.GetIDFromSession(ctxGRPC, &grpcAuth.Cookie{Token: cookie.Value})
 
 		if err != nil {
 			cookie.Expires = time.Unix(0, 0)
 
 		} else {
-			userId = uId
+			userId = uId.ID
 			authorized = true
 
 			// сетим новое время куки
 			// и обновляем время токена
-			updatedToken, err := session.UpdateToken(cookie.Value)
+			//updatedToken, err := session.UpdateToken(cookie.Value)
+			//grpcConn, err := grpcAuth.CreateConnection()
+			//if err != nil {
+			//	http.Error(res, "relogin, please", http.StatusInternalServerError)
+			//
+			//	logrus.Error(errors.Wrap(err, "cant get connection to auth service"))
+			//	return
+			//}
+			//defer grpcConn.Close()
+			//
+			//AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
+			//ctx := context.Background()
+			cookieGRPC, err := AuthGRPC.UpdateSession(ctx, &grpcAuth.Cookie{Token: cookie.Value})
 			if err != nil {
-				// TODO(): переделать на ErrResponse
 				http.Error(res, "relogin, please", http.StatusInternalServerError)
+
+				logrus.Error(errors.Wrap(err, "Set token from grpc returned error"))
+				return
 			}
 
-			session.UpdateHttpCookie(cookie, updatedToken.CookieExpiredTime)
+			timeCookie, err := time.Parse(time.RFC3339, cookieGRPC.Expiration)
+			if err != nil {
+				http.Error(res, "relogin, please", http.StatusInternalServerError)
+
+				logrus.Error(errors.Wrap(err, "cant convert time from string"))
+				return
+			}
+			//if err != nil {
+			//	TODO(): переделать на ErrResponse
+				//http.Error(res, "relogin, please", http.StatusInternalServerError)
+			//}
+
+			session.UpdateHttpCookie(cookie, timeCookie)
 		}
 
 		http.SetCookie(res, cookie)

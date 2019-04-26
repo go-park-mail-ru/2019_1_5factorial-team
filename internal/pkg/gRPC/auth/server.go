@@ -13,7 +13,7 @@ import (
 
 const (
 	address = "auth-go"
-	port = "5000"
+	port    = "5000"
 )
 
 type Auth struct {
@@ -66,6 +66,26 @@ func (a *Auth) DeleteSession(ctx context.Context, cookie *Cookie) (*Nothing, err
 		return &Nothing{}, err
 	}
 	return &Nothing{}, nil
+}
+
+func (a *Auth) UpdateSession(ctx context.Context, cookie *Cookie) (*Cookie, error) {
+	updatedToken, err := session.UpdateToken(cookie.Token)
+	if err != nil {
+		return nil, errors.Wrap(err, "cant update token in auth grpc")
+	}
+	return &Cookie{
+		Token:      updatedToken.Token,
+		Expiration: updatedToken.CookieExpiredTime.Format(time.RFC3339),
+	}, nil
+}
+
+func (a *Auth) GetIDFromSession(ctx context.Context, cookie *Cookie) (*UserID, error) {
+	uId, err := session.GetId(cookie.Token)
+	if err != nil {
+		return &UserID{}, errors.Wrap(err, "cant find session in auth grpc")
+	}
+
+	return &UserID{ID: uId}, nil
 }
 
 // getid from session
