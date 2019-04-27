@@ -11,6 +11,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"net"
 	"time"
+	"github.com/icrowley/fake"
+	"strings"
+	"fmt"
 )
 
 const LastMessagesLimit = 50
@@ -49,7 +52,7 @@ func NewUserID(conn *websocket.Conn, ID string) (*User, error) {
 
 func NewUserFake(conn *websocket.Conn) (*User, error) {
 	ID := bson.NewObjectId().Hex()
-	FakeNick := ""
+	FakeNick := getFakeNick()
 	FakeAvatar := ""
 	return &User{
 		conn:       conn,
@@ -222,4 +225,13 @@ func (u *User) SendLastMessages() {
 			//return
 		}
 	}
+}
+
+
+func getFakeNick() string{
+	color := fake.Color()
+	jobTitle := fake.JobTitle()
+	jobTitle = strings.Replace(jobTitle, " ", "_", -1)
+	resultFakeName := fmt.Sprintf("%s_%s", color,jobTitle)
+	return resultFakeName
 }
