@@ -30,7 +30,7 @@ var validUserInput = map[string]MessageType{
 
 // TODO(): type должен быть в инкаме, а в рассылках не указываться
 type UserMessage struct {
-	//Type string        `json:"type,omitempty"   bson:"-"`
+	Type string        `json:"type,omitempty"   bson:"-"`
 	ID   bson.ObjectId `json:"id"     bson:"_id,omitempty"`
 	From string        `json:"from"   bson:"from"`
 	Time time.Time     `json:"time"   bson:"time"`
@@ -38,9 +38,9 @@ type UserMessage struct {
 }
 
 func (um *UserMessage) Validate() error {
-	//if _, ok := validUserInput[um.Type]; !ok {
-	//	return errors.New("not valid message type")
-	//}
+	if _, ok := validUserInput[um.Type]; !ok {
+		return errors.New("not valid message type")
+	}
 
 	if um.Text == "" || um.Text == " " {
 		return errors.New("empty message payload")
