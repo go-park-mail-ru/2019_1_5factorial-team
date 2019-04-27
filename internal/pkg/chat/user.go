@@ -2,18 +2,18 @@ package chat
 
 import (
 	"context"
+	"fmt"
 	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
 	"github.com/gorilla/websocket"
+	"github.com/icrowley/fake"
 	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2/bson"
 	"net"
-	"time"
-	"github.com/icrowley/fake"
 	"strings"
-	"fmt"
+	"time"
 )
 
 const LastMessagesLimit = 50
@@ -117,7 +117,48 @@ func (u *User) ListenIncome() {
 		default:
 			//log.Printf("player %s ListenMessage default", p.Token)
 
-			message := &UserMessage{}
+			//message := &UserMessage{}
+			//err := u.conn.ReadJSON(message)
+			//if websocket.IsUnexpectedCloseError(err) || websocket.IsCloseError(err) {
+			//	u.ChatPtr.RemoveUser(u)
+			//	log.Printf("user %s disconnected", u.ID)
+			//
+			//	return
+			//
+			//} else if err != nil {
+			//	log.Printf("cannot read json, err = %s", err.Error())
+			//	u.SendErr(err.Error())
+			//
+			//	if e, ok := err.(*net.OpError); ok {
+			//		if e.Temporary() || e.Timeout() {
+			//			// I don't think these actually happen, but we would want to continue if they did...
+			//			continue
+			//		} else if e.Err.Error() == "use of closed network connection" { // happens very frequently
+			//			// не знаю что тут сделать, выкинуть его из комнаты или шо?
+			//			u.stopListen <- struct{}{}
+			//			continue
+			//		}
+			//	}
+			//
+			//	continue
+			//}
+			//
+			//if err = message.Validate(); err != nil {
+			//	u.SendErr(err.Error())
+			//	continue
+			//}
+			//
+			//message.From = u.Nickname
+			//message.Time = time.Now()
+			//err = message.Insert()
+			//if err != nil {
+			//	// TODO(): отправить юзеру сообщение, что мессаж не отправился
+			//	u.SendErr(err.Error())
+			//	continue
+			//}
+			//u.in <- message
+
+			message := &Message{}
 			err := u.conn.ReadJSON(message)
 			if websocket.IsUnexpectedCloseError(err) || websocket.IsCloseError(err) {
 				u.ChatPtr.RemoveUser(u)
@@ -143,20 +184,30 @@ func (u *User) ListenIncome() {
 				continue
 			}
 
-			if err = message.Validate(); err != nil {
-				u.SendErr(err.Error())
+			log.Println(message)
+			if message.Payload == nil {
+				u.SendErr("empty payload")
 				continue
 			}
 
-			message.From = u.Nickname
-			message.Time = time.Now()
-			err = message.Insert()
-			if err != nil {
-				// TODO(): отправить юзеру сообщение, что мессаж не отправился
-				u.SendErr(err.Error())
-				continue
+			if message.Type == MessageNew {
+				payloadMap := message.Payload.(map[string]interface{})
+
+				fmt.Println("CHECK NEW")
+				um := UserMessage{
+					From: u.Nickname,
+					Time: time.Now(),
+					Text: payloadMap["text"].(string),
+				}
+
+				err := um.Insert()
+				if err != nil {
+					// TODO(): отправить юзеру сообщение, что мессаж не отправился
+					u.SendErr(err.Error())
+					continue
+				}
+				u.in <- &um
 			}
-			u.in <- message
 		}
 	}
 }
@@ -227,11 +278,10 @@ func (u *User) SendLastMessages() {
 	}
 }
 
-
-func getFakeNick() string{
+func getFakeNick() string {
 	color := fake.Color()
 	jobTitle := fake.JobTitle()
 	jobTitle = strings.Replace(jobTitle, " ", "_", -1)
-	resultFakeName := fmt.Sprintf("%s_%s", color,jobTitle)
+	resultFakeName := fmt.Sprintf("%s_%s", color, jobTitle)
 	return resultFakeName
 }

@@ -11,7 +11,7 @@ var InstanceChat *Chat
 
 func Start() {
 	//игра крутится как отдельная сущность всегда
-	InstanceChat = NewChat(1)
+	InstanceChat = NewChat(20)
 	go panicWorker.PanicWorker(InstanceChat.Start)
 }
 
@@ -53,9 +53,11 @@ func (c *Chat) Start() {
 	for {
 		select {
 		case unregisterUser := <-c.unregister:
+			log.Printf("unregister user %s, Chat.Start()", unregisterUser.ID)
 			delete(c.Users, unregisterUser.Nickname)
 
 		case registerUser := <-c.register:
+			log.Printf("register user %s, Chat.Start()", registerUser.ID)
 			registerUser.out <- &Message{
 				Type:    MessageConnect,
 				Payload: nil,

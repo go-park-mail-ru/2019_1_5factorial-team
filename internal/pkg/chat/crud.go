@@ -30,7 +30,7 @@ func GetLastMessages(messagesCount int) ([]UserMessage, error) {
 	}
 
 	result := make([]UserMessage, 0, 1)
-	err = col.Find(nil).Sort("time").Limit(messagesCount).All(&result)
+	err = col.Find(nil).Sort("-time").Limit(messagesCount).All(&result)
 	if err != nil {
 		return nil, errors.Wrap(err, "cant get last messages")
 	}
