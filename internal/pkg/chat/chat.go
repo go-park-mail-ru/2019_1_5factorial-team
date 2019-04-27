@@ -71,10 +71,21 @@ func (c *Chat) Start() {
 			c.BroadcastSendMessages()
 
 		case message := <-c.messagesChan:
-			c.messages = append(c.messages, Message{
-				Type:    MessageNew,
-				Payload: message,
-			})
+			switch message.Type {
+			case string(MessageNew):
+				message.Type = ""
+				c.messages = append(c.messages, Message{
+					Type:    MessageNew,
+					Payload: message,
+				})
+			case string(MessageTyping):
+				message.Type = ""
+				c.messages = append(c.messages, Message{
+					Type:    MessageTyping,
+					Payload: message,
+				})
+			}
+
 		}
 	}
 }

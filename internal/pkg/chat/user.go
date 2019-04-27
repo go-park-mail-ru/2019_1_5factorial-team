@@ -148,16 +148,26 @@ func (u *User) ListenIncome() {
 				continue
 			}
 
-			message.From = u.Nickname
-			message.Time = time.Now()
-			err = message.Insert()
-			if err != nil {
-				// TODO(): отправить юзеру сообщение, что мессаж не отправился
-				u.SendErr(err.Error())
-				continue
+			switch message.Type {
+			case string(MessageNew):
+				message.From = u.Nickname
+				message.Time = time.Now()
+				
+				err = message.Insert()
+				if err != nil {
+					// TODO(): отправить юзеру сообщение, что мессаж не отправился
+					u.SendErr(err.Error())
+					continue
+				}
+			case string(MessageTyping):
+				message.From = u.Nickname
+
 			}
 
-			message.Type = ""
+			
+			
+
+			//message.Type = ""
 			u.in <- message
 
 			//message := &Message{}
