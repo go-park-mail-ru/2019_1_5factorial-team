@@ -64,7 +64,6 @@ func (mgs *MyGorgeousServer) Run() error {
 	mainRouter.HandleFunc("/api/user/score", controllers.GetLeaderboard).Methods("GET", "OPTIONS")
 	mainRouter.HandleFunc("/api/user/count", controllers.UsersCountInfo).Methods("GET", "OPTIONS")
 	mainRouter.HandleFunc("/api/session", controllers.SignIn).Methods("POST", "OPTIONS")
-	mainRouter.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
 
 	// routers with logged user
 	routerLoginRequired := mainRouter.PathPrefix("").Subrouter()
@@ -74,6 +73,8 @@ func (mgs *MyGorgeousServer) Run() error {
 	routerLoginRequired.HandleFunc("/api/user", controllers.UpdateProfile).Methods("PUT", "OPTIONS")
 	routerLoginRequired.HandleFunc("/api/session", controllers.IsSessionValid).Methods("GET", "OPTIONS")
 	routerLoginRequired.HandleFunc("/api/session", controllers.SignOut).Methods("DELETE", "OPTIONS")
+	// загрузка аватрки только для залогиненых юзеров
+	routerLoginRequired.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
 
 	// игра
 	routerLoginRequired.HandleFunc("/api/game/ws", controllers.Play).Methods("GET", "OPTIONS")
