@@ -325,7 +325,7 @@ func (u *User) SendLastMessages() {
 	//		//return
 	//	}
 	//}
-	for i := len(mes) - 1; i > 0; i++ {
+	for i := len(mes) - 1; i > 0; i-- {
 		err := u.conn.WriteJSON(Message{
 			Type:    MessageExist,
 			Payload: mes[i],
