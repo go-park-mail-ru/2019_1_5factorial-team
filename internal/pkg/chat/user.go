@@ -104,8 +104,12 @@ func (u *User) ListenIncome() {
 				continue
 			}
 
-			if message.Text == "" || message.Text == " " {
-				u.SendErr("empty text field")
+			//if message.Text == "" || message.Text == " "{
+			//	u.SendErr("empty text field")
+			//	continue
+			//}
+			if err = message.Validate(); err != nil {
+				u.SendErr(err.Error())
 				continue
 			}
 
