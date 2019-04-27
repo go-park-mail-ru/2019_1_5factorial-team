@@ -3,6 +3,7 @@ package chat
 import (
 	"errors"
 	"gopkg.in/mgo.v2/bson"
+	"strings"
 	"time"
 )
 
@@ -37,13 +38,43 @@ type UserMessage struct {
 	Text string        `json:"text,omitempty"   bson:"text"`
 
 	DeleteID string `json:"delete_id,omitempty" bson:"-"`
+	EditID   string `json:"edit_id,omitempty"   bson:"-"`
+}
+
+func (um *UserMessage) SetMessageEdit() error {
+	um.DeleteID = ""
+	um.ID = ""
+
+	//if um.EditID == "" || um.EditID == " " {
+	//	return errors.New("empty EDIT message edit_id")
+	//}
+	//
+	//if um.Text == "" || um.Text == " " {
+	//	return errors.New("empty NEW message text")
+	//}
+
+	if len(strings.Replace(um.EditID, " ", "", -1)) == 0 {
+		return errors.New("empty EDIT message edit_id")
+	}
+
+	if len(strings.Replace(um.EditID, " ", "", -1)) == 0 {
+		return errors.New("empty NEW message text")
+	}
+
+	return nil
 }
 
 func (um *UserMessage) SetMessageNew() error {
 	um.DeleteID = ""
+	um.EditID = ""
 
-	if um.Text == "" || um.Text == " " {
+	//if um.Text == "" || um.Text == " " {
+	//	return errors.New("empty NEW message text")
+	//}
+
+	if len(strings.Replace(um.Text, " ", "", -1)) == 0 {
 		return errors.New("empty NEW message text")
+
 	}
 
 	return nil
@@ -53,14 +84,22 @@ func (um *UserMessage) SetMessageTyping() {
 	um.ID = ""
 	um.Text = ""
 	um.DeleteID = ""
+	um.EditID = ""
+
 }
 
 func (um *UserMessage) SetMessageDelete() error {
 	um.ID = ""
 	um.Text = ""
+	um.EditID = ""
 
-	if um.DeleteID == "" || um.DeleteID == " " {
+	//if um.DeleteID == "" || um.DeleteID == " " {
+	//	return errors.New("delete id is empty")
+	//}
+
+	if len(strings.Replace(um.DeleteID, " ", "", -1)) == 0 {
 		return errors.New("delete id is empty")
+
 	}
 
 	return nil
