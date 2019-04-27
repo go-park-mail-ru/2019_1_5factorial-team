@@ -11,7 +11,7 @@ var InstanceChat *Chat
 
 func Start() {
 	//игра крутится как отдельная сущность всегда
-	InstanceChat = NewChat(20)
+	InstanceChat = NewChat(1)
 	go panicWorker.PanicWorker(InstanceChat.Start)
 }
 
@@ -78,6 +78,20 @@ func (c *Chat) Start() {
 }
 
 func (c *Chat) AddUser(user *User) {
+	if len(c.Users) >= c.MaxUsers {
+		log.Printf("user %s cant add, too many connects, connects = %d, max = %d", user.ID, len(c.Users), c.MaxUsers)
+
+		user.out <- &Message{
+			Type: MessageErr,
+			Payload: ErrMessage{
+				Error: "sorry, too many clients",
+			},
+		}
+		user.ChatPtr = c
+		user.CloseConn()
+
+		return
+	}
 	c.register <- user
 }
 

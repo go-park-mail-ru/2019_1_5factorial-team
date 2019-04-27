@@ -16,8 +16,8 @@ import (
 const LastMessagesLimit = 50
 
 type User struct {
-	conn       *websocket.Conn
-	ID         string
+	conn *websocket.Conn
+	ID   string
 	//Token      string
 	Nickname   string
 	Avatar     string
@@ -91,8 +91,8 @@ func NewUser(conn *websocket.Conn, token string) (*User, error) {
 	}
 
 	return &User{
-		conn:       conn,
-		ID:         u.ID.Hex(),
+		conn: conn,
+		ID:   u.ID.Hex(),
 		//Token:      token,
 		Nickname:   u.Nickname,
 		Avatar:     u.AvatarLink,
@@ -140,10 +140,6 @@ func (u *User) ListenIncome() {
 				continue
 			}
 
-			//if message.Text == "" || message.Text == " "{
-			//	u.SendErr("empty text field")
-			//	continue
-			//}
 			if err = message.Validate(); err != nil {
 				u.SendErr(err.Error())
 				continue
