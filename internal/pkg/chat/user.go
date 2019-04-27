@@ -187,6 +187,15 @@ func (u *User) ListenIncome() {
 					u.SendErr(err.Error())
 					continue
 				}
+			//case string(MessageEdit):
+			//	err := message.SetMessageEdit()
+			//	if err != nil {
+			//		log.Println("cant SetMessageEdit()", err)
+			//		u.SendErr(err.Error())
+			//		continue
+			//	}
+			//	message.From = u.Nickname
+			//
 			}
 
 			
@@ -304,10 +313,22 @@ func (u *User) SendLastMessages() {
 		log.Error(errors.Wrapf(err, "user %s cant get last messages on connect", u.Nickname))
 	}
 
-	for _, val := range mes {
+	//for _, val := range mes {
+	//	err := u.conn.WriteJSON(Message{
+	//		Type:    MessageExist,
+	//		Payload: val,
+	//	})
+	//	if err != nil {
+	//		log.Error("u.Listen cant send message ", err.Error())
+	//
+	//		u.CloseConn()
+	//		//return
+	//	}
+	//}
+	for i := len(mes) - 1; i > 0; i++ {
 		err := u.conn.WriteJSON(Message{
 			Type:    MessageExist,
-			Payload: val,
+			Payload: mes[i],
 		})
 		if err != nil {
 			log.Error("u.Listen cant send message ", err.Error())
