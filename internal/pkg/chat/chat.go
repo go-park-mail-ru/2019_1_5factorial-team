@@ -84,6 +84,12 @@ func (c *Chat) Start() {
 					Type:    MessageTyping,
 					Payload: message,
 				})
+			case string(MessageDelete):
+				message.Type = ""
+				c.messages = append(c.messages, Message{
+					Type:    MessageDelete,
+					Payload: message,
+				})
 			}
 
 		}

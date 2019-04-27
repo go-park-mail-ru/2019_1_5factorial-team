@@ -150,18 +150,43 @@ func (u *User) ListenIncome() {
 
 			switch message.Type {
 			case string(MessageNew):
+				err := message.SetMessageNew()
+				if err != nil {
+					log.Println("cant SetMessageNew()", err)
+					u.SendErr(err.Error())
+					continue
+				}
+
 				message.From = u.Nickname
 				message.Time = time.Now()
 				
 				err = message.Insert()
 				if err != nil {
-					// TODO(): отправить юзеру сообщение, что мессаж не отправился
+					log.Println("cant insert new msg", err)
 					u.SendErr(err.Error())
 					continue
 				}
+
 			case string(MessageTyping):
+				message.SetMessageTyping()
+
 				message.From = u.Nickname
 
+			case string(MessageDelete):
+				err := message.SetMessageDelete()
+				if err != nil {
+					log.Println("cant SetMessageDelete()", err)
+					u.SendErr(err.Error())
+					continue
+				}
+
+				message.From = u.Nickname
+				err = message.Delete()
+				if err != nil {
+					log.Println("cant delete msg", err)
+					u.SendErr(err.Error())
+					continue
+				}
 			}
 
 			

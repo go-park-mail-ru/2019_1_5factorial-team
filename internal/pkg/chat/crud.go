@@ -23,6 +23,31 @@ func (um *UserMessage) Insert() error {
 	return nil
 }
 
+func (um *UserMessage) Delete() error {
+	col, err := database.GetCollection(collectionName)
+	if err != nil {
+		return errors.Wrap(err, "collection not found")
+	}
+
+	tmpMes := &UserMessage{}
+
+	err = col.Find(bson.M{"_id": bson.ObjectIdHex(um.DeleteID)}).One(tmpMes)
+	if err != nil {
+		return errors.Wrap(err, "cant find msg with this id")
+	}
+
+	if tmpMes.From != um.From {
+		return errors.New("u cant delete this message")
+	}
+
+	err = col.Remove(bson.M{"_id": bson.ObjectIdHex(um.DeleteID)})
+	if err != nil {
+		return errors.Wrap(err, "cant delete message")
+	}
+
+	return nil
+}
+
 func GetLastMessages(messagesCount int) ([]UserMessage, error) {
 	col, err := database.GetCollection(collectionName)
 	if err != nil {

@@ -31,10 +31,39 @@ var validUserInput = map[string]MessageType{
 // TODO(): type должен быть в инкаме, а в рассылках не указываться
 type UserMessage struct {
 	Type string        `json:"type,omitempty"   bson:"-"`
-	ID   bson.ObjectId `json:"id"     bson:"_id,omitempty"`
-	From string        `json:"from"   bson:"from"`
-	Time time.Time     `json:"time"   bson:"time"`
-	Text string        `json:"text"   bson:"text"`
+	ID   bson.ObjectId `json:"id,omitempty"     bson:"_id,omitempty"`
+	From string        `json:"from,omitempty"   bson:"from"`
+	Time time.Time     `json:"time,omitempty"   bson:"time"`
+	Text string        `json:"text,omitempty"   bson:"text"`
+
+	DeleteID string `json:"delete_id,omitempty" bson:"-"`
+}
+
+func (um *UserMessage) SetMessageNew() error {
+	um.DeleteID = ""
+
+	if um.Text == "" || um.Text == " " {
+		return errors.New("empty NEW message text")
+	}
+
+	return nil
+}
+
+func (um *UserMessage) SetMessageTyping() {
+	um.ID = ""
+	um.Text = ""
+	um.DeleteID = ""
+}
+
+func (um *UserMessage) SetMessageDelete() error {
+	um.ID = ""
+	um.Text = ""
+
+	if um.DeleteID == "" || um.DeleteID == " " {
+		return errors.New("delete id is empty")
+	}
+
+	return nil
 }
 
 func (um *UserMessage) Validate() error {
@@ -42,9 +71,9 @@ func (um *UserMessage) Validate() error {
 		return errors.New("not valid message type")
 	}
 
-	if um.Text == "" || um.Text == " " {
-		return errors.New("empty message payload")
-	}
+	//if um.Text == "" || um.Text == " " {
+	//	return errors.New("empty message payload")
+	//}
 
 	return nil
 }
