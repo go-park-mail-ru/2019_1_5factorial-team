@@ -36,7 +36,7 @@ func (mgc *MyGorgeousChat) Run() error {
 	chatRouter := mux.NewRouter()
 	chatRouter.Use(middleware.CORSMiddleware)
 	chatRouter.Use(middleware.AuthMiddleware)
-	chatRouter.Use(middleware.CheckLoginMiddleware)
+	//chatRouter.Use(middleware.CheckLoginMiddleware)
 	chatRouter.Use(middleware.PanicMiddleware)
 
 	chatRouter.HandleFunc("/api/chat/global/ws", controllers.ConnectToGlobalChat).Methods("GET", "OPTIONS")

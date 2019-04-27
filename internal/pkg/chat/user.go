@@ -8,6 +8,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
+	"gopkg.in/mgo.v2/bson"
 	"net"
 	"time"
 )
@@ -17,7 +18,7 @@ const LastMessagesLimit = 50
 type User struct {
 	conn       *websocket.Conn
 	ID         string
-	Token      string
+	//Token      string
 	Nickname   string
 	Avatar     string
 	ChatPtr    *Chat
@@ -25,6 +26,41 @@ type User struct {
 	out        chan *Message
 	unregister chan struct{}
 	stopListen chan struct{}
+}
+
+func NewUserID(conn *websocket.Conn, ID string) (*User, error) {
+	u, err := user.GetUserById(ID)
+	if err != nil {
+		log.Error(errors.Wrap(err, "cant create user, GetUserById"))
+		return nil, errors.Wrap(err, "cant create user, GetUserById")
+	}
+
+	return &User{
+		conn:       conn,
+		ID:         ID,
+		Nickname:   u.Nickname,
+		Avatar:     u.AvatarLink,
+		in:         make(chan *UserMessage),
+		out:        make(chan *Message),
+		unregister: make(chan struct{}),
+		stopListen: make(chan struct{}),
+	}, nil
+}
+
+func NewUserFake(conn *websocket.Conn) (*User, error) {
+	ID := bson.NewObjectId().Hex()
+	FakeNick := ""
+	FakeAvatar := ""
+	return &User{
+		conn:       conn,
+		ID:         ID,
+		Nickname:   FakeNick,
+		Avatar:     FakeAvatar,
+		in:         make(chan *UserMessage),
+		out:        make(chan *Message),
+		unregister: make(chan struct{}),
+		stopListen: make(chan struct{}),
+	}, nil
 }
 
 func NewUser(conn *websocket.Conn, token string) (*User, error) {
@@ -57,7 +93,7 @@ func NewUser(conn *websocket.Conn, token string) (*User, error) {
 	return &User{
 		conn:       conn,
 		ID:         u.ID.Hex(),
-		Token:      token,
+		//Token:      token,
 		Nickname:   u.Nickname,
 		Avatar:     u.AvatarLink,
 		in:         make(chan *UserMessage),
@@ -72,7 +108,7 @@ func (u *User) ListenIncome() {
 		select {
 		case <-u.stopListen:
 			log.Println("len stopListen", len(u.stopListen))
-			log.Printf("%s, stop listen", u.Token)
+			log.Printf("%s, stop listen", u.ID)
 			return
 
 		default:
@@ -82,7 +118,7 @@ func (u *User) ListenIncome() {
 			err := u.conn.ReadJSON(message)
 			if websocket.IsUnexpectedCloseError(err) || websocket.IsCloseError(err) {
 				u.ChatPtr.RemoveUser(u)
-				log.Printf("player %s disconnected", u.Token)
+				log.Printf("user %s disconnected", u.ID)
 
 				return
 
