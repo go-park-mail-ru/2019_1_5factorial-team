@@ -44,3 +44,14 @@ services:
 #      options:
 #        max-size: "1k"
 #        max-file: "3"
+
+    worker-go:
+      container_name: 5factorial-worker
+      restart: always
+      build:
+        context: ../.
+        dockerfile: ./third-party/worker/Dockerfile
+    volumes:
+    - '/etc/5factorial:/etc/5factorial'
+    depends_on:
+    - mongo-session
