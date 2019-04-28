@@ -5,9 +5,11 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"net"
+	"sync"
 	"time"
 )
 
@@ -16,7 +18,25 @@ const (
 	port    = "5000"
 )
 
+var AuthGRPCClient AuthCheckerClient
+var once sync.Once
+
 type Auth struct {
+}
+
+func GetClient() AuthCheckerClient {
+	once.Do(func() {
+		grpcConn, err := CreateConnection()
+		if err != nil {
+			logrus.Error(errors.Wrap(err, "cant create auth service client"))
+
+			return
+		}
+
+		AuthGRPCClient = NewAuthCheckerClient(grpcConn)
+	})
+
+	return AuthGRPCClient
 }
 
 func CreateConnection() (*grpc.ClientConn, error) {

@@ -78,6 +78,7 @@ func DropUserCookie(res http.ResponseWriter, req *http.Request) (int, error) {
 // @Router /api/user [post]
 func SignUp(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
+	AuthGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
 	ctxLogger.Info("===========================================")
 
 	data := SingUpRequest{}
@@ -110,16 +111,16 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	//
 	//cookie := session.CreateHttpCookie(randToken, expiration)
 	// TODO(): есть ли смысл всегда держать коннект открытым? (если перенести создание коннекта в server, то будет циклический импорт)
-	grpcConn, err := grpcAuth.CreateConnection()
-	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, err.Error())
-
-		ctxLogger.Error(errors.Wrap(err, "cant get connection to auth service"))
-		return
-	}
-	defer grpcConn.Close()
-
-	AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
+	//grpcConn, err := grpcAuth.CreateConnection()
+	//if err != nil {
+	//	ErrResponse(res, http.StatusInternalServerError, err.Error())
+	//
+	//	ctxLogger.Error(errors.Wrap(err, "cant get connection to auth service"))
+	//	return
+	//}
+	//defer grpcConn.Close()
+	//
+	//AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
 	ctx := context.Background()
 	cookieGRPC, err := AuthGRPC.CreateSession(ctx, &grpcAuth.UserID{ID: u.ID.Hex()})
 	if err != nil {

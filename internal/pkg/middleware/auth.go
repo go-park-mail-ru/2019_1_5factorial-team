@@ -17,10 +17,12 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		ctx := req.Context()
 		var userId string = ""
 		authorized := false
+		AuthGRPC := grpcAuth.GetClient()
 
 		defer func() {
 			ctx = context.WithValue(ctx, "userID", userId)
 			ctx = context.WithValue(ctx, "authorized", authorized)
+			ctx = context.WithValue(ctx, "authGRPC", AuthGRPC)
 
 			if authorized {
 				ctx = context.WithValue(ctx, "logger", log.LoggerWithAuth(req.WithContext(ctx)))
@@ -40,16 +42,17 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		//uId, err := session.GetId(cookie.Value)
-		grpcConn, err := grpcAuth.CreateConnection()
-		if err != nil {
-			http.Error(res, "relogin, please", http.StatusInternalServerError)
+		//grpcConn, err := grpcAuth.CreateConnection()
+		//if err != nil {
+		//	http.Error(res, "relogin, please", http.StatusInternalServerError)
+		//
+		//	logrus.Error(errors.Wrap(err, "cant get connection to auth service"))
+		//	return
+		//}
+		//defer grpcConn.Close()
+		//
+		//AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
 
-			logrus.Error(errors.Wrap(err, "cant get connection to auth service"))
-			return
-		}
-		defer grpcConn.Close()
-
-		AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
 		ctxGRPC := context.Background()
 		uId, err := AuthGRPC.GetIDFromSession(ctxGRPC, &grpcAuth.Cookie{Token: cookie.Value})
 

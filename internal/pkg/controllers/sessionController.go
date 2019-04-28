@@ -35,6 +35,7 @@ type signInRequest struct {
 // @Router /session [post]
 func SignIn(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
+	AuthGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
 
 	data := signInRequest{}
 	status, err := ParseRequestIntoStruct(true, req, &data)
@@ -54,16 +55,16 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// TODO(): есть ли смысл всегда держать коннект открытым? (если перенести создание коннекта в server, то будет циклический импорт)
-	grpcConn, err := grpcAuth.CreateConnection()
-	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, err.Error())
-
-		ctxLogger.Error(errors.Wrap(err, "cant get connection to auth service"))
-		return
-	}
-	defer grpcConn.Close()
-
-	AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
+	//grpcConn, err := grpcAuth.CreateConnection()
+	//if err != nil {
+	//	ErrResponse(res, http.StatusInternalServerError, err.Error())
+	//
+	//	ctxLogger.Error(errors.Wrap(err, "cant get connection to auth service"))
+	//	return
+	//}
+	//defer grpcConn.Close()
+	//
+	//AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
 	ctx := context.Background()
 	cookieGRPC, err := AuthGRPC.CreateSession(ctx, &grpcAuth.UserID{ID: u.ID.Hex()})
 	if err != nil {
@@ -103,6 +104,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 // @Router /session [delete]
 func SignOut(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
+	AuthGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
 
 	currentSession, err := req.Cookie(config.Get().CookieConfig.CookieName)
 	if err == http.ErrNoCookie {
@@ -114,16 +116,16 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// TODO(): есть ли смысл всегда держать коннект открытым? (если перенести создание коннекта в server, то будет циклический импорт)
-	grpcConn, err := grpcAuth.CreateConnection()
-	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, err.Error())
-
-		ctxLogger.Error(errors.Wrap(err, "cant get connection to auth service"))
-		return
-	}
-	defer grpcConn.Close()
-
-	AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
+	//grpcConn, err := grpcAuth.CreateConnection()
+	//if err != nil {
+	//	ErrResponse(res, http.StatusInternalServerError, err.Error())
+	//
+	//	ctxLogger.Error(errors.Wrap(err, "cant get connection to auth service"))
+	//	return
+	//}
+	//defer grpcConn.Close()
+	//
+	//AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
 	ctx := context.Background()
 	_, err = AuthGRPC.DeleteSession(ctx, &grpcAuth.Cookie{Token: currentSession.Value, Expiration: ""})
 	//err = session.DeleteToken(currentSession.Value)
