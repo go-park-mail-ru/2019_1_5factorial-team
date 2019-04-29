@@ -15,7 +15,7 @@ type PlayerCharacter struct {
 	Nick  string `json:"nick"`
 }
 
-func NewPlayerCharacter(token string) (PlayerCharacter, error) {
+func NewPlayerCharacter(token string, grpcClient grpcAuth.AuthCheckerClient) (PlayerCharacter, error) {
 	pc := PlayerCharacter{
 		Token: token,
 		HP:    5,
@@ -26,16 +26,16 @@ func NewPlayerCharacter(token string) (PlayerCharacter, error) {
 	//if err != nil {
 	//	return PlayerCharacter{}, errors.Wrap(err, "cant create player character")
 	//}
-	grpcConn, err := grpcAuth.CreateConnection()
-	if err != nil {
-		log.Error(errors.Wrap(err, "cant connect to auth grpc, NewUser"))
-		return PlayerCharacter{}, nil
-	}
-	defer grpcConn.Close()
-
-	AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
+	//grpcConn, err := grpcAuth.CreateConnection()
+	//if err != nil {
+	//	log.Error(errors.Wrap(err, "cant connect to auth grpc, NewUser"))
+	//	return PlayerCharacter{}, nil
+	//}
+	//defer grpcConn.Close()
+	//
+	//AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
 	ctx := context.Background()
-	uID, err := AuthGRPC.GetIDFromSession(ctx, &grpcAuth.Cookie{Token: token, Expiration: ""})
+	uID, err := grpcClient.GetIDFromSession(ctx, &grpcAuth.Cookie{Token: token, Expiration: ""})
 	if err != nil {
 		log.Error(errors.Wrap(err, "cant create user, GetID"))
 		return PlayerCharacter{}, nil

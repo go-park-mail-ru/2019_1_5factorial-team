@@ -11,7 +11,7 @@ import (
 
 func ConnectToGlobalChat(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-
+	var user *chat.User
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
@@ -27,47 +27,26 @@ func ConnectToGlobalChat(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//currentSession, err := req.Cookie(config.Get().CookieConfig.CookieName)
-	//if err == http.ErrNoCookie {
-	//	// бесполезная проверка, так кука валидна, но по гостайлу нужна
-	//	ErrResponse(res, http.StatusUnauthorized, "not authorized")
-	//
-	//	ctxLogger.Error(errors.Wrap(err, "not authorized"))
-	//	return
-	//}
-	//
-	//user, err := chat.NewUser(conn, currentSession.Value)
-	//if err != nil {
-	//	ErrResponse(res, http.StatusInternalServerError, "cant connect to chat")
-	//
-	//	ctxLogger.Error(errors.Wrap(err, "cant create chat.User"))
-	//	return
-	//}
-
 	if req.Context().Value("authorized").(bool) != false {
-		user, err := chat.NewUserID(conn, req.Context().Value("userID").(string))
+		user, err = chat.NewUserID(conn, req.Context().Value("userID").(string))
 		if err != nil {
 			ErrResponse(res, http.StatusInternalServerError, "cant connect to chat")
 
 			ctxLogger.Error(errors.Wrap(err, "cant create chat.User"))
 			return
 		}
-		// TODO(): убрать
-		go panicWorker.PanicWorker(user.Listen)
-		chat.InstanceChat.AddUser(user)
 	} else {
-		user, err := chat.NewUserFake(conn)
+		user, err = chat.NewUserFake(conn)
 		if err != nil {
 			ErrResponse(res, http.StatusInternalServerError, "cant connect to chat")
 
 			ctxLogger.Error(errors.Wrap(err, "cant create chat.User"))
 			return
 		}
+	}
 
+	if user != nil {
 		go panicWorker.PanicWorker(user.Listen)
 		chat.InstanceChat.AddUser(user)
 	}
-	//go panicWorker.PanicWorker(user.Listen)
-	//chat.InstanceChat.AddUser(user)
-	//chat2.InstanceChat.InstanceChat.AddUser(user)
 }

@@ -77,7 +77,7 @@ func (mgs *MyGorgeousServer) Run() error {
 	routerLoginRequired.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
 
 	// игра
-	routerLoginRequired.HandleFunc("/api/game/ws", controllers.Play).Methods("GET", "OPTIONS")
+	//routerLoginRequired.HandleFunc("/api/game/ws", controllers.Play).Methods("GET", "OPTIONS")
 
 	// chat
 	//routerLoginRequired.HandleFunc("/api/chat/global/ws", controllers.ConnectToGlobalChat).Methods("GET", "OPTIONS")

@@ -1,9 +1,7 @@
 package chat
 
 import (
-	"context"
 	"fmt"
-	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
@@ -66,46 +64,6 @@ func NewUserFake(conn *websocket.Conn) (*User, error) {
 	}, nil
 }
 
-func NewUser(conn *websocket.Conn, token string) (*User, error) {
-	grpcConn, err := grpcAuth.CreateConnection()
-	if err != nil {
-		log.Error(errors.Wrap(err, "cant connect to auth grpc, NewUser"))
-		return nil, nil
-	}
-	defer grpcConn.Close()
-
-	AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
-	ctx := context.Background()
-	uID, err := AuthGRPC.GetIDFromSession(ctx, &grpcAuth.Cookie{Token: token, Expiration: ""})
-	if err != nil {
-		log.Error(errors.Wrap(err, "cant create user, GetID"))
-		return nil, nil
-	}
-	//ID, err := session.GetId(token)
-	//if err != nil {
-	//	log.Error(errors.Wrap(err, "cant create user, GetID"))
-	//	return nil, nil
-	//}
-
-	u, err := user.GetUserById(uID.ID)
-	if err != nil {
-		log.Error(errors.Wrap(err, "cant create user, GetUserById"))
-		return nil, nil
-	}
-
-	return &User{
-		conn: conn,
-		ID:   u.ID.Hex(),
-		//Token:      token,
-		Nickname:   u.Nickname,
-		Avatar:     u.AvatarLink,
-		in:         make(chan *UserMessage),
-		out:        make(chan *Message),
-		unregister: make(chan struct{}),
-		stopListen: make(chan struct{}),
-	}, nil
-}
-
 func (u *User) ListenIncome() {
 	for {
 		select {
@@ -159,7 +117,7 @@ func (u *User) ListenIncome() {
 
 				message.From = u.Nickname
 				message.Time = time.Now()
-				
+
 				err = message.Insert()
 				if err != nil {
 					log.Println("cant insert new msg", err)
@@ -187,19 +145,16 @@ func (u *User) ListenIncome() {
 					u.SendErr(err.Error())
 					continue
 				}
-			//case string(MessageEdit):
-			//	err := message.SetMessageEdit()
-			//	if err != nil {
-			//		log.Println("cant SetMessageEdit()", err)
-			//		u.SendErr(err.Error())
-			//		continue
-			//	}
-			//	message.From = u.Nickname
-			//
+				//case string(MessageEdit):
+				//	err := message.SetMessageEdit()
+				//	if err != nil {
+				//		log.Println("cant SetMessageEdit()", err)
+				//		u.SendErr(err.Error())
+				//		continue
+				//	}
+				//	message.From = u.Nickname
+				//
 			}
-
-			
-			
 
 			//message.Type = ""
 			u.in <- message
