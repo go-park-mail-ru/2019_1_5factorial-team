@@ -1,8 +1,9 @@
 package chat
 
 import (
+	"context"
 	"fmt"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
+	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
 	"github.com/gorilla/websocket"
@@ -29,10 +30,13 @@ type User struct {
 	stopListen chan struct{}
 }
 
-func NewUserID(conn *websocket.Conn, ID string) (*User, error) {
-	u, err := user.GetUserById(ID)
+func NewUserID(conn *websocket.Conn, ID string, GRPC grpcAuth.AuthCheckerClient) (*User, error) {
+	//u, err := user.GetUserById(ID)
+	ctx := context.Background()
+	u, err := GRPC.GetUserByID(ctx, &grpcAuth.User{ID: ID})
 	if err != nil {
 		log.Error(errors.Wrap(err, "cant create user, GetUserById"))
+
 		return nil, errors.Wrap(err, "cant create user, GetUserById")
 	}
 
@@ -52,6 +56,7 @@ func NewUserFake(conn *websocket.Conn) (*User, error) {
 	ID := bson.NewObjectId().Hex()
 	FakeNick := getFakeNick()
 	FakeAvatar := ""
+
 	return &User{
 		conn:       conn,
 		ID:         ID,

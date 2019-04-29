@@ -8,7 +8,6 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -36,6 +35,8 @@ type signInRequest struct {
 func SignIn(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 	AuthGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	// TODO(): в грпц прокидывать контекст запроса или оставить через бэкграунд (впринципе разницы нет, сейчас)
+	ctx := context.Background()
 
 	data := signInRequest{}
 	status, err := ParseRequestIntoStruct(true, req, &data)
@@ -46,7 +47,15 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	u, err := user.IdentifyUser(data.Login, data.Password)
+	//u, err := user.IdentifyUser(data.Login, data.Password)
+	//if err != nil {
+	//	ErrResponse(res, http.StatusBadRequest, "Wrong password or login")
+	//
+	//	ctxLogger.Error(errors.Wrap(err, "Wrong password or login"))
+	//	return
+	//}
+
+	u, err := AuthGRPC.IdentifyUser(ctx, &grpcAuth.DataAuth{Login: data.Login, Password: data.Password})
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, "Wrong password or login")
 
@@ -65,8 +74,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	//defer grpcConn.Close()
 	//
 	//AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
-	ctx := context.Background()
-	cookieGRPC, err := AuthGRPC.CreateSession(ctx, &grpcAuth.UserID{ID: u.ID.Hex()})
+	cookieGRPC, err := AuthGRPC.CreateSession(ctx, &grpcAuth.UserID{ID: u.ID})
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, err.Error())
 
@@ -88,7 +96,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	OkResponse(res, "ok auth")
 
 	ctxLogger.Infof("OK response\n\t--id = %s,\n\t--nickname = %s,\n\t--email = %s,\n\t--score = %d",
-		u.ID.Hex(), u.Nickname, u.Email, u.Score)
+		u.ID, u.Nickname, u.Email, u.Score)
 	ctxLogger.Infof("OK set cookie\n\t--token = %s,\n\t--path = %s,\n\t--expires = %s,\n\t--httpOnly = %t",
 		cookie.Value, cookie.Path, cookie.Expires, cookie.HttpOnly)
 }
@@ -177,7 +185,8 @@ type UserInfoResponse struct {
 // @Router /api/user [get]
 func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-
+	AuthGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	ctx := context.Background()
 	id := req.Context().Value("userID").(string)
 	if id == "" {
 		ErrResponse(res, http.StatusBadRequest, errors.New("invalid empty id").Error())
@@ -185,7 +194,9 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 		ctxLogger.Error(errors.New("invalid empty id"))
 		return
 	}
-	u, err := user.GetUserById(id)
+
+	//u, err := user.GetUserById(id)
+	u, err := AuthGRPC.GetUserByID(ctx, &grpcAuth.User{ID: id})
 	if err != nil {
 		// проверка на невалидный айди юзера
 		status, err := DropUserCookie(res, req)
@@ -205,7 +216,7 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 	OkResponse(res, UserInfoResponse{
 		Email:      u.Email,
 		Nickname:   u.Nickname,
-		Score:      u.Score,
+		Score:      int(u.Score),
 		AvatarLink: u.AvatarLink,
 	})
 

@@ -3,7 +3,6 @@ package gameLogic
 import (
 	"context"
 	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/pkg/errors"
 )
@@ -41,7 +40,8 @@ func NewPlayerCharacter(token string, grpcClient grpcAuth.AuthCheckerClient) (Pl
 		return PlayerCharacter{}, nil
 	}
 
-	u, err := user.GetUserById(uID.ID)
+	//u, err := user.GetUserById(uID.ID)
+	u, err := grpcClient.GetUserByID(ctx, &grpcAuth.User{ID: uID.ID})
 	if err != nil {
 		return PlayerCharacter{}, errors.Wrap(err, "cant create player character")
 	}

@@ -12,7 +12,6 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -33,7 +32,6 @@ type SignUpResponse struct {
 }
 
 func ParseRequestIntoStruct(auth bool, req *http.Request, requestStruct interface{}) (int, error) {
-
 	isAuth := req.Context().Value("authorized").(bool)
 	if isAuth == auth {
 		return http.StatusBadRequest, errors.New("already auth, ctx.authorized shouldn't be " + strconv.FormatBool(auth))
@@ -79,7 +77,7 @@ func DropUserCookie(res http.ResponseWriter, req *http.Request) (int, error) {
 func SignUp(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 	AuthGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
-	ctxLogger.Info("===========================================")
+	ctx := context.Background()
 
 	data := SingUpRequest{}
 	status, err := ParseRequestIntoStruct(true, req, &data)
@@ -93,7 +91,19 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	// TODO(smet1): валидация на данные, правда ли мыло - мыло, а самолет - вертолет?
 	fmt.Println(data)
 
-	u, err := user.CreateUser(data.Login, data.Email, data.Password)
+	//u, err := user.CreateUser(data.Login, data.Email, data.Password)
+	//if err != nil {
+	//	ErrResponse(res, http.StatusBadRequest, err.Error())
+	//
+	//	ctxLogger.Error(errors.Wrap(err, "err in user data"))
+	//	return
+	//}
+
+	u, err := AuthGRPC.CreateUser(ctx, &grpcAuth.UserNew{
+		Nickname: data.Login,
+		Email:    data.Email,
+		Password: data.Password,
+	})
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, err.Error())
 
@@ -121,8 +131,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	//defer grpcConn.Close()
 	//
 	//AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
-	ctx := context.Background()
-	cookieGRPC, err := AuthGRPC.CreateSession(ctx, &grpcAuth.UserID{ID: u.ID.Hex()})
+	cookieGRPC, err := AuthGRPC.CreateSession(ctx, &grpcAuth.UserID{ID: u.ID})
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, err.Error())
 
@@ -144,7 +153,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	OkResponse(res, "signUp ok")
 
 	ctxLogger.Infof("OK response\n\t--id = %s,\n\t--nickname = %s,\n\t--email = %s,\n\t--score = %d",
-		u.ID.Hex(), u.Nickname, u.Email, u.Score)
+		u.ID, u.Nickname, u.Email, u.Score)
 	ctxLogger.Infof("OK set cookie\n\t--token = %s,\n\t--path = %s,\n\t--expires = %s,\n\t--httpOnly = %t",
 		cookie.Value, cookie.Path, cookie.Expires, cookie.HttpOnly)
 }
@@ -162,7 +171,8 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 // @Router /api/user/{id} [get]
 func GetUser(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	ctxLogger.Info("============================================")
+	AuthGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	ctx := context.Background()
 
 	requestVariables := mux.Vars(req)
 	if requestVariables == nil {
@@ -180,7 +190,8 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	searchingUser, err := user.GetUserById(searchingID)
+	//searchingUser, err := user.GetUserById(searchingID)
+	searchingUser, err := AuthGRPC.GetUserByID(ctx, &grpcAuth.User{ID: searchingID})
 	if err != nil {
 		ErrResponse(res, http.StatusNotFound, "user with this id not found")
 
@@ -191,7 +202,7 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 	OkResponse(res, UserInfoResponse{
 		Email:      searchingUser.Email,
 		Nickname:   searchingUser.Nickname,
-		Score:      searchingUser.Score,
+		Score:      int(searchingUser.Score),
 		AvatarLink: searchingUser.AvatarLink,
 	})
 
@@ -234,7 +245,8 @@ type ProfileUpdateResponse struct {
 // @Router /api/user [put]
 func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	ctxLogger.Info("===========================================")
+	AuthGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	ctx := context.Background()
 
 	data := ProfileUpdateRequest{}
 	status, err := ParseRequestIntoStruct(false, req, &data)
@@ -247,7 +259,14 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 
 	userId := req.Context().Value("userID").(string)
 
-	err = user.UpdateUser(userId, data.Avatar, data.OldPassword, data.NewPassword)
+	//err = user.UpdateUser(userId, data.Avatar, data.OldPassword, data.NewPassword)
+	_, err = AuthGRPC.UpdateUser(ctx, &grpcAuth.UpdateUserReq{
+		ID:          userId,
+		NewAvatar:   data.Avatar,
+		OldPassword: data.OldPassword,
+		NewPassword: data.NewPassword,
+	})
+
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, err.Error())
 
@@ -255,17 +274,24 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	u, _ := user.GetUserById(userId)
+	//u, _ := user.GetUserById(userId)
+	u, err := AuthGRPC.GetUserByID(ctx, &grpcAuth.User{ID: userId})
+	if err != nil {
+		ErrResponse(res, http.StatusBadRequest, err.Error())
+
+		ctxLogger.Error(errors.Wrap(err, "UpdateUser error"))
+		return
+	}
 
 	OkResponse(res, ProfileUpdateResponse{
 		Email:      u.Email,
 		Nickname:   u.Nickname,
-		Score:      u.Score,
+		Score:      int(u.Score),
 		AvatarLink: u.AvatarLink,
 	})
 
 	ctxLogger.Infof("OK response\n\t--id = %s,\n\t--nickname = %s,\n\t--email = %s,\n\t--score = %d,\n\t--avatar = %s",
-		u.ID.Hex(), u.Nickname, u.Email, u.Score, u.AvatarLink)
+		u.ID, u.Nickname, u.Email, u.Score, u.AvatarLink)
 }
 
 type UsersCountInfoResponse struct {
@@ -281,9 +307,11 @@ type UsersCountInfoResponse struct {
 // @Router /api/user/count [get]
 func UsersCountInfo(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	ctxLogger.Info("============================================")
+	authGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	ctx := context.Background()
 
-	count, err := user.GetUsersCount()
+	//count, err := user.GetUsersCount()
+	count, err := authGRPC.GetUsersCount(ctx, &grpcAuth.Nothing{})
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, err.Error())
 
@@ -292,7 +320,7 @@ func UsersCountInfo(res http.ResponseWriter, req *http.Request) {
 	}
 
 	OkResponse(res, UsersCountInfoResponse{
-		Count: count,
+		Count: int(count.Count),
 	})
 
 	ctxLogger.Info("OK response, count = ", count)

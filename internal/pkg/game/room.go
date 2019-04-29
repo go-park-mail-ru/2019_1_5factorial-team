@@ -6,7 +6,6 @@ import (
 	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gameLogic"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/pkg/errors"
 	"sync"
@@ -268,7 +267,8 @@ func (r *Room) Close() {
 				continue
 			}
 
-			err = user.UpdateScore(uID.ID, p.Score)
+			//err = user.UpdateScore(uID.ID, p.Score)
+			_, err = r.game.GRPC.UpdateScore(ctx, &grpcAuth.UpdateScoreReq{ID: uID.ID, Score: int32(p.Score)})
 			if err != nil {
 				log.Error("cant update user score, user id=%s, token=%s, score=%d, err=%s",
 					uID.ID, p.Token, p.Score, err.Error())

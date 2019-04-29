@@ -13,11 +13,81 @@ message UserID {
     string ID = 1;
 }
 
-message Nothing {}
+message Nothing {
+}
+
+message User {
+    string ID = 1;
+    string email = 2;
+    string nickname = 3;
+    string hashPassword = 4;
+    int32 score = 5;
+    string avatarLink = 6;
+}
+
+message UserNew {
+    string nickname = 1;
+    string email = 2;
+    string password = 3;
+}
+
+message UpdateUserReq {
+    string ID = 1;
+    string newAvatar = 2;
+    string oldPassword = 3;
+    string newPassword = 4;
+}
+
+message ScoresParam {
+    int32 limit = 1;
+    int32 offset = 2;
+}
+
+message Score {
+    string nickname = 1;
+    int32 score = 2;
+}
+
+message Scores {
+    repeated Score scores = 1;
+}
+
+message Num {
+    int32 count = 1;
+}
+
+message UpdateScoreReq {
+    string ID = 1;
+    int32 score = 2;
+}
+
+message DataAuth {
+    string login = 1;
+    string password = 2;
+}
 
 service AuthChecker {
-    rpc CreateSession (UserID) returns (Cookie) {}
-    rpc DeleteSession (Cookie) returns (Nothing) {}
-    rpc UpdateSession (Cookie) returns (Cookie) {}
-    rpc GetIDFromSession (Cookie) returns (UserID) {}
+    rpc CreateSession (UserID) returns (Cookie) {
+    }
+    rpc DeleteSession (Cookie) returns (Nothing) {
+    }
+    rpc UpdateSession (Cookie) returns (Cookie) {
+    }
+    rpc GetIDFromSession (Cookie) returns (UserID) {
+    }
+
+    rpc CreateUser (UserNew) returns (User) {
+    }
+    rpc IdentifyUser (DataAuth) returns (User) {
+    }
+    rpc GetUserByID (User) returns (User) {
+    }
+    rpc UpdateUser (UpdateUserReq) returns (Nothing) {
+    }
+    rpc GetUsersScores (ScoresParam) returns (Scores) {
+    }
+    rpc GetUsersCount (Nothing) returns (Num) {
+    }
+    rpc UpdateScore (UpdateScoreReq) returns (Nothing) {
+    }
 }

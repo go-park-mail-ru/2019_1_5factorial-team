@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/chat"
+	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
@@ -11,6 +12,8 @@ import (
 
 func ConnectToGlobalChat(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
+	authGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+
 	var user *chat.User
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
@@ -28,7 +31,7 @@ func ConnectToGlobalChat(res http.ResponseWriter, req *http.Request) {
 	}
 
 	if req.Context().Value("authorized").(bool) != false {
-		user, err = chat.NewUserID(conn, req.Context().Value("userID").(string))
+		user, err = chat.NewUserID(conn, req.Context().Value("userID").(string), authGRPC)
 		if err != nil {
 			ErrResponse(res, http.StatusInternalServerError, "cant connect to chat")
 

@@ -139,31 +139,526 @@ func (m *Nothing) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Nothing proto.InternalMessageInfo
 
+type User struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Email                string   `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	Nickname             string   `protobuf:"bytes,3,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	HashPassword         string   `protobuf:"bytes,4,opt,name=hashPassword,proto3" json:"hashPassword,omitempty"`
+	Score                int32    `protobuf:"varint,5,opt,name=score,proto3" json:"score,omitempty"`
+	AvatarLink           string   `protobuf:"bytes,6,opt,name=avatarLink,proto3" json:"avatarLink,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *User) Reset()         { *m = User{} }
+func (m *User) String() string { return proto.CompactTextString(m) }
+func (*User) ProtoMessage()    {}
+func (*User) Descriptor() ([]byte, []int) {
+	return fileDescriptor_8bbd6f3875b0e874, []int{3}
+}
+
+func (m *User) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_User.Unmarshal(m, b)
+}
+func (m *User) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_User.Marshal(b, m, deterministic)
+}
+func (m *User) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_User.Merge(m, src)
+}
+func (m *User) XXX_Size() int {
+	return xxx_messageInfo_User.Size(m)
+}
+func (m *User) XXX_DiscardUnknown() {
+	xxx_messageInfo_User.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_User proto.InternalMessageInfo
+
+func (m *User) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+func (m *User) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *User) GetNickname() string {
+	if m != nil {
+		return m.Nickname
+	}
+	return ""
+}
+
+func (m *User) GetHashPassword() string {
+	if m != nil {
+		return m.HashPassword
+	}
+	return ""
+}
+
+func (m *User) GetScore() int32 {
+	if m != nil {
+		return m.Score
+	}
+	return 0
+}
+
+func (m *User) GetAvatarLink() string {
+	if m != nil {
+		return m.AvatarLink
+	}
+	return ""
+}
+
+type UserNew struct {
+	Nickname             string   `protobuf:"bytes,1,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	Email                string   `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	Password             string   `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UserNew) Reset()         { *m = UserNew{} }
+func (m *UserNew) String() string { return proto.CompactTextString(m) }
+func (*UserNew) ProtoMessage()    {}
+func (*UserNew) Descriptor() ([]byte, []int) {
+	return fileDescriptor_8bbd6f3875b0e874, []int{4}
+}
+
+func (m *UserNew) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserNew.Unmarshal(m, b)
+}
+func (m *UserNew) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserNew.Marshal(b, m, deterministic)
+}
+func (m *UserNew) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserNew.Merge(m, src)
+}
+func (m *UserNew) XXX_Size() int {
+	return xxx_messageInfo_UserNew.Size(m)
+}
+func (m *UserNew) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserNew.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserNew proto.InternalMessageInfo
+
+func (m *UserNew) GetNickname() string {
+	if m != nil {
+		return m.Nickname
+	}
+	return ""
+}
+
+func (m *UserNew) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *UserNew) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
+type UpdateUserReq struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	NewAvatar            string   `protobuf:"bytes,2,opt,name=newAvatar,proto3" json:"newAvatar,omitempty"`
+	OldPassword          string   `protobuf:"bytes,3,opt,name=oldPassword,proto3" json:"oldPassword,omitempty"`
+	NewPassword          string   `protobuf:"bytes,4,opt,name=newPassword,proto3" json:"newPassword,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UpdateUserReq) Reset()         { *m = UpdateUserReq{} }
+func (m *UpdateUserReq) String() string { return proto.CompactTextString(m) }
+func (*UpdateUserReq) ProtoMessage()    {}
+func (*UpdateUserReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_8bbd6f3875b0e874, []int{5}
+}
+
+func (m *UpdateUserReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UpdateUserReq.Unmarshal(m, b)
+}
+func (m *UpdateUserReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UpdateUserReq.Marshal(b, m, deterministic)
+}
+func (m *UpdateUserReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateUserReq.Merge(m, src)
+}
+func (m *UpdateUserReq) XXX_Size() int {
+	return xxx_messageInfo_UpdateUserReq.Size(m)
+}
+func (m *UpdateUserReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateUserReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpdateUserReq proto.InternalMessageInfo
+
+func (m *UpdateUserReq) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+func (m *UpdateUserReq) GetNewAvatar() string {
+	if m != nil {
+		return m.NewAvatar
+	}
+	return ""
+}
+
+func (m *UpdateUserReq) GetOldPassword() string {
+	if m != nil {
+		return m.OldPassword
+	}
+	return ""
+}
+
+func (m *UpdateUserReq) GetNewPassword() string {
+	if m != nil {
+		return m.NewPassword
+	}
+	return ""
+}
+
+type ScoresParam struct {
+	Limit                int32    `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset               int32    `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ScoresParam) Reset()         { *m = ScoresParam{} }
+func (m *ScoresParam) String() string { return proto.CompactTextString(m) }
+func (*ScoresParam) ProtoMessage()    {}
+func (*ScoresParam) Descriptor() ([]byte, []int) {
+	return fileDescriptor_8bbd6f3875b0e874, []int{6}
+}
+
+func (m *ScoresParam) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ScoresParam.Unmarshal(m, b)
+}
+func (m *ScoresParam) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ScoresParam.Marshal(b, m, deterministic)
+}
+func (m *ScoresParam) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ScoresParam.Merge(m, src)
+}
+func (m *ScoresParam) XXX_Size() int {
+	return xxx_messageInfo_ScoresParam.Size(m)
+}
+func (m *ScoresParam) XXX_DiscardUnknown() {
+	xxx_messageInfo_ScoresParam.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ScoresParam proto.InternalMessageInfo
+
+func (m *ScoresParam) GetLimit() int32 {
+	if m != nil {
+		return m.Limit
+	}
+	return 0
+}
+
+func (m *ScoresParam) GetOffset() int32 {
+	if m != nil {
+		return m.Offset
+	}
+	return 0
+}
+
+type Score struct {
+	Nickname             string   `protobuf:"bytes,1,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	Score                int32    `protobuf:"varint,2,opt,name=score,proto3" json:"score,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Score) Reset()         { *m = Score{} }
+func (m *Score) String() string { return proto.CompactTextString(m) }
+func (*Score) ProtoMessage()    {}
+func (*Score) Descriptor() ([]byte, []int) {
+	return fileDescriptor_8bbd6f3875b0e874, []int{7}
+}
+
+func (m *Score) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Score.Unmarshal(m, b)
+}
+func (m *Score) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Score.Marshal(b, m, deterministic)
+}
+func (m *Score) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Score.Merge(m, src)
+}
+func (m *Score) XXX_Size() int {
+	return xxx_messageInfo_Score.Size(m)
+}
+func (m *Score) XXX_DiscardUnknown() {
+	xxx_messageInfo_Score.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Score proto.InternalMessageInfo
+
+func (m *Score) GetNickname() string {
+	if m != nil {
+		return m.Nickname
+	}
+	return ""
+}
+
+func (m *Score) GetScore() int32 {
+	if m != nil {
+		return m.Score
+	}
+	return 0
+}
+
+type Scores struct {
+	Scores               []*Score `protobuf:"bytes,1,rep,name=scores,proto3" json:"scores,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Scores) Reset()         { *m = Scores{} }
+func (m *Scores) String() string { return proto.CompactTextString(m) }
+func (*Scores) ProtoMessage()    {}
+func (*Scores) Descriptor() ([]byte, []int) {
+	return fileDescriptor_8bbd6f3875b0e874, []int{8}
+}
+
+func (m *Scores) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Scores.Unmarshal(m, b)
+}
+func (m *Scores) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Scores.Marshal(b, m, deterministic)
+}
+func (m *Scores) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Scores.Merge(m, src)
+}
+func (m *Scores) XXX_Size() int {
+	return xxx_messageInfo_Scores.Size(m)
+}
+func (m *Scores) XXX_DiscardUnknown() {
+	xxx_messageInfo_Scores.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Scores proto.InternalMessageInfo
+
+func (m *Scores) GetScores() []*Score {
+	if m != nil {
+		return m.Scores
+	}
+	return nil
+}
+
+type Num struct {
+	Count                int32    `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Num) Reset()         { *m = Num{} }
+func (m *Num) String() string { return proto.CompactTextString(m) }
+func (*Num) ProtoMessage()    {}
+func (*Num) Descriptor() ([]byte, []int) {
+	return fileDescriptor_8bbd6f3875b0e874, []int{9}
+}
+
+func (m *Num) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Num.Unmarshal(m, b)
+}
+func (m *Num) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Num.Marshal(b, m, deterministic)
+}
+func (m *Num) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Num.Merge(m, src)
+}
+func (m *Num) XXX_Size() int {
+	return xxx_messageInfo_Num.Size(m)
+}
+func (m *Num) XXX_DiscardUnknown() {
+	xxx_messageInfo_Num.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Num proto.InternalMessageInfo
+
+func (m *Num) GetCount() int32 {
+	if m != nil {
+		return m.Count
+	}
+	return 0
+}
+
+type UpdateScoreReq struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Score                int32    `protobuf:"varint,2,opt,name=score,proto3" json:"score,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UpdateScoreReq) Reset()         { *m = UpdateScoreReq{} }
+func (m *UpdateScoreReq) String() string { return proto.CompactTextString(m) }
+func (*UpdateScoreReq) ProtoMessage()    {}
+func (*UpdateScoreReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_8bbd6f3875b0e874, []int{10}
+}
+
+func (m *UpdateScoreReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UpdateScoreReq.Unmarshal(m, b)
+}
+func (m *UpdateScoreReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UpdateScoreReq.Marshal(b, m, deterministic)
+}
+func (m *UpdateScoreReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateScoreReq.Merge(m, src)
+}
+func (m *UpdateScoreReq) XXX_Size() int {
+	return xxx_messageInfo_UpdateScoreReq.Size(m)
+}
+func (m *UpdateScoreReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateScoreReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpdateScoreReq proto.InternalMessageInfo
+
+func (m *UpdateScoreReq) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+func (m *UpdateScoreReq) GetScore() int32 {
+	if m != nil {
+		return m.Score
+	}
+	return 0
+}
+
+type DataAuth struct {
+	Login                string   `protobuf:"bytes,1,opt,name=login,proto3" json:"login,omitempty"`
+	Password             string   `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DataAuth) Reset()         { *m = DataAuth{} }
+func (m *DataAuth) String() string { return proto.CompactTextString(m) }
+func (*DataAuth) ProtoMessage()    {}
+func (*DataAuth) Descriptor() ([]byte, []int) {
+	return fileDescriptor_8bbd6f3875b0e874, []int{11}
+}
+
+func (m *DataAuth) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DataAuth.Unmarshal(m, b)
+}
+func (m *DataAuth) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DataAuth.Marshal(b, m, deterministic)
+}
+func (m *DataAuth) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DataAuth.Merge(m, src)
+}
+func (m *DataAuth) XXX_Size() int {
+	return xxx_messageInfo_DataAuth.Size(m)
+}
+func (m *DataAuth) XXX_DiscardUnknown() {
+	xxx_messageInfo_DataAuth.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DataAuth proto.InternalMessageInfo
+
+func (m *DataAuth) GetLogin() string {
+	if m != nil {
+		return m.Login
+	}
+	return ""
+}
+
+func (m *DataAuth) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*Cookie)(nil), "session.Cookie")
 	proto.RegisterType((*UserID)(nil), "session.UserID")
 	proto.RegisterType((*Nothing)(nil), "session.Nothing")
+	proto.RegisterType((*User)(nil), "session.User")
+	proto.RegisterType((*UserNew)(nil), "session.UserNew")
+	proto.RegisterType((*UpdateUserReq)(nil), "session.UpdateUserReq")
+	proto.RegisterType((*ScoresParam)(nil), "session.ScoresParam")
+	proto.RegisterType((*Score)(nil), "session.Score")
+	proto.RegisterType((*Scores)(nil), "session.Scores")
+	proto.RegisterType((*Num)(nil), "session.Num")
+	proto.RegisterType((*UpdateScoreReq)(nil), "session.UpdateScoreReq")
+	proto.RegisterType((*DataAuth)(nil), "session.DataAuth")
 }
 
 func init() { proto.RegisterFile("auth.proto", fileDescriptor_8bbd6f3875b0e874) }
 
 var fileDescriptor_8bbd6f3875b0e874 = []byte{
-	// 225 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4a, 0x2c, 0x2d, 0xc9,
-	0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x2f, 0x4e, 0x2d, 0x2e, 0xce, 0xcc, 0xcf, 0x53,
-	0xb2, 0xe3, 0x62, 0x73, 0xce, 0xcf, 0xcf, 0xce, 0x4c, 0x15, 0x12, 0xe1, 0x62, 0x2d, 0xc9, 0xcf,
-	0x4e, 0xcd, 0x93, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x82, 0x70, 0x84, 0xe4, 0xb8, 0xb8, 0x52,
-	0x2b, 0x0a, 0x32, 0x8b, 0x12, 0x4b, 0x32, 0xf3, 0xf3, 0x24, 0x98, 0xc0, 0x52, 0x48, 0x22, 0x4a,
-	0x12, 0x5c, 0x6c, 0xa1, 0xc5, 0xa9, 0x45, 0x9e, 0x2e, 0x42, 0x7c, 0x5c, 0x4c, 0x9e, 0x2e, 0x50,
-	0xcd, 0x4c, 0x9e, 0x2e, 0x4a, 0x9c, 0x5c, 0xec, 0x7e, 0xf9, 0x25, 0x19, 0x99, 0x79, 0xe9, 0x46,
-	0x4f, 0x19, 0xb9, 0xb8, 0x1d, 0x4b, 0x4b, 0x32, 0x9c, 0x33, 0x52, 0x93, 0xb3, 0x53, 0x8b, 0x84,
-	0x8c, 0xb9, 0x78, 0x9d, 0x8b, 0x52, 0x13, 0x4b, 0x52, 0x83, 0x21, 0xae, 0x10, 0xe2, 0xd7, 0x83,
-	0xba, 0x47, 0x0f, 0x62, 0x98, 0x14, 0x42, 0x00, 0xe2, 0x3a, 0x25, 0x06, 0x21, 0x13, 0x2e, 0x5e,
-	0x97, 0xd4, 0x9c, 0x54, 0x6c, 0x9a, 0x20, 0x6a, 0xa4, 0x04, 0xe0, 0x02, 0x50, 0x8b, 0x95, 0x18,
-	0x40, 0x56, 0x85, 0x16, 0xa4, 0x24, 0xe2, 0xd1, 0x85, 0xc5, 0x2a, 0x33, 0x2e, 0x01, 0xf7, 0xd4,
-	0x12, 0x4f, 0x17, 0xb7, 0xa2, 0xfc, 0x5c, 0x22, 0xf4, 0x41, 0xdc, 0xac, 0xc4, 0x90, 0xc4, 0x06,
-	0x0e, 0x5c, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0xa9, 0x12, 0x87, 0xe9, 0x6a, 0x01, 0x00,
-	0x00,
+	// 604 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x54, 0x4d, 0x6f, 0xd3, 0x40,
+	0x10, 0xb5, 0xd3, 0xda, 0x6d, 0xc7, 0x4d, 0x28, 0xab, 0xaa, 0x58, 0x01, 0xa1, 0x68, 0x0f, 0xa8,
+	0x17, 0x0a, 0xb4, 0xa8, 0xa2, 0x80, 0x90, 0x4a, 0x2c, 0x2a, 0x4b, 0x28, 0xaa, 0x8c, 0x2a, 0xce,
+	0x4b, 0xb2, 0xa9, 0x57, 0x89, 0xbd, 0xc1, 0xbb, 0x21, 0xf4, 0xc8, 0x5f, 0xe1, 0x7f, 0xf1, 0x5f,
+	0xd0, 0xee, 0xfa, 0x33, 0x71, 0x05, 0xc7, 0x79, 0x33, 0x6f, 0xf6, 0xcd, 0xf3, 0x8c, 0x01, 0xc8,
+	0x52, 0xc6, 0x27, 0x8b, 0x8c, 0x4b, 0x8e, 0x76, 0x04, 0x15, 0x82, 0xf1, 0x14, 0x7f, 0x00, 0x77,
+	0xc8, 0xf9, 0x8c, 0x51, 0x74, 0x08, 0x8e, 0xe4, 0x33, 0x9a, 0xfa, 0xf6, 0xc0, 0x3e, 0xde, 0x8b,
+	0x4c, 0x80, 0x9e, 0x02, 0xd0, 0x9f, 0x0b, 0x96, 0x11, 0xc9, 0x78, 0xea, 0x77, 0x74, 0xaa, 0x86,
+	0x60, 0x1f, 0xdc, 0x1b, 0x41, 0xb3, 0x30, 0x40, 0x3d, 0xe8, 0x84, 0x41, 0x4e, 0xee, 0x84, 0x01,
+	0xde, 0x83, 0x9d, 0x11, 0x97, 0x31, 0x4b, 0x6f, 0xf1, 0x6f, 0x1b, 0xb6, 0x55, 0xd5, 0x7a, 0x8d,
+	0x7a, 0x93, 0x26, 0x84, 0xcd, 0xf3, 0xc6, 0x26, 0x40, 0x7d, 0xd8, 0x4d, 0xd9, 0x78, 0x96, 0x92,
+	0x84, 0xfa, 0x5b, 0x3a, 0x51, 0xc6, 0x08, 0xc3, 0x7e, 0x4c, 0x44, 0x7c, 0x4d, 0x84, 0x58, 0xf1,
+	0x6c, 0xe2, 0x6f, 0xeb, 0x7c, 0x03, 0x53, 0x5d, 0xc5, 0x98, 0x67, 0xd4, 0x77, 0x06, 0xf6, 0xb1,
+	0x13, 0x99, 0x40, 0x4d, 0x42, 0x7e, 0x10, 0x49, 0xb2, 0xcf, 0x2c, 0x9d, 0xf9, 0xae, 0x99, 0xa4,
+	0x42, 0xf0, 0x57, 0xd8, 0x51, 0x1a, 0x47, 0x74, 0xd5, 0x10, 0x60, 0xaf, 0x09, 0xb8, 0x57, 0xf2,
+	0xa2, 0x90, 0x94, 0x4b, 0x2e, 0x62, 0xfc, 0xcb, 0x86, 0xee, 0xcd, 0x62, 0x42, 0x24, 0x55, 0xfd,
+	0x23, 0xfa, 0x7d, 0xc3, 0x86, 0x27, 0xb0, 0x97, 0xd2, 0xd5, 0xa5, 0xd6, 0x92, 0xf7, 0xad, 0x00,
+	0x34, 0x00, 0x8f, 0xcf, 0x27, 0xd7, 0xcd, 0xf6, 0x75, 0x48, 0x55, 0xa4, 0x74, 0xb5, 0xe6, 0x49,
+	0x1d, 0xc2, 0xef, 0xc0, 0xfb, 0xa2, 0x5c, 0x10, 0xd7, 0x24, 0x23, 0x89, 0x1a, 0x62, 0xce, 0x12,
+	0x26, 0xb5, 0x06, 0x27, 0x32, 0x01, 0x3a, 0x02, 0x97, 0x4f, 0xa7, 0x82, 0x4a, 0xad, 0xc1, 0x89,
+	0xf2, 0x08, 0x5f, 0x80, 0xa3, 0xc9, 0xff, 0xf2, 0xc5, 0x98, 0xde, 0xa9, 0x99, 0x8e, 0x5f, 0x82,
+	0x6b, 0xde, 0x45, 0xcf, 0xc0, 0xd5, 0x90, 0xf0, 0xed, 0xc1, 0xd6, 0xb1, 0x77, 0xda, 0x3b, 0xc9,
+	0x57, 0xf0, 0x44, 0x17, 0x44, 0x79, 0x16, 0x3f, 0x86, 0xad, 0xd1, 0x52, 0x2b, 0x1c, 0xf3, 0x65,
+	0x5a, 0x2a, 0xd4, 0x01, 0x3e, 0x87, 0x9e, 0x71, 0xd2, 0x70, 0x5a, 0xac, 0x6c, 0x97, 0xf1, 0x1e,
+	0x76, 0x03, 0x22, 0xc9, 0xe5, 0x52, 0xc6, 0x7a, 0x76, 0x7e, 0xcb, 0xca, 0x3d, 0xd7, 0x41, 0xe3,
+	0x03, 0x76, 0x9a, 0x1f, 0xf0, 0xf4, 0xcf, 0x36, 0x78, 0x8a, 0x3a, 0x8c, 0xe9, 0x78, 0x46, 0x33,
+	0x74, 0x06, 0xdd, 0x61, 0x46, 0x95, 0x0a, 0x33, 0x01, 0x7a, 0x50, 0xce, 0x62, 0x6e, 0xa1, 0x5f,
+	0x01, 0xe6, 0xb8, 0xb0, 0x85, 0x5e, 0x43, 0x37, 0xa0, 0x73, 0xda, 0x46, 0x32, 0x35, 0xfd, 0x83,
+	0x12, 0x28, 0xee, 0xc6, 0x52, 0x4f, 0xe5, 0x03, 0xdf, 0xc7, 0x6a, 0x79, 0xea, 0x1c, 0x0e, 0xae,
+	0xa8, 0x0c, 0x83, 0x4f, 0x19, 0x4f, 0xfe, 0x83, 0x67, 0x34, 0x63, 0x0b, 0xbd, 0x00, 0x30, 0x73,
+	0xe9, 0x5b, 0x3d, 0x68, 0x14, 0x8c, 0xe8, 0xaa, 0xdf, 0x6d, 0x20, 0xd8, 0x42, 0xa7, 0xb0, 0x1f,
+	0x4e, 0x68, 0x2a, 0xd9, 0xf4, 0x4e, 0x53, 0x1e, 0x96, 0x05, 0x85, 0xdb, 0x9b, 0x9c, 0xe7, 0xe0,
+	0x5d, 0x51, 0xa9, 0x82, 0x8f, 0x77, 0x61, 0x80, 0x9a, 0xf9, 0xcd, 0xf2, 0x37, 0x00, 0xd5, 0xed,
+	0xa0, 0xa3, 0x2a, 0x5d, 0x3f, 0xa8, 0x56, 0xeb, 0x2e, 0xa0, 0x97, 0x3f, 0x24, 0xf2, 0x15, 0x3c,
+	0x6c, 0xae, 0x9c, 0xb9, 0x85, 0x9a, 0x11, 0x06, 0xc5, 0x16, 0x7a, 0x05, 0xdd, 0x82, 0x3a, 0x54,
+	0x7b, 0x87, 0x36, 0xfa, 0xf7, 0xf7, 0x2b, 0x64, 0x99, 0x60, 0x0b, 0xbd, 0x05, 0xaf, 0xb6, 0x99,
+	0xe8, 0xd1, 0x9a, 0xd0, 0x62, 0x5f, 0xdb, 0x94, 0x7e, 0x73, 0xf5, 0x3f, 0xf9, 0xec, 0x6f, 0x00,
+	0x00, 0x00, 0xff, 0xff, 0x5b, 0x93, 0xa0, 0x4d, 0xa1, 0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -182,6 +677,13 @@ type AuthCheckerClient interface {
 	DeleteSession(ctx context.Context, in *Cookie, opts ...grpc.CallOption) (*Nothing, error)
 	UpdateSession(ctx context.Context, in *Cookie, opts ...grpc.CallOption) (*Cookie, error)
 	GetIDFromSession(ctx context.Context, in *Cookie, opts ...grpc.CallOption) (*UserID, error)
+	CreateUser(ctx context.Context, in *UserNew, opts ...grpc.CallOption) (*User, error)
+	IdentifyUser(ctx context.Context, in *DataAuth, opts ...grpc.CallOption) (*User, error)
+	GetUserByID(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
+	UpdateUser(ctx context.Context, in *UpdateUserReq, opts ...grpc.CallOption) (*Nothing, error)
+	GetUsersScores(ctx context.Context, in *ScoresParam, opts ...grpc.CallOption) (*Scores, error)
+	GetUsersCount(ctx context.Context, in *Nothing, opts ...grpc.CallOption) (*Num, error)
+	UpdateScore(ctx context.Context, in *UpdateScoreReq, opts ...grpc.CallOption) (*Nothing, error)
 }
 
 type authCheckerClient struct {
@@ -228,12 +730,82 @@ func (c *authCheckerClient) GetIDFromSession(ctx context.Context, in *Cookie, op
 	return out, nil
 }
 
+func (c *authCheckerClient) CreateUser(ctx context.Context, in *UserNew, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/session.AuthChecker/CreateUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authCheckerClient) IdentifyUser(ctx context.Context, in *DataAuth, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/session.AuthChecker/IdentifyUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authCheckerClient) GetUserByID(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/session.AuthChecker/GetUserByID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authCheckerClient) UpdateUser(ctx context.Context, in *UpdateUserReq, opts ...grpc.CallOption) (*Nothing, error) {
+	out := new(Nothing)
+	err := c.cc.Invoke(ctx, "/session.AuthChecker/UpdateUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authCheckerClient) GetUsersScores(ctx context.Context, in *ScoresParam, opts ...grpc.CallOption) (*Scores, error) {
+	out := new(Scores)
+	err := c.cc.Invoke(ctx, "/session.AuthChecker/GetUsersScores", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authCheckerClient) GetUsersCount(ctx context.Context, in *Nothing, opts ...grpc.CallOption) (*Num, error) {
+	out := new(Num)
+	err := c.cc.Invoke(ctx, "/session.AuthChecker/GetUsersCount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authCheckerClient) UpdateScore(ctx context.Context, in *UpdateScoreReq, opts ...grpc.CallOption) (*Nothing, error) {
+	out := new(Nothing)
+	err := c.cc.Invoke(ctx, "/session.AuthChecker/UpdateScore", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthCheckerServer is the server API for AuthChecker service.
 type AuthCheckerServer interface {
 	CreateSession(context.Context, *UserID) (*Cookie, error)
 	DeleteSession(context.Context, *Cookie) (*Nothing, error)
 	UpdateSession(context.Context, *Cookie) (*Cookie, error)
 	GetIDFromSession(context.Context, *Cookie) (*UserID, error)
+	CreateUser(context.Context, *UserNew) (*User, error)
+	IdentifyUser(context.Context, *DataAuth) (*User, error)
+	GetUserByID(context.Context, *User) (*User, error)
+	UpdateUser(context.Context, *UpdateUserReq) (*Nothing, error)
+	GetUsersScores(context.Context, *ScoresParam) (*Scores, error)
+	GetUsersCount(context.Context, *Nothing) (*Num, error)
+	UpdateScore(context.Context, *UpdateScoreReq) (*Nothing, error)
 }
 
 func RegisterAuthCheckerServer(s *grpc.Server, srv AuthCheckerServer) {
@@ -312,6 +884,132 @@ func _AuthChecker_GetIDFromSession_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthChecker_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserNew)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthCheckerServer).CreateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/session.AuthChecker/CreateUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthCheckerServer).CreateUser(ctx, req.(*UserNew))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthChecker_IdentifyUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DataAuth)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthCheckerServer).IdentifyUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/session.AuthChecker/IdentifyUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthCheckerServer).IdentifyUser(ctx, req.(*DataAuth))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthChecker_GetUserByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(User)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthCheckerServer).GetUserByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/session.AuthChecker/GetUserByID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthCheckerServer).GetUserByID(ctx, req.(*User))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthChecker_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthCheckerServer).UpdateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/session.AuthChecker/UpdateUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthCheckerServer).UpdateUser(ctx, req.(*UpdateUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthChecker_GetUsersScores_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ScoresParam)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthCheckerServer).GetUsersScores(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/session.AuthChecker/GetUsersScores",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthCheckerServer).GetUsersScores(ctx, req.(*ScoresParam))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthChecker_GetUsersCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Nothing)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthCheckerServer).GetUsersCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/session.AuthChecker/GetUsersCount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthCheckerServer).GetUsersCount(ctx, req.(*Nothing))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthChecker_UpdateScore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateScoreReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthCheckerServer).UpdateScore(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/session.AuthChecker/UpdateScore",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthCheckerServer).UpdateScore(ctx, req.(*UpdateScoreReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _AuthChecker_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "session.AuthChecker",
 	HandlerType: (*AuthCheckerServer)(nil),
@@ -331,6 +1029,34 @@ var _AuthChecker_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetIDFromSession",
 			Handler:    _AuthChecker_GetIDFromSession_Handler,
+		},
+		{
+			MethodName: "CreateUser",
+			Handler:    _AuthChecker_CreateUser_Handler,
+		},
+		{
+			MethodName: "IdentifyUser",
+			Handler:    _AuthChecker_IdentifyUser_Handler,
+		},
+		{
+			MethodName: "GetUserByID",
+			Handler:    _AuthChecker_GetUserByID_Handler,
+		},
+		{
+			MethodName: "UpdateUser",
+			Handler:    _AuthChecker_UpdateUser_Handler,
+		},
+		{
+			MethodName: "GetUsersScores",
+			Handler:    _AuthChecker_GetUsersScores_Handler,
+		},
+		{
+			MethodName: "GetUsersCount",
+			Handler:    _AuthChecker_GetUsersCount_Handler,
+		},
+		{
+			MethodName: "UpdateScore",
+			Handler:    _AuthChecker_UpdateScore_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
