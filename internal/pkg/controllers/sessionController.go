@@ -106,7 +106,6 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 	}
 
 	_, err = authGRPC.DeleteSession(ctx, &grpcAuth.Cookie{Token: currentSession.Value, Expiration: ""})
-	//err = session.DeleteToken(currentSession.Value)
 	if err != nil && err.Error() == session.NoTokenFound {
 		// bad token
 		ctxLogger.Error(errors.Wrap(err, "cannot delete token from current session, user cookie will set expired"))

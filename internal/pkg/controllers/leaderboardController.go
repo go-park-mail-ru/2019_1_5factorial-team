@@ -43,7 +43,6 @@ func GetLeaderboard(res http.ResponseWriter, req *http.Request) {
 	limit, _ := strconv.Atoi(query.Get("limit"))
 	offset, _ := strconv.Atoi(query.Get("offset"))
 
-	//leaderboard, err := user.GetUsersScores(limit, offset)
 	scores, err := authGRPC.GetUsersScores(ctx, &grpcAuth.ScoresParam{Limit: int32(limit), Offset: int32(offset)})
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, err.Error())

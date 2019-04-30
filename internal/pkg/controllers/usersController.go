@@ -143,7 +143,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 // @Router /api/user/{id} [get]
 func GetUser(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	AuthGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	authGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
 	ctx := context.Background()
 
 	requestVariables := mux.Vars(req)
@@ -162,8 +162,7 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//searchingUser, err := user.GetUserById(searchingID)
-	searchingUser, err := AuthGRPC.GetUserByID(ctx, &grpcAuth.User{ID: searchingID})
+	searchingUser, err := authGRPC.GetUserByID(ctx, &grpcAuth.User{ID: searchingID})
 	if err != nil {
 		ErrResponse(res, http.StatusNotFound, "user with this id not found")
 
@@ -217,7 +216,7 @@ type ProfileUpdateResponse struct {
 // @Router /api/user [put]
 func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	AuthGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	authGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
 	ctx := context.Background()
 
 	data := ProfileUpdateRequest{}
@@ -231,7 +230,7 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 
 	userId := req.Context().Value("userID").(string)
 
-	_, err = AuthGRPC.UpdateUser(ctx, &grpcAuth.UpdateUserReq{
+	_, err = authGRPC.UpdateUser(ctx, &grpcAuth.UpdateUserReq{
 		ID:          userId,
 		NewAvatar:   data.Avatar,
 		OldPassword: data.OldPassword,
@@ -245,7 +244,7 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	u, err := AuthGRPC.GetUserByID(ctx, &grpcAuth.User{ID: userId})
+	u, err := authGRPC.GetUserByID(ctx, &grpcAuth.User{ID: userId})
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, err.Error())
 
@@ -280,7 +279,6 @@ func UsersCountInfo(res http.ResponseWriter, req *http.Request) {
 	authGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
 	ctx := context.Background()
 
-	//count, err := user.GetUsersCount()
 	count, err := authGRPC.GetUsersCount(ctx, &grpcAuth.Nothing{})
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, err.Error())
