@@ -34,8 +34,8 @@ type signInRequest struct {
 // @Router /session [post]
 func SignIn(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	AuthGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
-	// TODO(): в грпц прокидывать контекст запроса или оставить через бэкграунд (впринципе разницы нет, сейчас)
+	authGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	// TODO(): в грпц прокидывать контекст запроса или оставить через бэкграунд (впринципе разницы нет, сейчас) можно брать оттуда логгер, но хз
 	ctx := context.Background()
 
 	data := signInRequest{}
@@ -47,15 +47,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//u, err := user.IdentifyUser(data.Login, data.Password)
-	//if err != nil {
-	//	ErrResponse(res, http.StatusBadRequest, "Wrong password or login")
-	//
-	//	ctxLogger.Error(errors.Wrap(err, "Wrong password or login"))
-	//	return
-	//}
-
-	u, err := AuthGRPC.IdentifyUser(ctx, &grpcAuth.DataAuth{Login: data.Login, Password: data.Password})
+	u, err := authGRPC.IdentifyUser(ctx, &grpcAuth.DataAuth{Login: data.Login, Password: data.Password})
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, "Wrong password or login")
 
@@ -63,18 +55,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// TODO(): есть ли смысл всегда держать коннект открытым? (если перенести создание коннекта в server, то будет циклический импорт)
-	//grpcConn, err := grpcAuth.CreateConnection()
-	//if err != nil {
-	//	ErrResponse(res, http.StatusInternalServerError, err.Error())
-	//
-	//	ctxLogger.Error(errors.Wrap(err, "cant get connection to auth service"))
-	//	return
-	//}
-	//defer grpcConn.Close()
-	//
-	//AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
-	cookieGRPC, err := AuthGRPC.CreateSession(ctx, &grpcAuth.UserID{ID: u.ID})
+	cookieGRPC, err := authGRPC.CreateSession(ctx, &grpcAuth.UserID{ID: u.ID})
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, err.Error())
 
@@ -112,7 +93,8 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 // @Router /session [delete]
 func SignOut(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	AuthGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	authGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	ctx := context.Background()
 
 	currentSession, err := req.Cookie(config.Get().CookieConfig.CookieName)
 	if err == http.ErrNoCookie {
@@ -123,19 +105,7 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// TODO(): есть ли смысл всегда держать коннект открытым? (если перенести создание коннекта в server, то будет циклический импорт)
-	//grpcConn, err := grpcAuth.CreateConnection()
-	//if err != nil {
-	//	ErrResponse(res, http.StatusInternalServerError, err.Error())
-	//
-	//	ctxLogger.Error(errors.Wrap(err, "cant get connection to auth service"))
-	//	return
-	//}
-	//defer grpcConn.Close()
-	//
-	//AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
-	ctx := context.Background()
-	_, err = AuthGRPC.DeleteSession(ctx, &grpcAuth.Cookie{Token: currentSession.Value, Expiration: ""})
+	_, err = authGRPC.DeleteSession(ctx, &grpcAuth.Cookie{Token: currentSession.Value, Expiration: ""})
 	//err = session.DeleteToken(currentSession.Value)
 	if err != nil && err.Error() == session.NoTokenFound {
 		// bad token
@@ -185,8 +155,9 @@ type UserInfoResponse struct {
 // @Router /api/user [get]
 func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	AuthGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	authGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
 	ctx := context.Background()
+
 	id := req.Context().Value("userID").(string)
 	if id == "" {
 		ErrResponse(res, http.StatusBadRequest, errors.New("invalid empty id").Error())
@@ -195,8 +166,7 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//u, err := user.GetUserById(id)
-	u, err := AuthGRPC.GetUserByID(ctx, &grpcAuth.User{ID: id})
+	u, err := authGRPC.GetUserByID(ctx, &grpcAuth.User{ID: id})
 	if err != nil {
 		// проверка на невалидный айди юзера
 		status, err := DropUserCookie(res, req)

@@ -10,16 +10,10 @@ import (
 var InstanceChat *Chat
 
 func Start() {
-	//игра крутится как отдельная сущность всегда
+	//чат крутится как отдельная сущность всегда
 	InstanceChat = NewChat(20)
 	go panicWorker.PanicWorker(InstanceChat.Start)
 }
-
-//func init() {
-//	// игра крутится как отдельная сущность всегда
-//	InstanceChat = NewChat(20)
-//	go panicWorker.PanicWorker(InstanceChat.Start)
-//}
 
 type Chat struct {
 	mu           *sync.Mutex
@@ -71,6 +65,8 @@ func (c *Chat) Start() {
 			c.BroadcastSendMessages()
 
 		case message := <-c.messagesChan:
+			// костыли пезда (но работает)
+			// а локалке Payload нормально кастится в map[string]interface{}, а на тачке хуй (хз поч)
 			switch message.Type {
 			case string(MessageNew):
 				message.Type = ""

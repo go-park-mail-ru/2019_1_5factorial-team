@@ -9,10 +9,7 @@ import (
 	"net/http"
 )
 
-//var InstanceChat *MyGorgeousChat
-
 type MyGorgeousChat struct {
-	//InstanceChat *chat.Chat
 	port string
 }
 
@@ -20,10 +17,6 @@ func New(port string) *MyGorgeousChat {
 	mgc := MyGorgeousChat{}
 	mgc.port = port
 
-	//mgc.InstanceChat = chat.NewChat(20)
-	//go panicWorker.PanicWorker(mgc.InstanceChat.Start)
-
-	//InstanceChat = &mgc
 	chat.Start()
 
 	return &mgc

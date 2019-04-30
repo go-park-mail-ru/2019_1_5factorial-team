@@ -17,12 +17,13 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		ctx := req.Context()
 		var userId string = ""
 		authorized := false
-		AuthGRPC := grpcAuth.GetClient()
+		authGRPC := grpcAuth.GetClient()
+		ctxGRPC := context.Background()
 
 		defer func() {
 			ctx = context.WithValue(ctx, "userID", userId)
 			ctx = context.WithValue(ctx, "authorized", authorized)
-			ctx = context.WithValue(ctx, "authGRPC", AuthGRPC)
+			ctx = context.WithValue(ctx, "authGRPC", authGRPC)
 
 			if authorized {
 				ctx = context.WithValue(ctx, "logger", log.LoggerWithAuth(req.WithContext(ctx)))
@@ -41,20 +42,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		//uId, err := session.GetId(cookie.Value)
-		//grpcConn, err := grpcAuth.CreateConnection()
-		//if err != nil {
-		//	http.Error(res, "relogin, please", http.StatusInternalServerError)
-		//
-		//	logrus.Error(errors.Wrap(err, "cant get connection to auth service"))
-		//	return
-		//}
-		//defer grpcConn.Close()
-		//
-		//AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
-
-		ctxGRPC := context.Background()
-		uId, err := AuthGRPC.GetIDFromSession(ctxGRPC, &grpcAuth.Cookie{Token: cookie.Value})
+		uId, err := authGRPC.GetIDFromSession(ctxGRPC, &grpcAuth.Cookie{Token: cookie.Value})
 
 		if err != nil {
 			cookie.Expires = time.Unix(0, 0)
@@ -65,19 +53,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 			// сетим новое время куки
 			// и обновляем время токена
-			//updatedToken, err := session.UpdateToken(cookie.Value)
-			//grpcConn, err := grpcAuth.CreateConnection()
-			//if err != nil {
-			//	http.Error(res, "relogin, please", http.StatusInternalServerError)
-			//
-			//	logrus.Error(errors.Wrap(err, "cant get connection to auth service"))
-			//	return
-			//}
-			//defer grpcConn.Close()
-			//
-			//AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
-			//ctx := context.Background()
-			cookieGRPC, err := AuthGRPC.UpdateSession(ctx, &grpcAuth.Cookie{Token: cookie.Value})
+			cookieGRPC, err := authGRPC.UpdateSession(ctx, &grpcAuth.Cookie{Token: cookie.Value})
 			if err != nil {
 				http.Error(res, "relogin, please", http.StatusInternalServerError)
 
@@ -92,10 +68,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				logrus.Error(errors.Wrap(err, "cant convert time from string"))
 				return
 			}
-			//if err != nil {
-			//	TODO(): переделать на ErrResponse
-			//http.Error(res, "relogin, please", http.StatusInternalServerError)
-			//}
 
 			session.UpdateHttpCookie(cookie, timeCookie)
 		}

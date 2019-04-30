@@ -45,14 +45,6 @@ func (um *UserMessage) SetMessageEdit() error {
 	um.DeleteID = ""
 	um.ID = ""
 
-	//if um.EditID == "" || um.EditID == " " {
-	//	return errors.New("empty EDIT message edit_id")
-	//}
-	//
-	//if um.Text == "" || um.Text == " " {
-	//	return errors.New("empty NEW message text")
-	//}
-
 	if len(strings.Replace(um.EditID, " ", "", -1)) == 0 {
 		return errors.New("empty EDIT message edit_id")
 	}
@@ -67,10 +59,6 @@ func (um *UserMessage) SetMessageEdit() error {
 func (um *UserMessage) SetMessageNew() error {
 	um.DeleteID = ""
 	um.EditID = ""
-
-	//if um.Text == "" || um.Text == " " {
-	//	return errors.New("empty NEW message text")
-	//}
 
 	if len(strings.Replace(um.Text, " ", "", -1)) == 0 {
 		return errors.New("empty NEW message text")
@@ -93,10 +81,6 @@ func (um *UserMessage) SetMessageDelete() error {
 	um.Text = ""
 	um.EditID = ""
 
-	//if um.DeleteID == "" || um.DeleteID == " " {
-	//	return errors.New("delete id is empty")
-	//}
-
 	if len(strings.Replace(um.DeleteID, " ", "", -1)) == 0 {
 		return errors.New("delete id is empty")
 
@@ -109,10 +93,6 @@ func (um *UserMessage) Validate() error {
 	if _, ok := validUserInput[um.Type]; !ok {
 		return errors.New("not valid message type")
 	}
-
-	//if um.Text == "" || um.Text == " " {
-	//	return errors.New("empty message payload")
-	//}
 
 	return nil
 }

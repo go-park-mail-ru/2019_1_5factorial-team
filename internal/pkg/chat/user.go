@@ -31,7 +31,6 @@ type User struct {
 }
 
 func NewUserID(conn *websocket.Conn, ID string, GRPC grpcAuth.AuthCheckerClient) (*User, error) {
-	//u, err := user.GetUserById(ID)
 	ctx := context.Background()
 	u, err := GRPC.GetUserByID(ctx, &grpcAuth.User{ID: ID})
 	if err != nil {
@@ -78,7 +77,6 @@ func (u *User) ListenIncome() {
 			return
 
 		default:
-			//log.Printf("player %s ListenMessage default", p.Token)
 
 			message := &UserMessage{}
 			err := u.conn.ReadJSON(message)
@@ -150,73 +148,9 @@ func (u *User) ListenIncome() {
 					u.SendErr(err.Error())
 					continue
 				}
-				//case string(MessageEdit):
-				//	err := message.SetMessageEdit()
-				//	if err != nil {
-				//		log.Println("cant SetMessageEdit()", err)
-				//		u.SendErr(err.Error())
-				//		continue
-				//	}
-				//	message.From = u.Nickname
-				//
 			}
 
-			//message.Type = ""
 			u.in <- message
-
-			//message := &Message{}
-			//err := u.conn.ReadJSON(message)
-			//if websocket.IsUnexpectedCloseError(err) || websocket.IsCloseError(err) {
-			//	u.ChatPtr.RemoveUser(u)
-			//	log.Printf("user %s disconnected", u.ID)
-			//
-			//	return
-			//
-			//} else if err != nil {
-			//	log.Printf("cannot read json, err = %s", err.Error())
-			//	u.SendErr(err.Error())
-			//
-			//	if e, ok := err.(*net.OpError); ok {
-			//		if e.Temporary() || e.Timeout() {
-			//			// I don't think these actually happen, but we would want to continue if they did...
-			//			continue
-			//		} else if e.Err.Error() == "use of closed network connection" { // happens very frequently
-			//			// не знаю что тут сделать, выкинуть его из комнаты или шо?
-			//			u.stopListen <- struct{}{}
-			//			continue
-			//		}
-			//	}
-			//
-			//	continue
-			//}
-			//
-			//log.Println(message)
-			//if message.Payload == nil {
-			//	u.SendErr("empty payload")
-			//	continue
-			//}
-			//
-			//if message.Type == MessageNew {
-			//	payloadMap := message.Payload.(map[string]interface{})
-			//
-			//	fmt.Println("CHECK NEW")
-			//	um := UserMessage{
-			//		From: u.Nickname,
-			//		Time: time.Now(),
-			//		Text: payloadMap["text"].(string),
-			//	}
-			//
-			//	err := um.Insert()
-			//	if err != nil {
-			//		// TODO(): отправить юзеру сообщение, что мессаж не отправился
-			//		u.SendErr(err.Error())
-			//		continue
-			//	}
-			//	u.in <- &um
-			//} else if message.Type == MessageTyping {
-			//	log.Println(u.ID, "typing")
-			//}
-
 		}
 	}
 }
@@ -273,18 +207,6 @@ func (u *User) SendLastMessages() {
 		log.Error(errors.Wrapf(err, "user %s cant get last messages on connect", u.Nickname))
 	}
 
-	//for _, val := range mes {
-	//	err := u.conn.WriteJSON(Message{
-	//		Type:    MessageExist,
-	//		Payload: val,
-	//	})
-	//	if err != nil {
-	//		log.Error("u.Listen cant send message ", err.Error())
-	//
-	//		u.CloseConn()
-	//		//return
-	//	}
-	//}
 	for i := len(mes) - 1; i > 0; i-- {
 		err := u.conn.WriteJSON(Message{
 			Type:    MessageExist,

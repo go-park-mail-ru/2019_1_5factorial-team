@@ -76,7 +76,7 @@ func DropUserCookie(res http.ResponseWriter, req *http.Request) (int, error) {
 // @Router /api/user [post]
 func SignUp(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	AuthGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	authGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
 	ctx := context.Background()
 
 	data := SingUpRequest{}
@@ -91,15 +91,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	// TODO(smet1): валидация на данные, правда ли мыло - мыло, а самолет - вертолет?
 	fmt.Println(data)
 
-	//u, err := user.CreateUser(data.Login, data.Email, data.Password)
-	//if err != nil {
-	//	ErrResponse(res, http.StatusBadRequest, err.Error())
-	//
-	//	ctxLogger.Error(errors.Wrap(err, "err in user data"))
-	//	return
-	//}
-
-	u, err := AuthGRPC.CreateUser(ctx, &grpcAuth.UserNew{
+	u, err := authGRPC.CreateUser(ctx, &grpcAuth.UserNew{
 		Nickname: data.Login,
 		Email:    data.Email,
 		Password: data.Password,
@@ -111,27 +103,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//randToken, expiration, err := session.SetToken(u.ID.Hex())
-	//if err != nil {
-	//	ErrResponse(res, http.StatusInternalServerError, err.Error())
-	//
-	//	ctxLogger.Error(errors.Wrap(err, "Set token returned err"))
-	//	return
-	//}
-	//
-	//cookie := session.CreateHttpCookie(randToken, expiration)
-	// TODO(): есть ли смысл всегда держать коннект открытым? (если перенести создание коннекта в server, то будет циклический импорт)
-	//grpcConn, err := grpcAuth.CreateConnection()
-	//if err != nil {
-	//	ErrResponse(res, http.StatusInternalServerError, err.Error())
-	//
-	//	ctxLogger.Error(errors.Wrap(err, "cant get connection to auth service"))
-	//	return
-	//}
-	//defer grpcConn.Close()
-	//
-	//AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
-	cookieGRPC, err := AuthGRPC.CreateSession(ctx, &grpcAuth.UserID{ID: u.ID})
+	cookieGRPC, err := authGRPC.CreateSession(ctx, &grpcAuth.UserID{ID: u.ID})
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, err.Error())
 
@@ -259,7 +231,6 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 
 	userId := req.Context().Value("userID").(string)
 
-	//err = user.UpdateUser(userId, data.Avatar, data.OldPassword, data.NewPassword)
 	_, err = AuthGRPC.UpdateUser(ctx, &grpcAuth.UpdateUserReq{
 		ID:          userId,
 		NewAvatar:   data.Avatar,
@@ -274,7 +245,6 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//u, _ := user.GetUserById(userId)
 	u, err := AuthGRPC.GetUserByID(ctx, &grpcAuth.User{ID: userId})
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, err.Error())

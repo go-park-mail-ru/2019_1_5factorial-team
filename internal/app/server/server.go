@@ -24,19 +24,6 @@ func New(port string) *MyGorgeousServer {
 	return &mgs
 }
 
-//func CreateAuthClient(port string) {
-//	grcpConn, err := grpc.Dial(
-//		"127.0.0.1:"+port,
-//		grpc.WithInsecure(),
-//	)
-//	if err != nil {
-//		log.Error(errors.New("cant connect to grpc"))
-//	}
-//	defer grcpConn.Close()
-//
-//	AuthGRPC = session.NewAuthCheckerClient(grcpConn)
-//}
-
 func (mgs *MyGorgeousServer) Run() error {
 
 	address := ":" + mgs.port
@@ -75,16 +62,6 @@ func (mgs *MyGorgeousServer) Run() error {
 	routerLoginRequired.HandleFunc("/api/session", controllers.SignOut).Methods("DELETE", "OPTIONS")
 	// загрузка аватрки только для залогиненых юзеров
 	routerLoginRequired.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
-
-	// игра
-	//routerLoginRequired.HandleFunc("/api/game/ws", controllers.Play).Methods("GET", "OPTIONS")
-
-	// chat
-	//routerLoginRequired.HandleFunc("/api/chat/global/ws", controllers.ConnectToGlobalChat).Methods("GET", "OPTIONS")
-
-	//go auth.Run()
-	// TODO(): вынести порт grpc в константы
-	//CreateAuthClient("5000")
 
 	err := http.ListenAndServe(address, router)
 	if err != nil {
