@@ -9,14 +9,17 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"gopkg.in/mgo.v2"
 	"net"
+	"strings"
 	"sync"
 	"time"
 )
 
 const (
-	address = "auth-go"
-	port    = "5000"
+	address           = "auth-go"
+	port              = "5000"
+	MongoConflictCode = 11000
 )
 
 var AuthGRPCClient AuthCheckerClient
@@ -115,6 +118,15 @@ func (a *Auth) CreateUser(ctx context.Context, data *UserNew) (*User, error) {
 	u, err := user.CreateUser(data.Nickname, data.Email, data.Password)
 	if err != nil {
 		log.Error(errors.Wrap(err, "err in user data, AuthGRPC"))
+
+		if errors.Cause(err).(*mgo.LastError).Code == MongoConflictCode {
+			if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Nickname) {
+				return &User{}, errors.New("login conflict")
+
+			} else if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Email) {
+				return &User{}, errors.New("email conflict")
+			}
+		}
 
 		return &User{}, err
 	}

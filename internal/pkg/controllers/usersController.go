@@ -4,12 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"google.golang.org/grpc/status"
-	"gopkg.in/mgo.v2"
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
@@ -19,8 +16,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
-
-const MongoConflictCode = 11000
 
 // 'Content-Type': 'application/json; charset=utf-8'
 // 	"login":
@@ -102,31 +97,12 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 		Password: data.Password,
 	})
 	if err != nil {
-		s, ok := status.FromError(err)
-		if !ok {
-			ErrResponse(res, http.StatusBadRequest, err.Error())
+		ErrResponse(res, http.StatusConflict, err.Error())
 
-			ctxLogger.Error(errors.Wrap(err, "err in user data"))
-			return
-		}
+		ctxLogger.Error(errors.Wrap(err, "err in user data"))
+		return
 
-		ctxLogger.Error(s)
-
-		if s.Code() == MongoConflictCode {
-			if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Login) {
-				ErrResponse(res, http.StatusConflict, "login conflict")
-
-				ctxLogger.Error(errors.Wrap(err, "err in user data"))
-				return
-
-			} else if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Email) {
-				ErrResponse(res, http.StatusConflict, "email conflict")
-
-				ctxLogger.Error(errors.Wrap(err, "err in user data"))
-				return
-			}
-		}
-		//if errors.Cause(err).(*status.).Code == MongoConflictCode {
+		//if errors.Cause(err).(*mgo.LastError).Code == MongoConflictCode {
 		//	if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Login) {
 		//		ErrResponse(res, http.StatusConflict, "login conflict")
 		//
@@ -140,8 +116,6 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 		//		return
 		//	}
 		//}
-
-
 	}
 
 	cookieGRPC, err := authGRPC.CreateSession(ctx, &grpcAuth.UserID{ID: u.ID})
