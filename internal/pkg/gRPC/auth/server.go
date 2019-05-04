@@ -134,7 +134,7 @@ func (a *Auth) CreateUser(ctx context.Context, data *UserNew) (*User, error) {
 	}
 
 	return &User{
-		ID:           u.ID.String(),
+		ID:           u.ID.Hex(),
 		Email:        u.Email,
 		Nickname:     u.Nickname,
 		HashPassword: u.HashPassword,

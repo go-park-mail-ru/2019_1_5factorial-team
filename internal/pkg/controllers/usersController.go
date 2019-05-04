@@ -99,10 +99,6 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 		Password: data.Password,
 	})
 	if err != nil {
-		//ErrResponse(res, http.StatusConflict, err.Error())
-		//
-		//ctxLogger.Error(errors.Wrap(err, "err in user data"))
-		//return
 		st, ok := status.FromError(err)
 		if !ok {
 			ErrResponse(res, http.StatusInternalServerError, err.Error())
@@ -115,21 +111,6 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 
 		ctxLogger.Error(errors.Wrapf(err, "grpc code = %d, mes = %s", st.Code(), st.Message()))
 		return
-
-		//if errors.Cause(err).(*mgo.LastError).Code == MongoConflictCode {
-		//	if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Login) {
-		//		ErrResponse(res, http.StatusConflict, "login conflict")
-		//
-		//		ctxLogger.Error(errors.Wrap(err, "err in user data"))
-		//		return
-		//
-		//	} else if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Email) {
-		//		ErrResponse(res, http.StatusConflict, "email conflict")
-		//
-		//		ctxLogger.Error(errors.Wrap(err, "err in user data"))
-		//		return
-		//	}
-		//}
 	}
 
 	cookieGRPC, err := authGRPC.CreateSession(ctx, &grpcAuth.UserID{ID: u.ID})
