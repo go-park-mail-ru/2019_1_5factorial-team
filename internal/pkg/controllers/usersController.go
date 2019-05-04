@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/grpcErr"
+	"google.golang.org/grpc/status"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -97,9 +99,21 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 		Password: data.Password,
 	})
 	if err != nil {
-		ErrResponse(res, http.StatusConflict, err.Error())
+		//ErrResponse(res, http.StatusConflict, err.Error())
+		//
+		//ctxLogger.Error(errors.Wrap(err, "err in user data"))
+		//return
+		st, ok := status.FromError(err)
+		if !ok {
+			ErrResponse(res, http.StatusInternalServerError, err.Error())
 
-		ctxLogger.Error(errors.Wrap(err, "err in user data"))
+			ctxLogger.Error(errors.Wrap(err, "err in user data, cant convert err in status.FromError"))
+			return
+		}
+
+		ErrResponse(res, grpcErr.GetHTTPStatus(st.Code()), st.Message())
+
+		ctxLogger.Error(errors.Wrapf(err, "grpc code = %d, mes = %s", st.Code(), st.Message()))
 		return
 
 		//if errors.Cause(err).(*mgo.LastError).Code == MongoConflictCode {

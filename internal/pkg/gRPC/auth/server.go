@@ -9,6 +9,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"gopkg.in/mgo.v2"
 	"net"
 	"strings"
@@ -121,14 +123,14 @@ func (a *Auth) CreateUser(ctx context.Context, data *UserNew) (*User, error) {
 
 		if errors.Cause(err).(*mgo.LastError).Code == MongoConflictCode {
 			if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Nickname) {
-				return &User{}, errors.New("login conflict")
+				return &User{}, status.Error(codes.AlreadyExists, "login conflict")
 
 			} else if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Email) {
-				return &User{}, errors.New("email conflict")
+				return &User{}, status.Error(codes.AlreadyExists, "email conflict")
 			}
 		}
 
-		return &User{}, err
+		return &User{}, status.Error(codes.Internal, err.Error())
 	}
 
 	return &User{
