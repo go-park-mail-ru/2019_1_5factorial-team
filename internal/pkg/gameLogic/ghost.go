@@ -16,7 +16,7 @@ type Ghost struct {
 const (
 	DefaultRightPosition   = 1440
 	DefaultLeftPosition    = 0
-	DefaultMovementSpeed   = 240
+	DefaultMovementSpeed   = 80
 	DefaultLenSymbolsSlice = 4
 	DefaultDamage          = 1
 
@@ -148,6 +148,7 @@ func (gs *GhostQueue) PopSymbol(sym Symbol) int {
 
 			score += ScoreMatchSymbol
 		}
+
 		if len(gs.Items[i].Symbols) != 0 {
 			newItems = append(newItems, gs.Items[i])
 		} else {
