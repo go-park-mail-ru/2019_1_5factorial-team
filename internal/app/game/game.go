@@ -1,6 +1,7 @@
 package game
 
 import (
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
 	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/game"
@@ -21,7 +22,7 @@ func New(port string) *MyGorgeousGame {
 	mgc := MyGorgeousGame{}
 	mgc.port = port
 
-	game.Start(roomsCount, grpcAuth.AuthGRPCClient)
+	game.Start(config.Get().GameConfig.MaxRooms, grpcAuth.AuthGRPCClient)
 
 	return &mgc
 }

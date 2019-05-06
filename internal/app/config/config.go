@@ -78,6 +78,29 @@ type LogrusConfig struct {
 	TimestampFormat string `json:"timestamp_format"`
 }
 
+type GameConfig struct {
+	MaxRooms uint32 `json:"max_rooms"`
+
+	// спрайты
+	DefaultSpriteWidth int `json:"default_sprite_width"`
+
+	// оси игры
+	AxisLen             int `json:"axis_len"`
+	PlayerLeftPosition  int
+	PlayerRightPosition int
+
+	// основные константы механики
+	DefaultRightPosition   int    `json:"default_right_position"`
+	DefaultLeftPosition    int    `json:"default_left_position"`
+	DefaultMovementSpeed   int    `json:"default_movement_speed"`
+	DefaultLenSymbolsSlice int    `json:"default_len_symbols_slice"`
+	DefaultDamage          uint32 `json:"default_damage"`
+
+	// очки
+	ScoreKillGhost   int `json:"score_kill_ghost"`
+	ScoreMatchSymbol int `json:"score_match_symbol"`
+}
+
 // TODO(): есть смысл объединить в 1 файл конфига
 // структура сервера, собирает все вышеперечисленные структуры
 type ServerConfig struct {
@@ -86,6 +109,7 @@ type ServerConfig struct {
 	CookieConfig       CookieConfig
 	DBConfig           []DBConfig
 	LogrusConfig       LogrusConfig
+	GameConfig         GameConfig
 
 	configPath string
 }
@@ -119,6 +143,10 @@ var configs = []valueAndPath{
 		from: "logrus_config.json",
 		to:   &instance.LogrusConfig,
 	},
+	{
+		from: "game_config.json",
+		to:   &instance.GameConfig,
+	},
 }
 
 // считывание всех конфигов по пути `configsDir`
@@ -140,6 +168,8 @@ func Init(configsDir string) error {
 
 	instance.StaticServerConfig.MaxUploadSize = instance.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
 
+	instance.GameConfig.PlayerLeftPosition = (instance.GameConfig.AxisLen - instance.GameConfig.DefaultSpriteWidth) / 2
+	instance.GameConfig.PlayerRightPosition = instance.GameConfig.AxisLen / 2
 	return nil
 }
 
