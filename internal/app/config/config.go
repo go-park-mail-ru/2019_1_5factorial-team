@@ -45,7 +45,6 @@ func (d Duration) MarshalJSON() (b []byte, err error) {
 type CookieConfig struct {
 	CookieName      string   `json:"cookie_name"`
 	HttpOnly        bool     `json:"http_only"`
-	CookieDuration  int64    `json:"cookie_time_hours"`
 	ServerPrefix    string   `json:"server_prefix"`
 	CookieTimeHours Duration `json:"cookie_time"`
 }
