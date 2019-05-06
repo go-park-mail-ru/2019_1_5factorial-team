@@ -214,3 +214,10 @@ func (a *Auth) UpdateScore(ctx context.Context, req *UpdateScoreReq) (*Nothing, 
 
 	return &Nothing{}, nil
 }
+
+func (a *Auth) Ping(ctx context.Context, _ *Nothing) (*Nothing, error) {
+	log.Warn("grpc auth alive")
+	// тут еще можно проверять доступность баз
+
+	return &Nothing{}, nil
+}

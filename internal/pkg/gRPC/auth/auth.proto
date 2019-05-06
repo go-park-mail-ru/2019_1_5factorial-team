@@ -90,4 +90,7 @@ service AuthChecker {
     }
     rpc UpdateScore (UpdateScoreReq) returns (Nothing) {
     }
+
+    rpc Ping (Nothing) returns (Nothing) {
+    }
 }
