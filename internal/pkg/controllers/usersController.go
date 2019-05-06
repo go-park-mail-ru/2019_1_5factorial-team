@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"gopkg.in/mgo.v2"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/grpcErr"
+	"google.golang.org/grpc/status"
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
@@ -18,8 +18,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
-
-const MongoConflictCode = 11000
 
 // 'Content-Type': 'application/json; charset=utf-8'
 // 	"login":
@@ -84,8 +82,9 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	ctx := context.Background()
 
 	data := SingUpRequest{}
-	status, err := ParseRequestIntoStruct(true, req, &data)
+	statusErr, err := ParseRequestIntoStruct(true, req, &data)
 	if err != nil {
+		ErrResponse(res, statusErr, err.Error())
 
 		ctxLogger.Error(errors.Wrap(err, "ParseRequestIntoStruct error"))
 		return
@@ -100,23 +99,17 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 		Password: data.Password,
 	})
 	if err != nil {
-		if errors.Cause(err).(*mgo.LastError).Code == MongoConflictCode {
-			if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Login) {
-				ErrResponse(res, http.StatusConflict, "login conflict")
+		st, ok := status.FromError(err)
+		if !ok {
+			ErrResponse(res, http.StatusInternalServerError, err.Error())
 
-				ctxLogger.Error(errors.Wrap(err, "err in user data"))
-				return
-
-			} else if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Email) {
-				ErrResponse(res, http.StatusConflict, "email conflict")
-
-				ctxLogger.Error(errors.Wrap(err, "err in user data"))
-				return
-			}
+			ctxLogger.Error(errors.Wrap(err, "err in user data, cant convert err in status.FromError"))
+			return
 		}
 
-		ErrResponse(res, status, err.Error())
-		ctxLogger.Error(errors.Wrap(err, "err in user data"))
+		ErrResponse(res, grpcErr.GetHTTPStatus(st.Code()), st.Message())
+
+		ctxLogger.Error(errors.Wrapf(err, "grpc code = %d, mes = %s", st.Code(), st.Message()))
 		return
 	}
 

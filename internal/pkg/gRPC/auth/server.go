@@ -8,13 +8,18 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"gopkg.in/mgo.v2"
 	"net"
+	"strings"
 	"time"
 )
 
 const (
-	address = "auth-go"
-	port    = "5000"
+	address           = "auth-go"
+	port              = "5000"
+	MongoConflictCode = 11000
 )
 
 var AuthGRPCClient AuthCheckerClient
@@ -97,11 +102,20 @@ func (a *Auth) CreateUser(ctx context.Context, data *UserNew) (*User, error) {
 	if err != nil {
 		log.Error(errors.Wrap(err, "err in user data, AuthGRPC"))
 
-		return &User{}, err
+		if errors.Cause(err).(*mgo.LastError).Code == MongoConflictCode {
+			if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Nickname) {
+				return &User{}, status.Error(codes.AlreadyExists, "login conflict")
+
+			} else if strings.Contains(errors.Cause(err).(*mgo.LastError).Err, data.Email) {
+				return &User{}, status.Error(codes.AlreadyExists, "email conflict")
+			}
+		}
+
+		return &User{}, status.Error(codes.Internal, err.Error())
 	}
 
 	return &User{
-		ID:           u.ID.String(),
+		ID:           u.ID.Hex(),
 		Email:        u.Email,
 		Nickname:     u.Nickname,
 		HashPassword: u.HashPassword,
@@ -146,6 +160,7 @@ func (a *Auth) GetUserByID(ctx context.Context, u *User) (*User, error) {
 }
 
 func (a *Auth) UpdateUser(ctx context.Context, req *UpdateUserReq) (*Nothing, error) {
+	// TODO(): сделать ответ, как в CreateUser (status.Code, status.Message)
 	err := user.UpdateUser(req.ID, req.NewAvatar, req.OldPassword, req.NewPassword)
 	if err != nil {
 		log.Error(errors.Wrap(err, "UpdateUser error, AuthGRPC"))
