@@ -1,31 +1,22 @@
 package game
 
 import (
+	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
-	"github.com/sirupsen/logrus"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
 	"sync"
 )
 
 var InstanceGame *Game
 
-func init() {
+func Start(roomsCount uint32, authGRPCConn grpcAuth.AuthCheckerClient) {
 	// игра крутится как отдельная сущность всегда
-	InstanceGame = NewGame(10)
-	go PanicWorker(InstanceGame.Run)
-}
-
-func PanicWorker(job func()) {
-	defer func() {
-		if err := recover(); err != nil {
-			//log.Println("OOOOOPA PANIC recovered", err)
-			logrus.WithField("err", err).Error("OOOOOPA PANIC in game, recovered")
-		}
-	}()
-
-	job()
+	InstanceGame = NewGame(roomsCount, authGRPCConn)
+	go panicWorker.PanicWorker(InstanceGame.Run)
 }
 
 type Game struct {
+	GRPC       grpcAuth.AuthCheckerClient
 	RoomsCount uint32
 	mu         *sync.Mutex
 	searchMu   *sync.Mutex
@@ -34,8 +25,9 @@ type Game struct {
 	emptyRooms map[string]*Room
 }
 
-func NewGame(roomsCount uint32) *Game {
+func NewGame(roomsCount uint32, authGRPCConn grpcAuth.AuthCheckerClient) *Game {
 	return &Game{
+		GRPC:       authGRPCConn,
 		RoomsCount: roomsCount,
 		mu:         &sync.Mutex{},
 		searchMu:   &sync.Mutex{},
@@ -53,7 +45,6 @@ LOOP:
 		//g.searchMu.Lock()
 		log.Printf("len empty rooms = %d, len full rooms = %d", len(g.emptyRooms), len(g.rooms))
 		for _, room := range g.emptyRooms {
-
 			if len(room.Players) < int(room.MaxPlayers) {
 				room.AddPlayer(player)
 				g.MakeRoomFull(room)
@@ -63,7 +54,7 @@ LOOP:
 
 		room := NewRoom(2, g)
 		g.AddEmptyRoom(room)
-		go PanicWorker(room.Run)
+		go panicWorker.PanicWorker(room.Run)
 
 		room.AddPlayer(player)
 		//g.searchMu.Unlock()

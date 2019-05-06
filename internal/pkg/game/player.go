@@ -3,6 +3,7 @@ package game
 import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gameLogic"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
 	"github.com/gorilla/websocket"
 	"net"
 )
@@ -73,7 +74,7 @@ func (p *Player) ListenMessages() {
 }
 
 func (p *Player) Listen() {
-	go PanicWorker(p.ListenMessages)
+	go panicWorker.PanicWorker(p.ListenMessages)
 
 	for {
 		select {
