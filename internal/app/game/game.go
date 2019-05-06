@@ -5,6 +5,7 @@ import (
 	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/game"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"net/http"
@@ -21,13 +22,17 @@ func New(port string) *MyGorgeousGame {
 	mgc.port = port
 
 	game.Start(roomsCount, grpcAuth.GetClient())
+	log.Println("ok game start")
 
 	return &mgc
 }
 
 func (mgg *MyGorgeousGame) Run() error {
+	log.Println("InstanceGame.Run()")
 
 	address := ":" + mgg.port
+	log.Println(address)
+
 
 	gameRouter := mux.NewRouter()
 	gameRouter.Use(middleware.CORSMiddleware)
@@ -41,6 +46,7 @@ func (mgg *MyGorgeousGame) Run() error {
 	if err != nil {
 		return errors.Wrap(err, "server Run error")
 	}
+
 
 	return nil
 }

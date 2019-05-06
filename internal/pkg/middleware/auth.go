@@ -14,6 +14,7 @@ import (
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		log.Println("auth midd")
 		ctx := req.Context()
 		var userId string = ""
 		authorized := false
