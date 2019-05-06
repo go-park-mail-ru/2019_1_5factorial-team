@@ -179,6 +179,7 @@ func (a *Auth) GetUserByID(ctx context.Context, u *User) (*User, error) {
 }
 
 func (a *Auth) UpdateUser(ctx context.Context, req *UpdateUserReq) (*Nothing, error) {
+	// TODO(): сделать ответ, как в CreateUser (status.Code, status.Message)
 	err := user.UpdateUser(req.ID, req.NewAvatar, req.OldPassword, req.NewPassword)
 	if err != nil {
 		log.Error(errors.Wrap(err, "UpdateUser error, AuthGRPC"))

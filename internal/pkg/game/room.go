@@ -8,6 +8,8 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/pkg/errors"
+	"math"
+	"math/rand"
 	"sync"
 	"time"
 )
@@ -34,6 +36,7 @@ type Room struct {
 	ticker     *time.Ticker
 	state      *RoomState
 	playerCnt  uint
+	gameTime   float64
 
 	playersInputs []gameLogic.Symbol
 	playerInput   chan *gameLogic.Symbol
@@ -166,12 +169,18 @@ func (r *Room) rakePlayerInputs() {
 }
 
 func (r *Room) updateRoomState() {
+	//r.state.currentTime = time.Now()
+	// TODO(): тут типа прибавляем тик в мкс
+	r.gameTime += 1000000
+
 	if len(r.playersInputs) != 0 {
 		r.rakePlayerInputs()
 	}
 
-	if r.state.Objects.Len() < 2 {
-		r.state.Objects.PushBack(gameLogic.NewRandomGhost())
+	if r.state.Objects.Len() < 2 && rand.Float64() < 1-math.Pow(0.993, r.gameTime) {
+		// игровая логика
+		//r.state.Objects.PushBack(gameLogic.NewRandomGhost())
+		r.state.Objects.AddNewGhost()
 		log.Println("added new ghost")
 		log.Println(r.state.Objects)
 	}
@@ -180,40 +189,26 @@ func (r *Room) updateRoomState() {
 	if f {
 		deletedGhost := r.state.Objects.PopFront()
 
-		//for i := range r.state.Players {
-		//	r.state.Players[i].HP -= gameLogic.DefaultDamage
-		//
-		//	if r.state.Players[i].HP <= 0 {
-		//		r.Close()
-		//		return
-		//
-		//		// на каналах не работает хз поч
-		//		//r.dead <- &Player{}
-		//		//continue LOOP
-		//	}
-		//}
 		if deletedGhost.Speed > 0 {
 			r.state.Players[0].HP -= gameLogic.DefaultDamage
 
-			if r.state.Players[0].HP <= 0 {
-				r.Close()
-				return
-
-				// на каналах не работает хз поч
-				//r.dead <- &Player{}
-				//continue LOOP
-			}
 		} else if deletedGhost.Speed < 0 {
 			r.state.Players[1].HP -= gameLogic.DefaultDamage
 
-			if r.state.Players[1].HP <= 0 {
-				r.Close()
-				return
+			//if r.state.Players[1].HP <= 0 {
+			//	r.Close()
+			//	return
+			//
+			//	// на каналах не работает хз поч
+			//	//r.dead <- &Player{}
+			//	//continue LOOP
+			//}
+		}
 
-				// на каналах не работает хз поч
-				//r.dead <- &Player{}
-				//continue LOOP
-			}
+		if r.state.Players[0].HP <= 0 || r.state.Players[1].HP <= 0 {
+			r.Close()
+
+			return
 		}
 	}
 
