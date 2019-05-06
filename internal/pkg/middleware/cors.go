@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -10,8 +9,6 @@ import (
 
 func CORSMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-		log.Println(req.URL, "CORS")
-
 		val, ok := req.Header["Origin"]
 		if ok {
 			if config.Get().CORSConfig.Origin == "*" {

@@ -14,7 +14,7 @@ func Start(roomsCount uint32, authGRPCConn grpcAuth.AuthCheckerClient) {
 	InstanceGame = NewGame(roomsCount, authGRPCConn)
 	// упала игра -> дочерние горутины должны упасть, как и весь сервис
 	//go panicWorker.PanicWorker(InstanceGame.Run)
-	InstanceGame.Run()
+	go InstanceGame.Run()
 
 	log.Println("InstanceGame.Run()")
 }

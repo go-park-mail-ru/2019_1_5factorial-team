@@ -22,17 +22,13 @@ func New(port string) *MyGorgeousGame {
 	mgc.port = port
 
 	game.Start(roomsCount, grpcAuth.GetClient())
-	log.Println("ok game start")
 
 	return &mgc
 }
 
 func (mgg *MyGorgeousGame) Run() error {
-	log.Println("InstanceGame.Run()")
-
 	address := ":" + mgg.port
 	log.Println(address)
-
 
 	gameRouter := mux.NewRouter()
 	gameRouter.Use(middleware.CORSMiddleware)
@@ -46,7 +42,6 @@ func (mgg *MyGorgeousGame) Run() error {
 	if err != nil {
 		return errors.Wrap(err, "server Run error")
 	}
-
 
 	return nil
 }
