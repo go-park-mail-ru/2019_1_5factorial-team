@@ -28,7 +28,6 @@ type AvatarLinkResponse struct {
 // @Router /api/upload_avatar [post]
 func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	ctxLogger.Info("============================================")
 
 	// проверка на максимально допустимый размер
 	req.Body = http.MaxBytesReader(res, req.Body, config.Get().StaticServerConfig.MaxUploadSize)
