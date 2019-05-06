@@ -32,8 +32,9 @@ var symbolsDict = map[string]Symbol{
 
 func GenerateSymbolsSlice(len int) []Symbol {
 	res := make([]Symbol, 0, len)
-	for i := 0; i < len; i++ {
-		res = append(res, Symbol(rand.Intn(4)))
+	sliceLen := rand.Intn(4) + 2
+	for i := 0; i < sliceLen; i++ {
+		res = append(res, Symbol(rand.Intn(3)+2))
 	}
 
 	return res

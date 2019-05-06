@@ -24,7 +24,7 @@ const (
 	DefaultRightPosition   = 1440
 	DefaultLeftPosition    = 0
 	DefaultMovementSpeed   = 80
-	DefaultLenSymbolsSlice = 4
+	DefaultLenSymbolsSlice = 6
 	DefaultDamage          = 1
 
 	// за 1 призрака при 4 символах, можно получить 100
