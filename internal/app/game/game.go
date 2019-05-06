@@ -21,7 +21,7 @@ func New(port string) *MyGorgeousGame {
 	mgc := MyGorgeousGame{}
 	mgc.port = port
 
-	game.Start(roomsCount, grpcAuth.GetClient())
+	game.Start(roomsCount, grpcAuth.AuthGRPCClient)
 
 	return &mgc
 }

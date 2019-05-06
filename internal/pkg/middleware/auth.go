@@ -17,7 +17,8 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		ctx := req.Context()
 		var userId string = ""
 		authorized := false
-		authGRPC := grpcAuth.GetClient()
+		//authGRPC := grpcAuth.GetClient()
+		authGRPC := grpcAuth.AuthGRPCClient
 		ctxGRPC := context.Background()
 
 		defer func() {

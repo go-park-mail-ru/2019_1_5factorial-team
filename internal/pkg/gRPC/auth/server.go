@@ -6,7 +6,6 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -14,7 +13,6 @@ import (
 	"gopkg.in/mgo.v2"
 	"net"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -25,24 +23,8 @@ const (
 )
 
 var AuthGRPCClient AuthCheckerClient
-var once sync.Once
 
 type Auth struct {
-}
-
-func GetClient() AuthCheckerClient {
-	once.Do(func() {
-		grpcConn, err := CreateConnection()
-		if err != nil {
-			logrus.Error(errors.Wrap(err, "cant create auth service client"))
-
-			return
-		}
-
-		AuthGRPCClient = NewAuthCheckerClient(grpcConn)
-	})
-
-	return AuthGRPCClient
 }
 
 func CreateConnection() (*grpc.ClientConn, error) {
@@ -55,7 +37,6 @@ func CreateConnection() (*grpc.ClientConn, error) {
 
 		return nil, errors.Wrap(err, "cant connect to grpc")
 	}
-	//defer grcpConn.Close()
 
 	return grcpConn, nil
 }
@@ -226,6 +207,13 @@ func (a *Auth) UpdateScore(ctx context.Context, req *UpdateScoreReq) (*Nothing, 
 
 		return &Nothing{}, err
 	}
+
+	return &Nothing{}, nil
+}
+
+func (a *Auth) Ping(ctx context.Context, _ *Nothing) (*Nothing, error) {
+	log.Warn("grpc auth alive")
+	// тут еще можно проверять доступность баз
 
 	return &Nothing{}, nil
 }
