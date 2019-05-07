@@ -3,8 +3,10 @@ package middleware
 import (
 	"context"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
+	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
@@ -15,10 +17,14 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		ctx := req.Context()
 		var userId string = ""
 		authorized := false
+		//authGRPC := grpcAuth.GetClient()
+		authGRPC := grpcAuth.AuthGRPCClient
+		ctxGRPC := context.Background()
 
 		defer func() {
 			ctx = context.WithValue(ctx, "userID", userId)
 			ctx = context.WithValue(ctx, "authorized", authorized)
+			ctx = context.WithValue(ctx, "authGRPC", authGRPC)
 
 			if authorized {
 				ctx = context.WithValue(ctx, "logger", log.LoggerWithAuth(req.WithContext(ctx)))
@@ -37,24 +43,34 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		uId, err := session.GetId(cookie.Value)
+		uId, err := authGRPC.GetIDFromSession(ctxGRPC, &grpcAuth.Cookie{Token: cookie.Value})
 
 		if err != nil {
 			cookie.Expires = time.Unix(0, 0)
 
 		} else {
-			userId = uId
+			userId = uId.ID
 			authorized = true
 
 			// сетим новое время куки
 			// и обновляем время токена
-			updatedToken, err := session.UpdateToken(cookie.Value)
+			cookieGRPC, err := authGRPC.UpdateSession(ctx, &grpcAuth.Cookie{Token: cookie.Value})
 			if err != nil {
-				// TODO(): переделать на ErrResponse
 				http.Error(res, "relogin, please", http.StatusInternalServerError)
+
+				logrus.Error(errors.Wrap(err, "Set token from grpc returned error"))
+				return
 			}
 
-			session.UpdateHttpCookie(cookie, updatedToken.CookieExpiredTime)
+			timeCookie, err := time.Parse(time.RFC3339, cookieGRPC.Expiration)
+			if err != nil {
+				http.Error(res, "relogin, please", http.StatusInternalServerError)
+
+				logrus.Error(errors.Wrap(err, "cant convert time from string"))
+				return
+			}
+
+			session.UpdateHttpCookie(cookie, timeCookie)
 		}
 
 		http.SetCookie(res, cookie)

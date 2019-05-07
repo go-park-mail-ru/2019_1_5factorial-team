@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"context"
+	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -31,7 +33,8 @@ type GetLeaderboardResponse struct {
 // @Router /user/score [get]
 func GetLeaderboard(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	ctxLogger.Info("============================================")
+	authGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	ctx := context.Background()
 
 	query := req.URL.Query()
 
@@ -40,12 +43,17 @@ func GetLeaderboard(res http.ResponseWriter, req *http.Request) {
 	limit, _ := strconv.Atoi(query.Get("limit"))
 	offset, _ := strconv.Atoi(query.Get("offset"))
 
-	leaderboard, err := user.GetUsersScores(limit, offset)
+	scores, err := authGRPC.GetUsersScores(ctx, &grpcAuth.ScoresParam{Limit: int32(limit), Offset: int32(offset)})
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, err.Error())
 
 		ctxLogger.Error(errors.Wrap(err, "get leaderboard error"))
 		return
+	}
+
+	leaderboard := make([]user.Scores, 0, len(scores.Scores))
+	for _, val := range scores.Scores {
+		leaderboard = append(leaderboard, user.Scores{Nickname: val.Nickname, Score: int(val.Score)})
 	}
 
 	OkResponse(res, GetLeaderboardResponse{

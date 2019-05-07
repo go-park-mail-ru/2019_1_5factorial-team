@@ -104,4 +104,13 @@ else
     chmod -R 777 /data/db/session
 fi
 
+if [[ -d "/data/db/chat_global" ]]
+then
+    echo "-- Directory /data/db/chat_global exists"
+else
+    echo "-- Directory /data/db/chat_global does not exists. Creating dir..."
+    mkdir -p /data/db/chat_global
+    chmod -R 777 /data/db/chat_global
+fi
+
 echo "== OK"

@@ -2,11 +2,12 @@
 
 check_cover()
 {
-    go tool cover -func c.out
-
+#    sleep 30
     go test -coverpkg=./... -coverprofile=c.out ./...
+    go tool cover -func c.out
 }
 
 ./start_dbs_test.sh
 
-check_cover
+
+

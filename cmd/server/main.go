@@ -6,6 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 )
 
@@ -25,6 +26,11 @@ func main() {
 	log.InitLogs()
 
 	database.InitConnection()
+
+	err = gRPC.InitAuthClient()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	s := server.New(*port)
 
