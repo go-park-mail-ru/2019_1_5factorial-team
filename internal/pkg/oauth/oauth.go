@@ -33,6 +33,7 @@ func OauthUser(token string, service string) (int, error, string, time.Time) {
 	response, err := client.Do(request)
 
 	defer response.Body.Close()
+
 	if err != nil {
 		return http.StatusBadRequest, errors.Wrap(err, "cant HTTP request"), "", time.Time{}
 	}
