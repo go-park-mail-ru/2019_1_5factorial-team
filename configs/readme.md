@@ -14,6 +14,7 @@
     - user_faker_config -- конфиг для фейковых юзеров (запускается через cmd/fake/main.go)
     - game_config -- конфиг для игры
     - chat_confg -- конфиг чата
+    - auth_grpc_config -- конфиг для грпц
 
 **АТТЕНШОН плес**
 

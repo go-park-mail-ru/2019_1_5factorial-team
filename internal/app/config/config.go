@@ -106,6 +106,11 @@ type ChatConfig struct {
 	LastMessagesLimit int `json:"last_messages_limit"`
 }
 
+type AuthGRPCConfig struct {
+	Hostname string `json:"hostname"`
+	Port     string `json:"port"`
+}
+
 // TODO(): есть смысл объединить в 1 файл конфига
 // структура сервера, собирает все вышеперечисленные структуры
 type ServerConfig struct {
@@ -116,6 +121,7 @@ type ServerConfig struct {
 	LogrusConfig       LogrusConfig
 	GameConfig         GameConfig
 	ChatConfig         ChatConfig
+	AuthGRPCConfig     AuthGRPCConfig
 
 	configPath string
 }
@@ -156,6 +162,10 @@ var configs = []valueAndPath{
 	{
 		from: "chat_config.json",
 		to:   &instance.ChatConfig,
+	},
+	{
+		from: "auth_grpc_config.json",
+		to:   &instance.AuthGRPCConfig,
 	},
 }
 
