@@ -8,23 +8,33 @@ import (
 type Symbol int
 
 const (
-	Up Symbol = iota
-	Left
-	Right
-	Down
+	//Up Symbol = iota
+	//Left
+	//Right
+	//Down
+
+	_   = iota
+	_   = iota
+	LR  = iota
+	TD  = iota
+	DTD = iota
 )
 
 var symbolsDict = map[string]Symbol{
-	"up":    Up,
-	"left":  Left,
-	"right": Right,
-	"down":  Down,
+	//"up":    Up,
+	//"left":  Left,
+	//"right": Right,
+	//"down":  Down,
+	"2": LR,
+	"3": TD,
+	"4": DTD,
 }
 
 func GenerateSymbolsSlice(len int) []Symbol {
 	res := make([]Symbol, 0, len)
-	for i := 0; i < len; i++ {
-		res = append(res, Symbol(rand.Intn(4)))
+	sliceLen := rand.Intn(4) + 2
+	for i := 0; i < sliceLen; i++ {
+		res = append(res, Symbol(rand.Intn(3)+2))
 	}
 
 	return res

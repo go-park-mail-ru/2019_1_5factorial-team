@@ -1,20 +1,26 @@
 package game
 
 import (
-	"fmt"
+	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
 	"sync"
 )
 
 var InstanceGame *Game
 
-func init() {
+func Start(roomsCount uint32, authGRPCConn grpcAuth.AuthCheckerClient) {
 	// игра крутится как отдельная сущность всегда
-	InstanceGame = NewGame(10)
+	InstanceGame = NewGame(roomsCount, authGRPCConn)
+	// упала игра -> дочерние горутины должны упасть, как и весь сервис
+	//go panicWorker.PanicWorker(InstanceGame.Run)
 	go InstanceGame.Run()
+
+	log.Println("InstanceGame.Run()")
 }
 
 type Game struct {
+	GRPC       grpcAuth.AuthCheckerClient
 	RoomsCount uint32
 	mu         *sync.Mutex
 	searchMu   *sync.Mutex
@@ -23,8 +29,9 @@ type Game struct {
 	emptyRooms map[string]*Room
 }
 
-func NewGame(roomsCount uint32) *Game {
+func NewGame(roomsCount uint32, authGRPCConn grpcAuth.AuthCheckerClient) *Game {
 	return &Game{
+		GRPC:       authGRPCConn,
 		RoomsCount: roomsCount,
 		mu:         &sync.Mutex{},
 		searchMu:   &sync.Mutex{},
@@ -39,8 +46,8 @@ func (g *Game) Run() {
 
 LOOP:
 	for player := range g.register {
-		g.searchMu.Lock()
-		fmt.Println("len empty rooms = ", len(g.emptyRooms))
+		//g.searchMu.Lock()
+		log.Printf("len empty rooms = %d, len full rooms = %d", len(g.emptyRooms), len(g.rooms))
 		for _, room := range g.emptyRooms {
 			if len(room.Players) < int(room.MaxPlayers) {
 				room.AddPlayer(player)
@@ -51,10 +58,10 @@ LOOP:
 
 		room := NewRoom(2, g)
 		g.AddEmptyRoom(room)
-		go room.Run()
+		go panicWorker.PanicWorker(room.Run)
 
 		room.AddPlayer(player)
-		g.searchMu.Unlock()
+		//g.searchMu.Unlock()
 	}
 }
 
@@ -82,6 +89,8 @@ func (g *Game) AddEmptyRoom(room *Room) {
 func (g *Game) MakeRoomFull(room *Room) {
 	g.mu.Lock()
 	g.emptyRooms[room.ID] = nil
+	delete(g.emptyRooms, room.ID)
+
 	g.rooms[room.ID] = room
 	g.mu.Unlock()
 }

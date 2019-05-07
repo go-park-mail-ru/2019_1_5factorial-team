@@ -1,8 +1,6 @@
 package server
 
 import (
-	"net/http"
-
 	_ "github.com/go-park-mail-ru/2019_1_5factorial-team/docs"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
@@ -10,7 +8,10 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"net/http"
 )
+
+//var AuthGRPC session.AuthCheckerClient
 
 type MyGorgeousServer struct {
 	port string
@@ -50,7 +51,6 @@ func (mgs *MyGorgeousServer) Run() error {
 	mainRouter.HandleFunc("/api/user/score", controllers.GetLeaderboard).Methods("GET", "OPTIONS")
 	mainRouter.HandleFunc("/api/user/count", controllers.UsersCountInfo).Methods("GET", "OPTIONS")
 	mainRouter.HandleFunc("/api/session", controllers.SignIn).Methods("POST", "OPTIONS")
-	mainRouter.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
 
 	// routers with logged user
 	routerLoginRequired := mainRouter.PathPrefix("").Subrouter()
@@ -60,9 +60,8 @@ func (mgs *MyGorgeousServer) Run() error {
 	routerLoginRequired.HandleFunc("/api/user", controllers.UpdateProfile).Methods("PUT", "OPTIONS")
 	routerLoginRequired.HandleFunc("/api/session", controllers.IsSessionValid).Methods("GET", "OPTIONS")
 	routerLoginRequired.HandleFunc("/api/session", controllers.SignOut).Methods("DELETE", "OPTIONS")
-
-	// игра
-	routerLoginRequired.HandleFunc("/api/game/ws", controllers.Play).Methods("GET", "OPTIONS")
+	// загрузка аватрки только для залогиненых юзеров
+	routerLoginRequired.HandleFunc("/api/upload_avatar", controllers.UploadAvatar).Methods("POST", "OPTIONS")
 
 	err := http.ListenAndServe(address, router)
 	if err != nil {
