@@ -18,7 +18,7 @@ func main() {
 	flag.Parse()
 
 	fuc := user.FakeUsersConfig{}
-
+ 
 	// конфиг генерации фейковых юзеров
 	err := config_reader.ReadConfigFile(*configPath, "user_faker_config.json", &fuc)
 	if err != nil {
