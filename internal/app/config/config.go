@@ -101,6 +101,11 @@ type GameConfig struct {
 	ScoreMatchSymbol int `json:"score_match_symbol"`
 }
 
+type ChatConfig struct {
+	MaxUsers          int `json:"max_users"`
+	LastMessagesLimit int `json:"last_messages_limit"`
+}
+
 // TODO(): есть смысл объединить в 1 файл конфига
 // структура сервера, собирает все вышеперечисленные структуры
 type ServerConfig struct {
@@ -110,6 +115,7 @@ type ServerConfig struct {
 	DBConfig           []DBConfig
 	LogrusConfig       LogrusConfig
 	GameConfig         GameConfig
+	ChatConfig         ChatConfig
 
 	configPath string
 }
@@ -146,6 +152,10 @@ var configs = []valueAndPath{
 	{
 		from: "game_config.json",
 		to:   &instance.GameConfig,
+	},
+	{
+		from: "chat_config.json",
+		to:   &instance.ChatConfig,
 	},
 }
 
