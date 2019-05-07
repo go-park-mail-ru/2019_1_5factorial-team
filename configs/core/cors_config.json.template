@@ -1,0 +1,8 @@
+{
+  "allow-origin": "*",
+  "allow-credentials": true,
+
+  "allow-methods": ["POST", "GET", "DELETE", "PUT"],
+  "allow-headers": ["Content-Type"],
+  "max-age": 86400
+}

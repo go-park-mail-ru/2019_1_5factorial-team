@@ -11,7 +11,7 @@ import (
 
 func main() {
 	port := flag.String("port", "5051", "server will start on this port")
-	configPath := flag.String("config", "/etc/5factorial/", "dir with server configs")
+	configPath := flag.String("config", "/etc/5factorial/core/", "dir with server configs")
 	flag.Parse()
 
 	log.Warn("server will start on port", *port)
