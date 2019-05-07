@@ -1,31 +1,20 @@
 package game
 
 import (
+	"context"
 	"fmt"
+	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gameLogic"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
+	"github.com/pkg/errors"
+	"math"
+	"math/rand"
 	"sync"
 	"time"
 )
 
 // ось X (-100; 100) => игроки стоят в нуле
-
-// X - середина
-type PlayerState struct {
-	ID string
-	X  int
-	HP int
-}
-
-// X - середина
-type ObjectState struct {
-	ID    string
-	Type  string
-	X     int
-	Speed int
-}
 
 // нужон ли тайм?
 type RoomState struct {
@@ -47,6 +36,7 @@ type Room struct {
 	ticker     *time.Ticker
 	state      *RoomState
 	playerCnt  uint
+	gameTime   float64
 
 	playersInputs []gameLogic.Symbol
 	playerInput   chan *gameLogic.Symbol
@@ -80,6 +70,11 @@ func (r *Room) Run() {
 	for {
 		select {
 		case in := <-r.playerInput:
+			if r.playerCnt != r.MaxPlayers {
+				log.Println("skip player input, bcs game not started, waiting second player")
+				continue
+			}
+			// TODO(): если игра не началась или закончилась, но юзер шлет мувы, то они записываются
 			r.playersInputs = append(r.playersInputs, *in)
 
 		case <-r.dead:
@@ -144,7 +139,7 @@ func (r *Room) addPlayerToState(player *Player) {
 		Payload: nil,
 	})
 
-	npc, err := gameLogic.NewPlayerCharacter(player.Token)
+	npc, err := gameLogic.NewPlayerCharacter(player.Token, r.game.GRPC)
 	if err != nil {
 		log.Error(err.Error(), "cant create character in room, closing")
 
@@ -158,6 +153,9 @@ func (r *Room) addPlayerToState(player *Player) {
 }
 
 func (r *Room) rakePlayerInputs() {
+	log.Println("rake", r.state.Players[0].HP, r.state.Players[1].HP)
+
+	log.Println("===")
 	for _, val := range r.playersInputs {
 		val := r.state.Objects.PopSymbol(val)
 
@@ -165,37 +163,60 @@ func (r *Room) rakePlayerInputs() {
 			r.state.Players[i].Score += val
 		}
 	}
+	log.Println("===")
+
 	r.playersInputs = make([]gameLogic.Symbol, 0, 10)
 }
 
 func (r *Room) updateRoomState() {
+	//r.state.currentTime = time.Now()
+	// TODO(): тут типа прибавляем тик в мкс
+	r.gameTime += 1000000
+
 	if len(r.playersInputs) != 0 {
 		r.rakePlayerInputs()
 	}
 
-	if r.state.Objects.Len() <= 4 {
-		r.state.Objects.PushBack(gameLogic.NewRandomGhost())
+	if r.state.Objects.Len() < 2 && rand.Float64() < 1-math.Pow(0.993, r.gameTime) {
+		// игровая логика
+		//r.state.Objects.PushBack(gameLogic.NewRandomGhost())
+		r.state.Objects.AddNewGhost()
+		log.Println("added new ghost")
+		log.Println(r.state.Objects)
 	}
-
-	log.Println("tick")
 
 	f := r.state.Objects.MoveAllGhosts()
 	if f {
-		r.state.Objects.PopFront()
+		deletedGhost := r.state.Objects.PopFront()
 
-		for i := range r.state.Players {
-			r.state.Players[i].HP -= 20
+		if deletedGhost.Speed > 0 {
+			r.state.Players[0].HP -= gameLogic.DefaultDamage
 
-			if r.state.Players[i].HP <= 0 {
-				r.Close()
-				return
+		} else if deletedGhost.Speed < 0 {
+			r.state.Players[1].HP -= gameLogic.DefaultDamage
 
-				// на каналах не работает хз поч
-				//r.dead <- &Player{}
-				//continue LOOP
-			}
+			//if r.state.Players[1].HP <= 0 {
+			//	r.Close()
+			//	return
+			//
+			//	// на каналах не работает хз поч
+			//	//r.dead <- &Player{}
+			//	//continue LOOP
+			//}
+		}
+
+		if r.state.Players[0].HP <= 0 || r.state.Players[1].HP <= 0 {
+			r.Close()
+
+			return
 		}
 	}
+
+	log.Println("tick")
+}
+
+func (r *Room) SendMessageAllPlayers() {
+
 }
 
 func (r *Room) AddPlayer(player *Player) {
@@ -211,25 +232,42 @@ func (r *Room) RemovePlayer(player *Player) {
 func (r *Room) Close() {
 	r.mu.Lock()
 
+	r.ticker.Stop()
+
+	//grpcConn, err := grpcAuth.CreateConnection()
+	//if err != nil {
+	//	log.Error(errors.Wrap(err, "cant connect to auth grpc, NewUser"))
+	//}
+	//defer grpcConn.Close()
+	//
+	//AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
+	ctx := context.Background()
+
 	// добавляю юзерам очки их персонажей
 	for _, p := range r.state.Players {
 		if _, ok := r.Players[p.Token]; ok {
 			r.Players[p.Token].Score = p.Score
 
-			id, err := session.GetId(p.Token)
+			//id, err := session.GetId(p.Token)
+			//if err != nil {
+			//	log.Error("cant get player id from session, token=%s, err=%s", p.Token, err.Error())
+			//
+			//	r.Players[p.Token].Score = 0
+			//	continue
+			//}
+			uID, err := r.game.GRPC.GetIDFromSession(ctx, &grpcAuth.Cookie{Token: p.Token, Expiration: ""})
 			if err != nil {
-				log.Error("cant get player id from session, token=%s, err=%s", p.Token, err.Error())
-
+				log.Error(errors.Wrap(err, "cant create user, GetID"))
 				r.Players[p.Token].Score = 0
 				continue
 			}
 
-			err = user.UpdateScore(id, p.Score)
+			//err = user.UpdateScore(uID.ID, p.Score)
+			_, err = r.game.GRPC.UpdateScore(ctx, &grpcAuth.UpdateScoreReq{ID: uID.ID, Score: int32(p.Score)})
 			if err != nil {
 				log.Error("cant update user score, user id=%s, token=%s, score=%d, err=%s",
-					id, p.Token, p.Score, err.Error())
+					uID.ID, p.Token, p.Score, err.Error())
 
-				// TODO(): я хз че тут сделать x2
 				r.Players[p.Token].Score = 0
 				continue
 			}
@@ -241,6 +279,7 @@ func (r *Room) Close() {
 			Type:    MessageEnd,
 			Payload: fmt.Sprintf("GAME OVER your score = %d", player.Score),
 		})
+		// по идеи убирать игрока надо здесь, а не через game
 		r.game.RemovePlayer(player)
 	}
 

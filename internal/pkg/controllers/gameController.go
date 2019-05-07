@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/game"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -11,7 +12,6 @@ import (
 
 func Play(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
-	ctxLogger.Info("============================================")
 
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
@@ -21,7 +21,6 @@ func Play(res http.ResponseWriter, req *http.Request) {
 		},
 	}
 
-	//conn, err := upgrader.Upgrade(res, req, http.Header{"Upgrade": []string{"websocket"}})
 	conn, err := upgrader.Upgrade(res, req, nil)
 	if err != nil {
 		ctxLogger.Printf("error while connecting: %s", err)
@@ -37,10 +36,10 @@ func Play(res http.ResponseWriter, req *http.Request) {
 		ctxLogger.Error(errors.Wrap(err, "not authorized"))
 		return
 	}
-	
+
 	ctxLogger.Warn(err)
 
 	player := game.NewPlayer(conn, currentSession.Value)
-	go player.Listen()
+	go panicWorker.PanicWorker(player.Listen)
 	game.InstanceGame.AddPlayer(player)
 }

@@ -16,9 +16,8 @@ type Message struct {
 }
 
 type IncomeMessage struct {
-	Type MessageType `json:"type"`
-	//Player  string `json:"player"`
-	Pressed string `json:"pressed"`
+	Type    MessageType `json:"type"`
+	Pressed string      `json:"pressed"`
 }
 
 //{"type": "MOVE", "pressed": "up"}

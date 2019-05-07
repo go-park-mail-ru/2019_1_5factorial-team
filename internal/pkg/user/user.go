@@ -50,7 +50,6 @@ func GetUserById(id string) (User, error) {
 }
 
 func UpdateUser(id string, newAvatar string, oldPassword string, newPassword string) error {
-
 	if newPassword == "" && newAvatar == "" {
 		return errors.New("nothing to update")
 	}

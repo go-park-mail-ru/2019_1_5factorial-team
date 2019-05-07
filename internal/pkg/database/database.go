@@ -15,46 +15,42 @@ var session *mgo.Session
 
 var collections map[string]*mgo.Collection
 
-// TODO(): delete Once
-var once sync.Once
 var mu *sync.Mutex
 
 func InitConnection() {
-	once.Do(func() {
-		mu = &sync.Mutex{}
+	mu = &sync.Mutex{}
 
-		collections = make(map[string]*mgo.Collection)
-		var err error
+	collections = make(map[string]*mgo.Collection)
+	var err error
 
-		for _, val := range config.Get().DBConfig {
+	for _, val := range config.Get().DBConfig {
 
-			//mongodb://mongo-user:27031,
-			fmt.Println(fmt.Sprintf("%s://%s:%s", "mongodb", val.Hostname, val.MongoPort))
+		//mongodb://mongo-user:27031,
+		fmt.Println(fmt.Sprintf("%s://%s:%s", "mongodb", val.Hostname, val.MongoPort))
 
-			session, err = mgo.DialWithInfo(&mgo.DialInfo{
-				Addrs:    []string{fmt.Sprintf("%s:%s", val.Hostname, val.MongoPort)},
-				Timeout:  10 * time.Second,
-				Database: val.DatabaseName,
-			})
-			if err != nil {
-				logrus.Fatal(err)
-			}
-
-			collection := session.DB(val.DatabaseName).C(val.CollectionName)
-
-			// очистка коллекции по конфигу
-			if n, _ := collection.Count(); n != 0 && val.TruncateTable {
-				logrus.Warn("truncating db", val.CollectionName)
-				err = collection.DropCollection()
-				if err != nil {
-					session.Close()
-					logrus.Fatal("db truncate: ", err, val)
-				}
-			}
-
-			collections[val.CollectionName] = collection
+		session, err = mgo.DialWithInfo(&mgo.DialInfo{
+			Addrs:    []string{fmt.Sprintf("%s:%s", val.Hostname, val.MongoPort)},
+			Timeout:  10 * time.Second,
+			Database: val.DatabaseName,
+		})
+		if err != nil {
+			logrus.Fatal(err)
 		}
-	})
+
+		collection := session.DB(val.DatabaseName).C(val.CollectionName)
+
+		// очистка коллекции по конфигу
+		if n, _ := collection.Count(); n != 0 && val.TruncateTable {
+			logrus.Warn("truncating db", val.CollectionName)
+			err = collection.DropCollection()
+			if err != nil {
+				session.Close()
+				logrus.Fatal("db truncate: ", err, val)
+			}
+		}
+
+		collections[val.CollectionName] = collection
+	}
 }
 
 func GetCollection(name string) (*mgo.Collection, error) {

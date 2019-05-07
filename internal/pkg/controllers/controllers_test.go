@@ -94,7 +94,7 @@ func testHandler(funcToTest func(http.ResponseWriter, *http.Request), tests []Te
 	return nil
 }
 
-func MainInit()  {
+func MainInit() {
 	configPath := "/etc/5factorial/"
 	err := config.Init(configPath)
 	if err != nil {
