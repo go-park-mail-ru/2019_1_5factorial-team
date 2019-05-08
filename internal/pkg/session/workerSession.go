@@ -17,7 +17,9 @@ type WorkerSession struct {
 func RemoveSession(port *string) {
 
 	fmt.Println("---=== CLEANING NONALIDE SESSIONS ===---")
-	session, err := mgo.Dial("mongodb://localhost:" + *port)
+	//session, err := mgo.Dial("mongodb://localhost:" + *port)
+	session, err := mgo.Dial(fmt.Sprintf("%s://%s:%s", "mongodb", "mongo-session", *port))
+
 	if err != nil {
 
 		log.Fatal(err)

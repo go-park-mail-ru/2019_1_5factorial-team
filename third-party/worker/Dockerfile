@@ -19,5 +19,4 @@ WORKDIR /server
 COPY . .
 
 RUN go build -mod=vendor cmd/worker/main.go
-
 CMD ./main
