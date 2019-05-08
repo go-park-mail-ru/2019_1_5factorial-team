@@ -61,14 +61,7 @@ services:
     ports:
       - '5051:5051'
     depends_on:
-      - mongo-user
-      - mongo-session
       - auth-go
-  #    logging:
-  #      driver: "json-file"
-  #      options:
-  #        max-size: "1k"
-  #        max-file: "3"
 
   chat-go:
     container_name: 5factorial-back-chat

@@ -1,6 +1,7 @@
 package chat
 
 import (
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
 	"sync"
@@ -11,7 +12,7 @@ var InstanceChat *Chat
 
 func Start() {
 	//чат крутится как отдельная сущность всегда
-	InstanceChat = NewChat(20)
+	InstanceChat = NewChat(config.Get().ChatConfig.MaxUsers)
 	go panicWorker.PanicWorker(InstanceChat.Start)
 }
 
