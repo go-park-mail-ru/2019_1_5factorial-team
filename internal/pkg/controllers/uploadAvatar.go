@@ -2,9 +2,11 @@ package controllers
 
 import (
 	"io/ioutil"
-	"log"
 	"net/http"
 	"path/filepath"
+
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
+	"github.com/sirupsen/logrus"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/fileproc"
 	"github.com/pkg/errors"
@@ -26,14 +28,14 @@ type AvatarLinkResponse struct {
 // @Failure 400 {object} controllers.errorResponse
 // @Router /api/upload_avatar [post]
 func UploadAvatar(res http.ResponseWriter, req *http.Request) {
-	log.Println(req.URL, "UploadAvatar")
+	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 
 	// проверка на максимально допустимый размер
-	req.Body = http.MaxBytesReader(res, req.Body, fileproc.MaxUploadSize)
-	if err := req.ParseMultipartForm(fileproc.MaxUploadSize); err != nil {
+	req.Body = http.MaxBytesReader(res, req.Body, config.Get().StaticServerConfig.MaxUploadSize)
+	if err := req.ParseMultipartForm(config.Get().StaticServerConfig.MaxUploadSize); err != nil {
 		ErrResponse(res, http.StatusBadRequest, "file too big")
 
-		log.Println(errors.Wrap(err, "file too big"))
+		ctxLogger.Error(errors.Wrap(err, "file too big"))
 		return
 	}
 
@@ -41,7 +43,7 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, "invalid file in request")
 
-		log.Println(errors.Wrap(err, "invalid file in request"))
+		ctxLogger.Info(errors.Wrap(err, "invalid file in request"))
 		return
 	}
 
@@ -50,7 +52,7 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, "invalid file cant ReadAll")
 
-		log.Println(errors.Wrap(err, "invalid file cant ReadAll"))
+		ctxLogger.Info(errors.Wrap(err, "invalid file cant ReadAll"))
 		return
 	}
 
@@ -58,17 +60,17 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	if !fileproc.CheckFileType(filetype) {
 		ErrResponse(res, http.StatusBadRequest, "invalid file type")
 
-		log.Println(errors.Wrap(err, "invalid file type"))
+		ctxLogger.Info(errors.Wrap(err, "invalid file type"))
 		return
 	}
 
-	//  забиваю на имя фала генерю новое
+	//  забиваю на имя файла генерю новое
 	fileName := fileproc.RandToken(12)
 	fileExtension := filepath.Ext(headers.Filename)
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, "cant read file type")
 
-		log.Println(errors.Wrap(err, "cant read file type"))
+		ctxLogger.Info(errors.Wrap(err, "cant read file type"))
 		return
 	}
 
@@ -77,15 +79,14 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		ErrResponse(res, http.StatusInternalServerError, "cant write file")
 
-		log.Println(errors.Wrap(err, "cant write file"))
+		ctxLogger.Info(errors.Wrap(err, "cant write file"))
 		return
 	}
-
-	log.Println("\t", req.URL, "OkResponse")
-	log.Println("\t\tavatar_link:", resultFile)
-	log.Println("\t\tfileExtension:", fileExtension, ", filetype:", filetype)
 
 	OkResponse(res, AvatarLinkResponse{
 		AvatarLink: "/static/" + resultFile,
 	})
+
+	ctxLogger.Infof("OK response\n\t--avatar_link = /static/%s,\n\t--fileExtention = %s,\n\t--filetype = %s",
+		resultFile, fileExtension, filetype)
 }

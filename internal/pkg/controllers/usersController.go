@@ -1,17 +1,23 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
-	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/grpcErr"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/validator"
+	"google.golang.org/grpc/status"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
+	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
+	"github.com/gorilla/mux"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 // 'Content-Type': 'application/json; charset=utf-8'
@@ -29,10 +35,9 @@ type SignUpResponse struct {
 }
 
 func ParseRequestIntoStruct(auth bool, req *http.Request, requestStruct interface{}) (int, error) {
-
 	isAuth := req.Context().Value("authorized").(bool)
 	if isAuth == auth {
-		return http.StatusBadRequest, errors.New("already auth")
+		return http.StatusBadRequest, errors.New("already auth, ctx.authorized shouldn't be " + strconv.FormatBool(auth))
 	}
 
 	body, err := ioutil.ReadAll(req.Body)
@@ -49,7 +54,7 @@ func ParseRequestIntoStruct(auth bool, req *http.Request, requestStruct interfac
 }
 
 func DropUserCookie(res http.ResponseWriter, req *http.Request) (int, error) {
-	currentSession, err := req.Cookie(session.CookieName)
+	currentSession, err := req.Cookie(config.Get().CookieConfig.CookieName)
 	if err == http.ErrNoCookie {
 		// бесполезная проверка, так кука валидна, но по гостайлу нужна
 
@@ -73,39 +78,74 @@ func DropUserCookie(res http.ResponseWriter, req *http.Request) (int, error) {
 // @Failure 500 {object} controllers.errorResponse
 // @Router /api/user [post]
 func SignUp(res http.ResponseWriter, req *http.Request) {
-	log.Println("================", req.URL, req.Method, "SignUp", "================")
+	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
+	authGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	ctx := context.Background()
 
 	data := SingUpRequest{}
-	status, err := ParseRequestIntoStruct(true, req, &data)
+	statusErr, err := ParseRequestIntoStruct(true, req, &data)
 	if err != nil {
-		ErrResponse(res, status, err.Error())
+		ErrResponse(res, statusErr, err.Error())
 
-		log.Println("\t", errors.Wrap(err, "ParseRequestIntoStruct error"))
+		ctxLogger.Error(errors.Wrap(err, "ParseRequestIntoStruct error"))
 		return
 	}
 
 	// TODO(smet1): валидация на данные, правда ли мыло - мыло, а самолет - вертолет?
-	fmt.Println(data)
-
-	u, err := user.CreateUser(data.Login, data.Email, data.Password)
-	if err != nil {
-		ErrResponse(res, http.StatusBadRequest, err.Error())
-
-		log.Println("\t", errors.Wrap(err, "err in user data"))
+	flagValidUser := validator.ValidNewUser(data.Login, data.Email, data.Password)
+	if !flagValidUser {
+		ErrResponse(res, http.StatusBadRequest, "invalid user data")
+		ctxLogger.Error(errors.Wrap(err, "err in user data"))
 		return
 	}
 
-	randToken, expiration, err := session.SetToken(u.Id)
+	fmt.Println(data)
 
-	cookie := session.CreateHttpCookie(randToken, expiration)
+	u, err := authGRPC.CreateUser(ctx, &grpcAuth.UserNew{
+		Nickname: data.Login,
+		Email:    data.Email,
+		Password: data.Password,
+	})
+	if err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			ErrResponse(res, http.StatusInternalServerError, err.Error())
+
+			ctxLogger.Error(errors.Wrap(err, "err in user data, cant convert err in status.FromError"))
+			return
+		}
+
+		ErrResponse(res, grpcErr.GetHTTPStatus(st.Code()), st.Message())
+
+		ctxLogger.Error(errors.Wrapf(err, "grpc code = %d, mes = %s", st.Code(), st.Message()))
+		return
+	}
+
+	cookieGRPC, err := authGRPC.CreateSession(ctx, &grpcAuth.UserID{ID: u.ID})
+	if err != nil {
+		ErrResponse(res, http.StatusInternalServerError, err.Error())
+
+		ctxLogger.Error(errors.Wrap(err, "Set token from grpc returned error"))
+		return
+	}
+
+	timeCookie, err := time.Parse(time.RFC3339, cookieGRPC.Expiration)
+	if err != nil {
+		ErrResponse(res, http.StatusInternalServerError, err.Error())
+
+		ctxLogger.Error(errors.Wrap(err, "cant convert time from string"))
+		return
+	}
+
+	cookie := session.CreateHttpCookie(cookieGRPC.Token, timeCookie)
 
 	http.SetCookie(res, cookie)
 	OkResponse(res, "signUp ok")
 
-	log.Println("\t", "ok response SignUp")
-	log.Println("\t ok response SignUp, user:\n\t\t\t\t\t\t\tid =", u.Id, "\n\t\t\t\t\t\t\tnickname =",
-		u.Nickname, "\n\t\t\t\t\t\t\temail =", u.Email, "\n\t\t\t\t\t\t\tscore =", u.Score)
-	log.Println("\t ok set cookie", cookie)
+	ctxLogger.Infof("OK response\n\t--id = %s,\n\t--nickname = %s,\n\t--email = %s,\n\t--score = %d",
+		u.ID, u.Nickname, u.Email, u.Score)
+	ctxLogger.Infof("OK set cookie\n\t--token = %s,\n\t--path = %s,\n\t--expires = %s,\n\t--httpOnly = %t",
+		cookie.Value, cookie.Path, cookie.Expires, cookie.HttpOnly)
 }
 
 // GetUser godoc
@@ -120,13 +160,15 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 // @Failure 500 {object} controllers.errorResponse
 // @Router /api/user/{id} [get]
 func GetUser(res http.ResponseWriter, req *http.Request) {
-	log.Println("================", req.URL, req.Method, "GetUser", "================")
+	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
+	authGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	ctx := context.Background()
 
 	requestVariables := mux.Vars(req)
 	if requestVariables == nil {
 		ErrResponse(res, http.StatusBadRequest, "user id not provided")
 
-		log.Println("\t", errors.New("no vars found"))
+		ctxLogger.Error(errors.New("no vars found"))
 		return
 	}
 
@@ -134,39 +176,27 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 	if !ok {
 		ErrResponse(res, http.StatusInternalServerError, "error")
 
-		log.Println("\t", errors.New("vars found, but cant found id"))
+		ctxLogger.Error(errors.New("vars found, but cant found id"))
 		return
 	}
 
-	intID, err := strconv.ParseInt(searchingID, 10, 64)
-	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, "bad id")
-
-		log.Println("\t", errors.New("cannot convert id from string"))
-		return
-	}
-
-	searchingUser, err := user.GetUserById(intID)
+	searchingUser, err := authGRPC.GetUserByID(ctx, &grpcAuth.User{ID: searchingID})
 	if err != nil {
 		ErrResponse(res, http.StatusNotFound, "user with this id not found")
 
-		log.Println("\t", errors.Wrap(err, "404 error"))
+		ctxLogger.Error(errors.Wrap(err, "user with this id not found"))
 		return
 	}
 
 	OkResponse(res, UserInfoResponse{
 		Email:      searchingUser.Email,
 		Nickname:   searchingUser.Nickname,
-		Score:      searchingUser.Score,
+		Score:      int(searchingUser.Score),
 		AvatarLink: searchingUser.AvatarLink,
 	})
 
-	log.Println("\t", "ok response GetUser", UserInfoResponse{
-		Email:      searchingUser.Email,
-		Nickname:   searchingUser.Nickname,
-		Score:      searchingUser.Score,
-		AvatarLink: searchingUser.AvatarLink,
-	})
+	ctxLogger.Infof("OK response\n\t--email = %v,\n\t--nickname = %v,\n\t--score = %v,\n\t--avatarLink = %v",
+		searchingUser.Email, searchingUser.Nickname, searchingUser.Score, searchingUser.AvatarLink)
 }
 
 // 'Content-Type': 'application/json; charset=utf-8'
@@ -203,40 +233,59 @@ type ProfileUpdateResponse struct {
 // @Failure 500 {object} controllers.errorResponse
 // @Router /api/user [put]
 func UpdateProfile(res http.ResponseWriter, req *http.Request) {
-	log.Println("================", req.URL, req.Method, "UpdateProfile", "================")
+	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
+	authGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	ctx := context.Background()
 
 	data := ProfileUpdateRequest{}
 	status, err := ParseRequestIntoStruct(false, req, &data)
 	if err != nil {
 		ErrResponse(res, status, err.Error())
 
-		log.Println("\t", errors.Wrap(err, "ParseRequestIntoStruct error"))
+		ctxLogger.Error(errors.Wrap(err, "ParseRequestIntoStruct error"))
 		return
 	}
 
-	err = user.UpdateUser(req.Context().Value("userID").(int64), data.Avatar, data.NewPassword, data.OldPassword)
+	//flagValidNewPassword := validator.ValidUpdatePassword(data.NewPassword)
+	//if !flagValidNewPassword {
+	//	ErrResponse(res, http.StatusBadRequest, "invalid new password")
+	//	ctxLogger.Error(errors.Wrap(err, "err in user data"))
+	//	return
+	//}
+
+	userId := req.Context().Value("userID").(string)
+
+	_, err = authGRPC.UpdateUser(ctx, &grpcAuth.UpdateUserReq{
+		ID:          userId,
+		NewAvatar:   data.Avatar,
+		OldPassword: data.OldPassword,
+		NewPassword: data.NewPassword,
+	})
+
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, err.Error())
 
-		log.Println("\t", errors.Wrap(err, "UpdateUser error"))
+		ctxLogger.Error(errors.Wrap(err, "UpdateUser error"))
 		return
 	}
 
-	u, _ := user.GetUserById(req.Context().Value("userID").(int64))
+	u, err := authGRPC.GetUserByID(ctx, &grpcAuth.User{ID: userId})
+	if err != nil {
+		ErrResponse(res, http.StatusBadRequest, err.Error())
+
+		ctxLogger.Error(errors.Wrap(err, "UpdateUser error"))
+		return
+	}
 
 	OkResponse(res, ProfileUpdateResponse{
 		Email:      u.Email,
 		Nickname:   u.Nickname,
-		Score:      u.Score,
+		Score:      int(u.Score),
 		AvatarLink: u.AvatarLink,
 	})
 
-	log.Println("\t", "ok response UpdateProfile", ProfileUpdateResponse{
-		Email:      u.Email,
-		Nickname:   u.Nickname,
-		Score:      u.Score,
-		AvatarLink: u.AvatarLink,
-	})
+	ctxLogger.Infof("OK response\n\t--id = %s,\n\t--nickname = %s,\n\t--email = %s,\n\t--score = %d,\n\t--avatar = %s",
+		u.ID, u.Nickname, u.Email, u.Score, u.AvatarLink)
 }
 
 type UsersCountInfoResponse struct {
@@ -251,14 +300,21 @@ type UsersCountInfoResponse struct {
 // @Success 200 {object} controllers.UsersCountInfoResponse
 // @Router /api/user/count [get]
 func UsersCountInfo(res http.ResponseWriter, req *http.Request) {
-	log.Println("================", req.URL, req.Method, "UsersCountInfo", "================")
+	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
+	authGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
+	ctx := context.Background()
 
-	count := user.GetUsersCount()
+	count, err := authGRPC.GetUsersCount(ctx, &grpcAuth.Nothing{})
+	if err != nil {
+		ErrResponse(res, http.StatusInternalServerError, err.Error())
+
+		ctxLogger.Error(err.Error())
+		return
+	}
+
 	OkResponse(res, UsersCountInfoResponse{
-		Count: count,
+		Count: int(count.Count),
 	})
 
-	log.Println("\t", "ok response UsersCountInfo", UsersCountInfoResponse{
-		Count: count,
-	})
+	ctxLogger.Info("OK response, count = ", count)
 }

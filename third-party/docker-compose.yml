@@ -1,0 +1,103 @@
+version: '3'
+services:
+  #  TODO(): авторизация при подключении к бд
+  mongo-user:
+    container_name: 5factorial-user-mongo
+    command: mongod --port 27031
+    image: mongo:4.0
+    #    environment:
+    #      MONGO_INITDB_ROOT_USERNAME: 'user'
+    #      MONGO_INITDB_ROOT_PASSWORD: 'user'
+    volumes:
+      - '/data/db/user:/data/db'
+    ports:
+      - '27051:27031' # map port to none standard port, to avoid conflicts with locally installed mongodb.
+
+  mongo-session:
+    container_name: 5factorial-session-mongo
+    command: mongod --port 27032
+    image: mongo:4.0
+    #    environment:
+    #      MONGO_INITDB_ROOT_USERNAME: 'user'
+    #      MONGO_INITDB_ROOT_PASSWORD: 'user'
+    volumes:
+      - '/data/db/session:/data/db'
+    ports:
+      - '27052:27032' # map port to none standard port, to avoid conflicts with locally installed mongodb.
+
+  mongo-chat-global:
+    container_name: 5factorial-chat-global-mongo
+    command: mongod --port 27033
+    image: mongo:4.0
+    #    environment:
+    #      MONGO_INITDB_ROOT_USERNAME: 'user'
+    #      MONGO_INITDB_ROOT_PASSWORD: 'user'
+    volumes:
+      - '/data/db/chat_global:/data/db'
+    ports:
+      - '27053:27033' # map port to none standard port, to avoid conflicts with locally installed mongodb.
+
+  auth-go:
+    container_name: 5factorial-back-auth
+    restart: always
+    build:
+      context: ../.
+      dockerfile: ./third-party/auth/Dockerfile
+    volumes:
+      - '/etc/5factorial:/etc/5factorial'
+    depends_on:
+      - mongo-user
+      - mongo-session
+
+  server-go:
+    container_name: 5factorial-back
+    restart: always
+    build:
+      context: ../.
+      dockerfile: ./third-party/server/Dockerfile
+    volumes:
+      - '/var/www/media/factorial:/var/www/media/factorial'
+      - '/etc/5factorial:/etc/5factorial'
+    ports:
+      - '5051:5051'
+    depends_on:
+      - auth-go
+
+  worker-go:
+    container_name: 5factorial-worker
+    restart: always
+    build:
+      context: ../.
+      dockerfile: ./third-party/worker/Dockerfile
+    volumes:
+      - '/etc/5factorial:/etc/5factorial'
+    depends_on:
+      - mongo-session
+
+  chat-go:
+    container_name: 5factorial-back-chat
+    restart: always
+    build:
+      context: ../.
+      dockerfile: ./third-party/chat/Dockerfile
+    volumes:
+      #     - '/var/www/media/factorial:/var/www/media/factorial'
+      - '/etc/5factorial:/etc/5factorial'
+    ports:
+      - '5052:5052'
+    depends_on:
+      - mongo-chat-global
+      - auth-go
+
+  game-go:
+    container_name: 5factorial-back-game
+    restart: always
+    build:
+      context: ../.
+      dockerfile: ./third-party/game/Dockerfile
+    volumes:
+      - '/etc/5factorial:/etc/5factorial'
+    ports:
+      - '5053:5053'
+    depends_on:
+      - auth-go

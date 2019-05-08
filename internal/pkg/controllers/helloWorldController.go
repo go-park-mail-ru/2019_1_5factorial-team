@@ -12,4 +12,5 @@ import (
 // @Router /hello [get]
 func HelloWorld(res http.ResponseWriter, req *http.Request) {
 	res.Write([]byte("World"))
+	panic("kek")
 }

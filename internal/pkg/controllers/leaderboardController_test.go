@@ -29,6 +29,7 @@ var testsGetLeaderboard = []TestCases{
 }
 
 func TestGetLeaderboard(t *testing.T) {
+	//MainInit()
 	err := testHandler(GetLeaderboard, testsGetLeaderboard, t)
 	if err != nil {
 		t.Errorf(err.Error())
