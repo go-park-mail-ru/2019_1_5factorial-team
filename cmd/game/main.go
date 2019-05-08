@@ -13,7 +13,7 @@ func main() {
 	// TODO(): кушать только необходимые коннекшены к базам
 
 	port := flag.String("port", "5053", "game-server will start on this port")
-	configPath := flag.String("config", "/etc/5factorial/", "dir with server configs")
+	configPath := flag.String("config", "/etc/5factorial/game/", "dir with server configs")
 	flag.Parse()
 
 	log.Warn("game-server will start on port ", *port)
