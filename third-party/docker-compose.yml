@@ -63,6 +63,17 @@ services:
     depends_on:
       - auth-go
 
+  worker-go:
+    container_name: 5factorial-worker
+    restart: always
+    build:
+      context: ../.
+      dockerfile: ./third-party/worker/Dockerfile
+    volumes:
+      - '/etc/5factorial:/etc/5factorial'
+    depends_on:
+      - mongo-session
+
   chat-go:
     container_name: 5factorial-back-chat
     restart: always

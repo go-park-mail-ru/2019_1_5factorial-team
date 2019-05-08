@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC"
-	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"context"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/config_reader"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC"
+	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/gorilla/mux"

@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/server"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
@@ -32,6 +33,7 @@ func main() {
 	}
 
 	s := server.New(*port)
+
 	err = s.Run()
 	if err != nil {
 		panic(err)

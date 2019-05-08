@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/grpcErr"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/validator"
 	"google.golang.org/grpc/status"
 	"io/ioutil"
 	"net/http"
@@ -245,12 +246,12 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	flagValidNewPassword := validator.ValidUpdatePassword(data.NewPassword)
-	if !flagValidNewPassword {
-		ErrResponse(res, http.StatusBadRequest, "invalid new password")
-		ctxLogger.Error(errors.Wrap(err, "err in user data"))
-		return
-	}
+	//flagValidNewPassword := validator.ValidUpdatePassword(data.NewPassword)
+	//if !flagValidNewPassword {
+	//	ErrResponse(res, http.StatusBadRequest, "invalid new password")
+	//	ctxLogger.Error(errors.Wrap(err, "err in user data"))
+	//	return
+	//}
 
 	userId := req.Context().Value("userID").(string)
 

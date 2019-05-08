@@ -105,12 +105,8 @@ echo "/etc/5factorial/core"
 copy_configs ./../configs/core /etc/5factorial/core
 echo "-- OK"
 
-<<<<<<< HEAD
-
-=======
 echo "/etc/5factorial"
 copy_configs ./../configs /etc/5factorial
->>>>>>> 36a98db746028a318eda588d11e8302c90550036
 echo "== OK"
 
 # /////////////////////////////////////////
