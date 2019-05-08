@@ -3,11 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/config_reader"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2"
-	"log"
 )
 
 // заполняем базу user, коллекция profile данными

@@ -1,11 +1,12 @@
 package session
 
 import (
+	"time"
+
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
 	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2/bson"
-	"time"
 )
 
 type UserSession struct {

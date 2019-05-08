@@ -2,8 +2,9 @@ package config_reader
 
 import (
 	"encoding/json"
-	"github.com/pkg/errors"
 	"io/ioutil"
+
+	"github.com/pkg/errors"
 )
 
 func ReadConfigFile(path string, filename string, dest interface{}) error {
