@@ -18,6 +18,9 @@ type Token struct {
 }
 
 func OauthUser(token string, service string) (int, error, string, time.Time) {
+	if token == "" {
+		return http.StatusBadRequest, errors.New("token is empty"), "", time.Time{}
+	}
 
 	client := &http.Client{}
 	request, err := http.NewRequest("GET", GetApiUrl(token, service), nil)
