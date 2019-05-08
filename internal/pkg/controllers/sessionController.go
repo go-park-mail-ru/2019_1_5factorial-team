@@ -47,7 +47,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	u, err := authGRPC.IdentifyUser(ctx, &grpcAuth.DataAuth{Login: data.Login, Password: data.Password})
+	u, err := authGRPC.IdentifyUser(ctx, &grpcAuth.DataAuth{Login: data.LoginOrEmail, Password: data.Password})
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, "Wrong password or login")
 
