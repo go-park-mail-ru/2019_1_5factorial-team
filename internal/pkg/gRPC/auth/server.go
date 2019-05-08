@@ -2,6 +2,7 @@ package session
 
 import (
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
@@ -29,7 +30,7 @@ type Auth struct {
 
 func CreateConnection() (*grpc.ClientConn, error) {
 	grcpConn, err := grpc.Dial(
-		fmt.Sprintf("%s:%s", address, port),
+		fmt.Sprintf("%s:%s", config.Get().AuthGRPCConfig.Hostname, config.Get().AuthGRPCConfig.Port),
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -42,7 +43,7 @@ func CreateConnection() (*grpc.ClientConn, error) {
 }
 
 func GRPCServer() error {
-	port := "5000"
+	port := config.Get().AuthGRPCConfig.Port
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Error(err)
