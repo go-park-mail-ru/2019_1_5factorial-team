@@ -61,6 +61,29 @@ services:
     ports:
       - '5051:5051'
     depends_on:
+<<<<<<< HEAD
+      - mongo-user
+      - mongo-session
+<<<<<<< HEAD
+#    logging:
+#      driver: "json-file"
+#      options:
+#        max-size: "1k"
+#        max-file: "3"
+
+    worker-go:
+      container_name: 5factorial-worker
+      restart: always
+      build:
+        context: ../.
+        dockerfile: ./third-party/worker/Dockerfile
+    volumes:
+    - '/etc/5factorial:/etc/5factorial'
+    depends_on:
+    - mongo-session
+=======
+=======
+>>>>>>> 36a98db746028a318eda588d11e8302c90550036
       - auth-go
 
   chat-go:
@@ -90,3 +113,4 @@ services:
       - '5053:5053'
     depends_on:
       - auth-go
+>>>>>>> fe970a3e191cd5df60074314fef885b6441e84fc
