@@ -47,18 +47,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-<<<<<<< HEAD
-	flagValidUser := validator.ValidLogin(data.Login, data.Password)
-	if !flagValidUser {
-		ErrResponse(res, http.StatusBadRequest, "invalid user data")
-		ctxLogger.Error(errors.Wrap(err, "err in user data"))
-		return
-	}
-
-	u, err := user.IdentifyUser(data.Login, data.Password)
-=======
 	u, err := authGRPC.IdentifyUser(ctx, &grpcAuth.DataAuth{Login: data.Login, Password: data.Password})
->>>>>>> fe970a3e191cd5df60074314fef885b6441e84fc
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, "Wrong password or login")
 
