@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC"
+	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"context"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/config_reader"
@@ -60,10 +62,12 @@ func testHandler(funcToTest func(http.ResponseWriter, *http.Request), tests []Te
 
 		router := mux.NewRouter()
 		router.HandleFunc(val.routerPath, funcToTest).Methods(val.method)
+		authGRPC := grpcAuth.AuthGRPCClient
 
 		ctx := req.Context()
 		ctx = context.WithValue(ctx, "authorized", val.authCtx)
 		ctx = context.WithValue(ctx, "userID", val.userIDCtx)
+		ctx = context.WithValue(ctx, "authGRPC", authGRPC)
 		if val.authCtx {
 			ctx = context.WithValue(ctx, "logger", log.LoggerWithAuth(req.WithContext(ctx)))
 		} else {
@@ -109,9 +113,20 @@ func MainInit() {
 	config.Get().DBConfig[1].MongoPort = "27062"
 	config.Get().DBConfig[1].TruncateTable = true
 
+	config.Get().DBConfig[2].Hostname = "localhost"
+	config.Get().DBConfig[2].MongoPort = "27063"
+	config.Get().DBConfig[2].TruncateTable = true
+
+	config.Get().AuthGRPCConfig.Hostname = "localhost"
+
 	log.InitLogs()
 
 	database.InitConnection()
+
+	err = gRPC.InitAuthClient()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	// indexes user
 	col, _ := database.GetCollection(config.Get().DBConfig[0].CollectionName)
