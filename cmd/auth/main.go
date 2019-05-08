@@ -12,7 +12,7 @@ import (
 func main() {
 	// TODO(): кушать только необходимые коннекшены к базам
 	port := flag.String("port", "5000", "chat-server will start on this port")
-	configPath := flag.String("config", "/etc/5factorial/", "dir with server configs")
+	configPath := flag.String("config", "/etc/5factorial/auth/", "dir with server configs")
 	flag.Parse()
 
 	log.Warn("auth-service will start on port ", *port)

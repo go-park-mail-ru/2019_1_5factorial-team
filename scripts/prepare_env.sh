@@ -1,5 +1,55 @@
 #!/usr/bin/env bash
 
+check_dir() {
+if [[ -d "$1" ]]
+then
+    echo "-- Directory $1 exists"
+else
+    echo "-- Directory $1 does not exists. Creating dir..."
+    mkdir -p $1
+    chmod -R 777 $1
+fi
+return 0
+}
+
+copy_file_from_template() {
+cp $1.template $2
+
+return 0
+}
+
+copy_configs() {
+echo "-- $1/auth_grpc_config -> $2"
+copy_file_from_template $1/auth_grpc_config.json $2/auth_grpc_config.json
+
+echo "-- $1/chat_config -> $2"
+copy_file_from_template $1/chat_config.json $2/chat_config.json
+
+echo "-- $1/cookie_config -> $2"
+copy_file_from_template $1/cookie_config.json $2/cookie_config.json
+
+echo "-- $1/cors_config -> $2"
+copy_file_from_template $1/cors_config.json $2/cors_config.json
+
+echo "-- $1/db_config -> $2"
+copy_file_from_template $1/db_config.json $2/db_config.json
+
+echo "-- $1/game_config -> $2"
+copy_file_from_template $1/game_config.json $2/game_config.json
+
+echo "-- $1/logrus_config -> $2"
+copy_file_from_template $1/logrus_config.json $2/logrus_config.json
+
+echo "-- $1/static_server_config -> $2"
+copy_file_from_template $1/static_server_config.json $2/static_server_config.json
+
+echo "-- $1/user_faker_config -> $2"
+copy_file_from_template $1/user_faker_config.json $2/user_faker_config.json
+
+return 0
+}
+
+# /////////////////////////////////////////
 pwd
 whoami
 
@@ -21,94 +71,51 @@ echo "Preparing env..."
 echo "Creating dir for static..."
 
 # проверка папки для статики
-if [[ -d "/var/www/media/factorial" ]]
-then
-    echo "-- Directory /var/www/media/factorial exists"
-else
-    echo "-- Directory /var/www/media/factorial does not exists. Creating dir..."
-    mkdir -p /var/www/media/factorial
-    chmod -R 777 /var/www/media/factorial
-fi
+check_dir "/var/www/media/factorial"
 
 echo "== OK"
 
 # /////////////////////////////////////////
 echo "Creating dir for configs..."
 
-# проверка папки для хранения данных БД
-if [[ -d "/etc/5factorial" ]]
-then
-    echo "-- Directory /etc/5factorial exists"
-else
-    echo "-- Directory /var/www/media/factorial does not exists. Creating dir..."
-    mkdir -p /etc/5factorial
-    chmod -R 777 /etc/5factorial
-fi
+# проверка папки для хранения конфигов
+check_dir "/etc/5factorial/auth"
+check_dir "/etc/5factorial/chat"
+check_dir "/etc/5factorial/game"
+check_dir "/etc/5factorial/core"
 
 echo "== OK"
 
 # /////////////////////////////////////////
-echo "Copying config files from templates"
+echo "Copying config files from templates..."
 
-echo "-- cookie_config"
-cp ./../configs/cookie_config.json.template /etc/5factorial/cookie_config.json
+echo "/etc/5factorial/auth"
+copy_configs ./../configs/auth /etc/5factorial/auth
+echo "-- OK"
 
-echo "-- cors_config"
-cp ./../configs/cors_config.json.template /etc/5factorial/cors_config.json
+echo "/etc/5factorial/chat"
+copy_configs ./../configs/chat /etc/5factorial/chat
+echo "-- OK"
 
-echo "-- db_config"
-cp ./../configs/db_config.json.template /etc/5factorial/db_config.json
+echo "/etc/5factorial/game"
+copy_configs ./../configs/game /etc/5factorial/game
+echo "-- OK"
 
-echo "-- static_server_config"
-cp ./../configs/static_server_config.json.template /etc/5factorial/static_server_config.json
+echo "/etc/5factorial/core"
+copy_configs ./../configs/core /etc/5factorial/core
+echo "-- OK"
 
-echo "-- user_faker_config"
-cp ./../configs/user_faker_config.json.template /etc/5factorial/user_faker_config.json
-
-echo "-- logrus_config"
-cp ./../configs/logrus_config.json.template /etc/5factorial/logrus_config.json
-
-
+echo "/etc/5factorial"
+copy_configs ./../configs /etc/5factorial
 echo "== OK"
 
 # /////////////////////////////////////////
 echo "Creating dir for db data..."
 
 # проверка папки для хранения данных БД
-if [[ -d "/data/db" ]]
-then
-    echo "-- Directory /data/db exists"
-else
-    echo "-- Directory /data/db does not exists. Creating dir..."
-    mkdir -p /data/db
-    chmod -R 777 /data/db
-fi
-
-if [[ -d "/data/db/user" ]]
-then
-    echo "-- Directory /data/db/user exists"
-else
-    echo "-- Directory /data/db/user does not exists. Creating dir..."
-    mkdir -p /data/db/user
-    chmod -R 777 /data/db/user
-fi
-
-if [[ -d "/data/db/session" ]]
-then
-    echo "-- Directory /data/db/session exists"
-else
-    echo "-- Directory /data/db/session does not exists. Creating dir..."
-    mkdir -p /data/db/session
-    chmod -R 777 /data/db/session
-fi
-
-if [[ -d "/data/db/chat_global" ]]
-then
-    echo "-- Directory /data/db/chat_global exists"
-else
-    echo "-- Directory /data/db/chat_global does not exists. Creating dir..."
-    mkdir -p /data/db/chat_global
-    chmod -R 777 /data/db/chat_global
-fi
+check_dir "/data/db"
+check_dir "/data/db/user"
+check_dir "/data/db/session"
+check_dir "/data/db/chat_global"
 
 echo "== OK"
