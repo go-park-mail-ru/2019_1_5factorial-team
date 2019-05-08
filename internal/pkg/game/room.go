@@ -190,10 +190,10 @@ func (r *Room) updateRoomState() {
 		deletedGhost := r.state.Objects.PopFront()
 
 		if deletedGhost.Speed > 0 {
-			r.state.Players[0].HP -= gameLogic.DefaultDamage
+			r.state.Players[0].HP -= int(deletedGhost.Damage)
 
 		} else if deletedGhost.Speed < 0 {
-			r.state.Players[1].HP -= gameLogic.DefaultDamage
+			r.state.Players[1].HP -= int(deletedGhost.Damage)
 
 			//if r.state.Players[1].HP <= 0 {
 			//	r.Close()

@@ -12,12 +12,5 @@
     "database_name": "user_session",
     "collection_name": "user_session",
     "truncate_table": false
-  },
-  {
-    "hostname": "mongo-chat-global",
-    "mongo_port": "27033",
-    "database_name": "chat_global",
-    "collection_name": "chat_global",
-    "truncate_table": false
   }
 ]

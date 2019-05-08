@@ -1,6 +1,7 @@
 package gameLogic
 
 import (
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/random"
 	"log"
 	"sync"
@@ -51,16 +52,16 @@ func NewGhost(startPosition int, damage uint32, speed int, symbolsLen int) Ghost
 func NewRandomGhost() Ghost {
 	g := Ghost{
 		//X:       DefaultRightPosition,
-		Damage:  DefaultDamage,
-		Symbols: GenerateSymbolsSlice(DefaultLenSymbolsSlice),
+		Damage:  config.Get().GameConfig.DefaultDamage,
+		Symbols: GenerateSymbolsSlice(config.Get().GameConfig.DefaultLenSymbolsSlice),
 	}
 
 	if random.RandBool() {
-		g.X = DefaultLeftPosition - DefaultSpriteWidth
-		g.Speed = DefaultMovementSpeed
+		g.X = config.Get().GameConfig.DefaultLeftPosition - config.Get().GameConfig.DefaultSpriteWidth
+		g.Speed = config.Get().GameConfig.DefaultMovementSpeed
 	} else {
-		g.X = DefaultRightPosition + DefaultSpriteWidth
-		g.Speed = -DefaultMovementSpeed
+		g.X = config.Get().GameConfig.DefaultRightPosition + config.Get().GameConfig.DefaultSpriteWidth
+		g.Speed = -config.Get().GameConfig.DefaultMovementSpeed
 	}
 
 	//if g.X > 0 {
@@ -74,19 +75,19 @@ func NewRandomGhost() Ghost {
 
 func NewRightGhost() Ghost {
 	return Ghost{
-		Damage:  DefaultDamage,
-		Symbols: GenerateSymbolsSlice(DefaultLenSymbolsSlice),
-		X:       DefaultRightPosition + DefaultSpriteWidth,
-		Speed:   -DefaultMovementSpeed,
+		Damage:  config.Get().GameConfig.DefaultDamage,
+		Symbols: GenerateSymbolsSlice(config.Get().GameConfig.DefaultLenSymbolsSlice),
+		X:       config.Get().GameConfig.DefaultRightPosition + config.Get().GameConfig.DefaultSpriteWidth,
+		Speed:   -config.Get().GameConfig.DefaultMovementSpeed,
 	}
 }
 
 func NewLeftGhost() Ghost {
 	return Ghost{
-		Damage:  DefaultDamage,
-		Symbols: GenerateSymbolsSlice(DefaultLenSymbolsSlice),
-		X:       DefaultLeftPosition - DefaultSpriteWidth,
-		Speed:   DefaultMovementSpeed,
+		Damage:  config.Get().GameConfig.DefaultDamage,
+		Symbols: GenerateSymbolsSlice(config.Get().GameConfig.DefaultLenSymbolsSlice),
+		X:       config.Get().GameConfig.DefaultLeftPosition - config.Get().GameConfig.DefaultSpriteWidth,
+		Speed:   config.Get().GameConfig.DefaultMovementSpeed,
 	}
 }
 
@@ -161,9 +162,9 @@ func (gq *GhostQueue) MoveAllGhosts() (hit bool) {
 	}
 
 	// коллизии, как хотела Надя
-	if gq.Items[0].Speed > 0 && gq.Items[0].X >= PlayerLeftPosition-DefaultSpriteWidth {
+	if gq.Items[0].Speed > 0 && gq.Items[0].X >= config.Get().GameConfig.PlayerLeftPosition-config.Get().GameConfig.DefaultSpriteWidth {
 		hit = true
-	} else if gq.Items[0].Speed < 0 && gq.Items[0].X <= PlayerRightPosition+DefaultSpriteWidth {
+	} else if gq.Items[0].Speed < 0 && gq.Items[0].X <= config.Get().GameConfig.PlayerRightPosition+config.Get().GameConfig.DefaultSpriteWidth {
 		hit = true
 	}
 
@@ -193,13 +194,13 @@ func (gq *GhostQueue) PopSymbol(sym Symbol) int {
 		if gq.Items[i].Symbols[0] == sym {
 			gq.Items[i].Symbols = gq.Items[i].Symbols[1:]
 
-			score += ScoreMatchSymbol
+			score += config.Get().GameConfig.ScoreMatchSymbol
 		}
 
 		if len(gq.Items[i].Symbols) != 0 {
 			newItems = append(newItems, gq.Items[i])
 		} else {
-			score += ScoreKillGhost
+			score += config.Get().GameConfig.ScoreKillGhost
 		}
 	}
 

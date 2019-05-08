@@ -3,6 +3,7 @@ package chat
 import (
 	"context"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
@@ -202,7 +203,7 @@ func (u *User) SendErr(error string) {
 }
 
 func (u *User) SendLastMessages() {
-	mes, err := GetLastMessages(LastMessagesLimit)
+	mes, err := GetLastMessages(config.Get().ChatConfig.LastMessagesLimit)
 	if err != nil {
 		log.Error(errors.Wrapf(err, "user %s cant get last messages on connect", u.Nickname))
 	}
