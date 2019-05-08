@@ -18,6 +18,9 @@ type Token struct {
 }
 
 func OauthUser(token string, service string) (int, error, string, time.Time) {
+	if token == "" {
+		return http.StatusBadRequest, errors.New("token is empty"), "", time.Time{}
+	}
 
 	client := &http.Client{}
 	request, err := http.NewRequest("GET", GetApiUrl(token, service), nil)
@@ -32,20 +35,29 @@ func OauthUser(token string, service string) (int, error, string, time.Time) {
 	}
 	response, err := client.Do(request)
 
-	defer response.Body.Close()
 	if err != nil {
 		return http.StatusBadRequest, errors.Wrap(err, "cant HTTP request"), "", time.Time{}
 	}
-
+	defer response.Body.Close()
 	contents, err := ioutil.ReadAll(response.Body)
-	if response.StatusCode != http.StatusOK || err != nil {
-		return http.StatusInternalServerError, errors.Wrap(err, "body ReadAll error"), "", time.Time{}
+
+	if err != nil {
+		return http.StatusBadRequest, errors.Wrap(err, "readall error"), "", time.Time{}
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return http.StatusBadGateway, errors.New("not valid token"), "", time.Time{}
 	}
 
 	uuid, name, err := GetOauthUser(service, contents)
 	if err != nil {
 		return http.StatusForbidden, errors.Wrap(err, "err in get oauth user"), "", time.Time{}
 	}
+
+	if uuid == "" && name == "" {
+		return http.StatusBadGateway, errors.Wrap(err, "err in user data"), "", time.Time{}
+	}
+
 	// TODO(mrocumare) после прикручивания базы прописать GetUser и CreateUser
 	searchingUser, err := user.IdentifyUser(uuid, DefaultPassword)
 	if err != nil && errors.Cause(err).Error() == PreCreateUserErrorString {
