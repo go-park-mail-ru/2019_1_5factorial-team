@@ -162,6 +162,16 @@ func (a *Auth) GetUserByID(ctx context.Context, u *User) (*User, error) {
 
 func (a *Auth) UpdateUser(ctx context.Context, req *UpdateUserReq) (*Nothing, error) {
 	// TODO(): сделать ответ, как в CreateUser (status.Code, status.Message)
+
+	//if req.NewPassword != "" {
+	//	flagValidNewPassword := validator.ValidUpdatePassword(req.NewPassword)
+	//	if !flagValidNewPassword {
+	//		//ErrResponse(res, http.StatusBadRequest, "invalid new password")
+	//		log.Error(errors.New("invalid new password"))
+	//		return &Nothing{}, errors.New("invalid new password")
+	//	}
+	//}
+
 	err := user.UpdateUser(req.ID, req.NewAvatar, req.OldPassword, req.NewPassword)
 	if err != nil {
 		log.Error(errors.Wrap(err, "UpdateUser error, AuthGRPC"))

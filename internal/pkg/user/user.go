@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/validator"
 	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -93,6 +94,11 @@ func UpdateUser(id string, newAvatar string, oldPassword string, newPassword str
 func validateChangingPasswords(oldPassword string, newPassword string, currentHashPassword string) error {
 	if oldPassword == "" {
 		return errors.New("please input old password")
+	}
+
+	flagValidNewPassword := validator.ValidUpdatePassword(newPassword)
+	if !flagValidNewPassword {
+		return errors.New("invalid new password")
 	}
 
 	err := comparePassword(newPassword, currentHashPassword)
