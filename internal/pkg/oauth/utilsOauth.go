@@ -34,6 +34,10 @@ func GetOauthUser(service string, contents []byte) (string, string, error) {
 		if err != nil {
 			return "", "", errors.Wrap(err, "json parsing error")
 		}
+
+		if len(userInfo.Users) == 0 {
+			return "", "", errors.New("not valid token")
+		}
 		vkInfo := (userInfo.Users)[0]
 		vkEmail, vkLogin := getEmailAndLoginFromVK(strconv.Itoa(vkInfo.ID), vkInfo.Name, vkInfo.LastName)
 		return vkEmail, vkLogin, nil

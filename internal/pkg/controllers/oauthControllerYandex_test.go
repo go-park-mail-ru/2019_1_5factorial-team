@@ -6,11 +6,11 @@ import (
 	"testing"
 )
 
-var testsLoginFromGoogle = []TestCases{
+var testsLoginFromYandex = []TestCases{
 	{
-		routerPath:     "/api/session/oauth/google",
+		routerPath:     "/api/session/oauth/yandex",
 		method:         "POST",
-		url:            "/api/session/oauth/google",
+		url:            "/api/session/oauth/yandex",
 		body:           strings.NewReader(`{"token": "qwqwqwqwqw"}`),
 		urlValues:      "",
 		expectedRes:    `{"error":"not valid token"}`,
@@ -18,9 +18,9 @@ var testsLoginFromGoogle = []TestCases{
 		authCtx:        false,
 	},
 	{
-		routerPath:     "/api/session/oauth/google",
+		routerPath:     "/api/session/oauth/yandex",
 		method:         "POST",
-		url:            "/api/session/oauth/google",
+		url:            "/api/session/oauth/yandex",
 		body:           strings.NewReader(`{"token": ""}`),
 		urlValues:      "",
 		expectedRes:    `{"error":"not valid token"}`,
@@ -29,9 +29,9 @@ var testsLoginFromGoogle = []TestCases{
 	},
 }
 
-func TestLoginFromGoogle(t *testing.T) {
+func TestLoginFromYandex(t *testing.T) {
 	//MainInit()
-	err := testHandler(LoginFromGoogle, testsLoginFromGoogle, t)
+	err := testHandler(LoginFromYandex, testsLoginFromYandex, t)
 	if err != nil {
 		t.Errorf(err.Error())
 	}

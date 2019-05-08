@@ -1,8 +1,9 @@
-package controllers 
+package controllers
 
-import ( 
-	"github.com/sirupsen/logrus"
+import (
 	"net/http"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/oauth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
