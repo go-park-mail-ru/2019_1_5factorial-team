@@ -17,7 +17,7 @@ import (
 // 	"password":
 // пока только логин, без почты
 type signInRequest struct {
-	Login    string `json:"loginOrEmail"`
+	LoginOrEmail    string `json:"loginOrEmail"`
 	Password string `json:"password"`
 }
 

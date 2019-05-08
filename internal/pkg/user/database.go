@@ -1,6 +1,8 @@
 package user
 
 import (
+	"strings"
+
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/database"
 	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2/bson"
@@ -8,17 +10,23 @@ import (
 
 var collectionName = "profile"
 
-func getUser(login string) (User, error) {
+func getUser(loginOrEmail string) (User, error) {
 	u := User{}
 
 	col, err := database.GetCollection(collectionName)
 	if err != nil {
 		return User{}, errors.Wrap(err, "collection not found")
 	}
-
-	err = col.Find(bson.M{"nickname": login}).One(&u)
-	if err != nil {
-		return User{}, errors.New("Invalid login")
+	if strings.Contains(loginOrEmail, "@") {
+		err = col.Find(bson.M{"email": loginOrEmail}).One(&u)
+		if err != nil {
+			return User{}, errors.New("Invalid email")
+		}
+	} else {
+		err = col.Find(bson.M{"nickname": loginOrEmail}).One(&u)
+		if err != nil {
+			return User{}, errors.New("Invalid login")
+		}
 	}
 
 	return u, nil
