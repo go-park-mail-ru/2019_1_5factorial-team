@@ -46,6 +46,7 @@ func GetOauthUser(service string, contents []byte) (string, string, error) {
 		if err != nil {
 			return "", "", errors.Wrap(err, "json parsing error")
 		}
+
 		yandexNickname := getLoginFromEmail(userInfo.Email) + "_Y"
 		return userInfo.Email, yandexNickname, nil
 	case "google":

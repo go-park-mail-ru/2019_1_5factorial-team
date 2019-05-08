@@ -91,6 +91,13 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// TODO(smet1): валидация на данные, правда ли мыло - мыло, а самолет - вертолет?
+	flagValidUser := validator.ValidNewUser(data.Login, data.Email, data.Password)
+	if !flagValidUser {
+		ErrResponse(res, http.StatusBadRequest, "invalid user data")
+		ctxLogger.Error(errors.Wrap(err, "err in user data"))
+		return
+	}
+
 	fmt.Println(data)
 
 	u, err := authGRPC.CreateUser(ctx, &grpcAuth.UserNew{
@@ -235,6 +242,13 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		ErrResponse(res, status, err.Error())
 
 		ctxLogger.Error(errors.Wrap(err, "ParseRequestIntoStruct error"))
+		return
+	}
+
+	flagValidNewPassword := validator.ValidUpdatePassword(data.NewPassword)
+	if !flagValidNewPassword {
+		ErrResponse(res, http.StatusBadRequest, "invalid new password")
+		ctxLogger.Error(errors.Wrap(err, "err in user data"))
 		return
 	}
 

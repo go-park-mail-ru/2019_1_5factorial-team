@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
-	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
+
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
+	"github.com/sirupsen/logrus"
 
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/fileproc"
 	"github.com/pkg/errors"
@@ -63,7 +64,7 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//  забиваю на имя фала генерю новое
+	//  забиваю на имя файла генерю новое
 	fileName := fileproc.RandToken(12)
 	fileExtension := filepath.Ext(headers.Filename)
 	if err != nil {
