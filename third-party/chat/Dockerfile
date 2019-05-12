@@ -16,11 +16,11 @@
 
 FROM golang:alpine
 
-RUN go mod vendor
-
 # Копируем исходный код в Docker-контейнер
 WORKDIR /server
 COPY . .
+
+RUN go mod vendor
 
 # Объявлем порт сервера
 EXPOSE 5052

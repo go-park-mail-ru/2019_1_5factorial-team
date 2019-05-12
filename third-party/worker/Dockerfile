@@ -16,11 +16,11 @@
 
 FROM golang:alpine
 
-RUN go mod vendor
-
 # Копируем исходный код в Docker-контейнер
 WORKDIR /server
 COPY . .
+
+RUN go mod vendor
 
 RUN go build -mod=vendor cmd/worker/main.go
 CMD ./main
