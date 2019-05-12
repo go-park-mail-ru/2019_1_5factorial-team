@@ -20,7 +20,5 @@ FROM golang:alpine
 WORKDIR /server
 COPY . .
 
-RUN go mod vendor
-
 RUN go build -mod=vendor cmd/worker/main.go
 CMD ./main

@@ -20,8 +20,6 @@ FROM golang:alpine
 WORKDIR /server
 COPY . .
 
-RUN go mod vendor
-
 # Объявлем порт сервера
 #EXPOSE 5000
 
