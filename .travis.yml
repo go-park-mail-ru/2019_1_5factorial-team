@@ -1,0 +1,13 @@
+language: go
+
+go:
+- 1.11.x
+
+git:
+  depth: 1
+
+script:
+  - cd scripts
+  - ./start.sh
+  - go tool cover -func c.out
+  - go test -coverpkg=./... -coverprofile=c.out ./...
