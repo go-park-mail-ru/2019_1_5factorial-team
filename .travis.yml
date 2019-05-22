@@ -8,8 +8,9 @@ go:
 
 script:
   - cd scripts
-  - ./prepare_env.sh
-  - ./start_dbs_test.sh
-  - cd ..
-  - go tool cover -func c.out
-  - go test -coverpkg=./... -coverprofile=c.out ./...
+  - sudo ./prepare_env.sh
+  - ./start_dbs_test.sh & sleep 20 ; cd .. ; go test -v ./...
+  # - ./start_dbs_test.sh & sleep 60 ; cd .. ; go test -coverpkg=./... -coverprofile=c.out ./... ; go tool cover -func c.out
+  # - cd ..
+  # - go tool cover -func c.out
+  # - go test -coverpkg=./... -coverprofile=c.out ./...

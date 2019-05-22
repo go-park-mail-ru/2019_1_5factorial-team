@@ -25,17 +25,17 @@ services:
     logging:
       driver: "none"
 
-  # mongo-cha6:
-  #   container_name: 5factorial-chat-mongo
-  #   command: mongod --port 27033
-  #   image: mongo:4.0
-  #   #    environment:
-  #   #      MONGO_INITDB_ROOT_USERNAME: 'user'
-  #   #      MONGO_INITDB_ROOT_PASSWORD: 'user'
-  #   ports:
-  #     - '27063:27033' # map port to none standard port, to avoid conflicts with locally installed mongodb.
-  #   logging:
-  #     driver: "none"
+  mongo-chat:
+    container_name: 5factorial-chat-mongo
+    command: mongod --port 27033
+    image: mongo:4.0
+    #    environment:
+    #      MONGO_INITDB_ROOT_USERNAME: 'user'
+    #      MONGO_INITDB_ROOT_PASSWORD: 'user'
+    ports:
+      - '27063:27033' # map port to none standard port, to avoid conflicts with locally installed mongodb.
+    logging:
+      driver: "none"
   auth-go:
     container_name: 5factorial-back-auth
     restart: always
