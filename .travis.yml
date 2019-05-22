@@ -7,9 +7,9 @@ go:
 #   depth: 1
 
 script:
-  - go mod init ; go mod vendor
   - cd scripts
-  - ./start.sh
+  - ./prepare_env.sh
+  - ./start_dbs_test.sh
   - cd ..
   - go tool cover -func c.out
   - go test -coverpkg=./... -coverprofile=c.out ./...

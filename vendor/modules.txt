@@ -1,0 +1,120 @@
+# github.com/PuerkitoBio/purell v1.1.1
+github.com/PuerkitoBio/purell
+# github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578
+github.com/PuerkitoBio/urlesc
+# github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc
+github.com/alecthomas/template
+github.com/alecthomas/template/parse
+# github.com/corpix/uarand v0.1.0
+github.com/corpix/uarand
+# github.com/go-openapi/jsonpointer v0.18.0
+github.com/go-openapi/jsonpointer
+# github.com/go-openapi/jsonreference v0.18.0
+github.com/go-openapi/jsonreference
+# github.com/go-openapi/spec v0.18.0
+github.com/go-openapi/spec
+# github.com/go-openapi/swag v0.18.0
+github.com/go-openapi/swag
+# github.com/golang/protobuf v1.3.1
+github.com/golang/protobuf/proto
+github.com/golang/protobuf/ptypes
+github.com/golang/protobuf/ptypes/any
+github.com/golang/protobuf/ptypes/duration
+github.com/golang/protobuf/ptypes/timestamp
+# github.com/gorilla/mux v1.7.1
+github.com/gorilla/mux
+# github.com/gorilla/websocket v1.4.0
+github.com/gorilla/websocket
+# github.com/icrowley/fake v0.0.0-20180203215853-4178557ae428
+github.com/icrowley/fake
+# github.com/konsorten/go-windows-terminal-sequences v1.0.2
+github.com/konsorten/go-windows-terminal-sequences
+# github.com/mailru/easyjson v0.0.0-20190312143242-1de009706dbe
+github.com/mailru/easyjson/jlexer
+github.com/mailru/easyjson/jwriter
+github.com/mailru/easyjson/buffer
+# github.com/manveru/faker v0.0.0-20171103152722-9fbc68a78c4d
+github.com/manveru/faker
+# github.com/pkg/errors v0.8.1
+github.com/pkg/errors
+# github.com/rossmcdonald/telegram_hook v0.0.0-20181023143956-eaf404d9475a
+github.com/rossmcdonald/telegram_hook
+# github.com/sirupsen/logrus v1.4.1
+github.com/sirupsen/logrus
+# github.com/swaggo/files v0.0.0-20190110041405-30649e0721f8
+github.com/swaggo/files
+# github.com/swaggo/http-swagger v0.0.0-20190324132102-654001218d89
+github.com/swaggo/http-swagger
+# github.com/swaggo/swag v1.5.0
+github.com/swaggo/swag
+# golang.org/x/crypto v0.0.0-20190422183909-d864b10871cd
+golang.org/x/crypto/bcrypt
+golang.org/x/crypto/blowfish
+# golang.org/x/net v0.0.0-20190424112056-4829fb13d2c6
+golang.org/x/net/context
+golang.org/x/net/proxy
+golang.org/x/net/webdav
+golang.org/x/net/trace
+golang.org/x/net/internal/socks
+golang.org/x/net/webdav/internal/xml
+golang.org/x/net/internal/timeseries
+golang.org/x/net/http2
+golang.org/x/net/http2/hpack
+golang.org/x/net/idna
+golang.org/x/net/http/httpguts
+# golang.org/x/sys v0.0.0-20190422165155-953cdadca894
+golang.org/x/sys/unix
+# golang.org/x/text v0.3.1-0.20180807135948-17ff2d5776d2
+golang.org/x/text/unicode/norm
+golang.org/x/text/width
+golang.org/x/text/secure/bidirule
+golang.org/x/text/unicode/bidi
+golang.org/x/text/transform
+# golang.org/x/tools v0.0.0-20190424031103-cb2dda6eabdf
+golang.org/x/tools/go/loader
+golang.org/x/tools/go/ast/astutil
+golang.org/x/tools/go/buildutil
+golang.org/x/tools/go/internal/cgo
+# google.golang.org/genproto v0.0.0-20190418145605-e7d98fc518a7
+google.golang.org/genproto/googleapis/rpc/status
+# google.golang.org/grpc v1.20.1
+google.golang.org/grpc/status
+google.golang.org/grpc
+google.golang.org/grpc/codes
+google.golang.org/grpc/balancer
+google.golang.org/grpc/balancer/roundrobin
+google.golang.org/grpc/connectivity
+google.golang.org/grpc/credentials
+google.golang.org/grpc/encoding
+google.golang.org/grpc/encoding/proto
+google.golang.org/grpc/grpclog
+google.golang.org/grpc/internal
+google.golang.org/grpc/internal/backoff
+google.golang.org/grpc/internal/balancerload
+google.golang.org/grpc/internal/binarylog
+google.golang.org/grpc/internal/channelz
+google.golang.org/grpc/internal/envconfig
+google.golang.org/grpc/internal/grpcrand
+google.golang.org/grpc/internal/grpcsync
+google.golang.org/grpc/internal/transport
+google.golang.org/grpc/keepalive
+google.golang.org/grpc/metadata
+google.golang.org/grpc/naming
+google.golang.org/grpc/peer
+google.golang.org/grpc/resolver
+google.golang.org/grpc/resolver/dns
+google.golang.org/grpc/resolver/passthrough
+google.golang.org/grpc/stats
+google.golang.org/grpc/tap
+google.golang.org/grpc/balancer/base
+google.golang.org/grpc/credentials/internal
+google.golang.org/grpc/binarylog/grpc_binarylog_v1
+google.golang.org/grpc/internal/syscall
+# gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce
+gopkg.in/mgo.v2
+gopkg.in/mgo.v2/bson
+gopkg.in/mgo.v2/internal/sasl
+gopkg.in/mgo.v2/internal/scram
+gopkg.in/mgo.v2/internal/json
+# gopkg.in/yaml.v2 v2.2.2
+gopkg.in/yaml.v2
