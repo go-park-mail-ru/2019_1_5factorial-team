@@ -7,7 +7,7 @@ go:
 #   depth: 1
 
 script:
-  - go mod vendor
+  - go mod init ; go mod vendor
   - cd scripts
   - ./start.sh
   - cd ..
