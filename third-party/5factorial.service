@@ -5,8 +5,9 @@ After=docker.service
 
 [Service]
 User=root
-ExecStart=/usr/local/bin/docker-compose --file /home/ubuntu/backend/2019_1_5factorial-team/third-party/docker-compose.yml up -d
-ExecStop=/usr/local/bin/docker-compose --file /home/ubuntu/backend/2019_1_5factorial-team/third-party/docker-compose.yml down -v
+ExecStartPre=/usr/local/bin/docker-compose --file /home/ubuntu/backend/2019_1_5factorial-team/third-party/docker-compose_start-only.yml down -v
+ExecStart=/usr/local/bin/docker-compose --file /home/ubuntu/backend/2019_1_5factorial-team/third-party/docker-compose_start-only.yml up
+ExecStop=/usr/local/bin/docker-compose --file /home/ubuntu/backend/2019_1_5factorial-team/third-party/docker-compose_start-only.yml down -v
 
 [Install]
 WantedBy=multi-user.target
