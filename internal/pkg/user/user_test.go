@@ -174,6 +174,28 @@ var casesIdentifyUser = []struct {
 		},
 		err: "",
 	},
+	{
+		loginOrEmail: "lula@gmail.com",
+		password:     "lula",
+		want: User{
+			Email:      "lula@gmail.com",
+			Nickname:   "Lula",
+			Score:      0,
+			AvatarLink: "",
+		},
+		err: "",
+	},
+	{
+		loginOrEmail: "lula1@gmail.com",
+		password:     "lula",
+		want: User{
+			Email:      "",
+			Nickname:   "",
+			Score:      0,
+			AvatarLink: "",
+		},
+		err: "Invalid email",
+	},
 }
 
 func TestIdentifyUser(t *testing.T) {
