@@ -43,6 +43,7 @@ jobs:
       docker push smetk/5factorial-game
   - stage: "deploy"
     name: "restart service"
+    if: $TRAVIS_COMMIT_MESSAGE =~ .*BUILD.*
     script:
     - ssh -i ~/5factorial_id_rsa.pem ubuntu@95.163.180.8 sudo systemctl restart 5factorial
 
