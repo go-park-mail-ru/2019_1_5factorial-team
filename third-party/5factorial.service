@@ -1,0 +1,12 @@
+[Unit]
+Description=Service managing back
+Requires=docker.service
+After=docker.service
+
+[Service]
+User=root
+ExecStart=/usr/local/bin/docker-compose --file /home/ubuntu/backend/2019_1_5factorial-team/third-party/docker-compose.yml up -d
+ExecStop=/usr/local/bin/docker-compose --file /home/ubuntu/backend/2019_1_5factorial-team/third-party/docker-compose.yml down -v
+
+[Install]
+WantedBy=multi-user.target

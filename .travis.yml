@@ -41,6 +41,10 @@ jobs:
     - docker push smetk/5factorial-auth   ; docker push smetk/5factorial-core ; 
       docker push smetk/5factorial-worker ; docker push smetk/5factorial-chat ; 
       docker push smetk/5factorial-game
+  - stage: "deploy"
+    name: "restart service"
+    script:
+    - ssh -i ~/5factorial_id_rsa.pem ubuntu@95.163.180.8 sudo systemctl restart 5factorial
 
 before_install:
 - openssl aes-256-cbc -K $encrypted_147bdc689a1a_key -iv $encrypted_147bdc689a1a_iv
