@@ -7,8 +7,8 @@ services:
     image: mongo:4.0
     ports:
       - '27061:27031' # map port to none standard port, to avoid conflicts with locally installed mongodb.
-    logging:
-      driver: "none"
+#    logging:
+#      driver: "none"
 
   mongo-session:
     container_name: 5factorial-session-mongo
@@ -16,11 +16,11 @@ services:
     image: mongo:4.0
     ports:
       - '27062:27032' # map port to none standard port, to avoid conflicts with locally installed mongodb.
-    logging:
-      driver: "none"
+#    logging:
+#      driver: "none"
 
   mongo-chat:
-    container_name: 5factorial-chat-mongo
+    container_name: 5factorial-chat-global-mongo
     command: mongod --port 27033
     image: mongo:4.0
     ports:
@@ -41,5 +41,5 @@ services:
     depends_on:
       - mongo-user
       - mongo-session
-    logging:
-      driver: "none"
+#    logging:
+#      driver: "none"

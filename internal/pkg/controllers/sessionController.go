@@ -17,8 +17,8 @@ import (
 // 	"password":
 // пока только логин, без почты
 type signInRequest struct {
-	LoginOrEmail    string `json:"loginOrEmail"`
-	Password string `json:"password"`
+	LoginOrEmail string `json:"loginOrEmail"`
+	Password     string `json:"password"`
 }
 
 // SignIn godoc

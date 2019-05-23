@@ -246,13 +246,6 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//flagValidNewPassword := validator.ValidUpdatePassword(data.NewPassword)
-	//if !flagValidNewPassword {
-	//	ErrResponse(res, http.StatusBadRequest, "invalid new password")
-	//	ctxLogger.Error(errors.Wrap(err, "err in user data"))
-	//	return
-	//}
-
 	userId := req.Context().Value("userID").(string)
 
 	_, err = authGRPC.UpdateUser(ctx, &grpcAuth.UpdateUserReq{

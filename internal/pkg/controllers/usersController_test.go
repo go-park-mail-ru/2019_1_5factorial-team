@@ -125,3 +125,54 @@ func TestGetUser(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 }
+
+var testsUpdateProfile = []TestCases{
+	{
+		routerPath:     "/api/user",
+		method:         "PUT",
+		url:            "/api/user",
+		body:           strings.NewReader(`{"avatar": "kekkekkek1", "old_password": "1","new_password": "password"}`),
+		urlValues:      "",
+		expectedRes:    `{"error":"already auth, ctx.authorized shouldn't be false"}`,
+		expectedStatus: http.StatusBadRequest,
+		authCtx:        false,
+	},
+	{
+		routerPath:     "/api/user",
+		method:         "PUT",
+		url:            "/api/user",
+		body:           strings.NewReader(`{"avatar": "kekkekkek1", "old_password": "1","new_password": "password"`),
+		urlValues:      "",
+		expectedRes:    `{"error":"json parsing error: unexpected end of JSON input"}`,
+		expectedStatus: http.StatusInternalServerError,
+		authCtx:        true,
+	},
+	{
+		routerPath:     "/api/user",
+		method:         "PUT",
+		url:            "/api/user",
+		body:           strings.NewReader(`{"avatar": "kekkekkek1", "old_password": "1","new_password": "password"}`),
+		urlValues:      "",
+		expectedRes:    `{"error":"rpc error: code = Unknown desc = update user error: id isn't mongo's hex"}`,
+		expectedStatus: http.StatusBadRequest,
+		authCtx:        true,
+	},
+	{
+		routerPath:     "/api/user",
+		method:         "PUT",
+		url:            "/api/user",
+		body:           strings.NewReader(`{"avatar": "kekkekkek1", "old_password": "1","new_password": "password"}`),
+		urlValues:      "",
+		expectedRes:    `{"error":"rpc error: code = Unknown desc = update user error: user with this id not found"}`,
+		expectedStatus: http.StatusBadRequest,
+		authCtx:        true,
+		userIDCtx:      "5556c0d9b49cd4582aaad41c",
+	},
+}
+
+func TestUpdateProfile(t *testing.T) {
+	err := testHandler(UpdateProfile, testsUpdateProfile, t)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+}

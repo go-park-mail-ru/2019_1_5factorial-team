@@ -19,6 +19,7 @@ func ValidUpdatePassword(password string) bool {
 
 	return expLopPassw.MatchString(password)
 }
+
 func ValidLogin(login string, password string) bool {
 	expLopPassw := regexp.MustCompile(ExpLoginPassword)
 	if expLopPassw.MatchString(login) && expLopPassw.MatchString(password) {
