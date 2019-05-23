@@ -1,29 +1,32 @@
 language: go
-
 services:
 - docker
-
 go:
 - 1.11.x
-
 script:
 - chmod 600 ~/5factorial_id_rsa.pem
 - ssh-keyscan -H 95.163.180.8 >> ~/.ssh/known_hosts
-# - cd scripts
-# - sudo ./prepare_env.sh
-# - "./start_dbs_test.sh & sleep 60 ; cd .. ; go test -v ./..."
-- "cd .. ; ls ; sleep 10 ; go test -v ./..."
-- docker build -t smetk/5factorial-auth:`git log -1 --pretty=%h` -f ./third-party/auth/Dockerfile .
-- docker build -t smetk/5factorial-core:`git log -1 --pretty=%h` -f ./third-party/server/Dockerfile .
-- docker build -t smetk/5factorial-worker:`git log -1 --pretty=%h` -f ./third-party/worker/Dockerfile .
-- docker build -t smetk/5factorial-chat:`git log -1 --pretty=%h` -f ./third-party/chat/Dockerfile .
-- docker build -t smetk/5factorial-game:`git log -1 --pretty=%h` -f ./third-party/game/Dockerfile .
-- docker push smetk/5factorial-auth & docker push smetk/5factorial-core & docker push smetk/5factorial-worker &
-  docker push smetk/5factorial-chat & docker push smetk/5factorial-game
-
+- cd .. ; ls ; sleep 10 ; go test -v ./...
+- docker build -t smetk/5factorial-auth:`git log -1 --pretty=%h` -f ./third-party/auth/Dockerfile
+  .
+- docker build -t smetk/5factorial-core:`git log -1 --pretty=%h` -f ./third-party/server/Dockerfile
+  .
+- docker build -t smetk/5factorial-worker:`git log -1 --pretty=%h` -f ./third-party/worker/Dockerfile
+  .
+- docker build -t smetk/5factorial-chat:`git log -1 --pretty=%h` -f ./third-party/chat/Dockerfile
+  .
+- docker build -t smetk/5factorial-game:`git log -1 --pretty=%h` -f ./third-party/game/Dockerfile
+  .
+- docker push smetk/5factorial-auth & docker push smetk/5factorial-core & docker push
+  smetk/5factorial-worker & docker push smetk/5factorial-chat & docker push smetk/5factorial-game
 before_install:
 - openssl aes-256-cbc -K $encrypted_147bdc689a1a_key -iv $encrypted_147bdc689a1a_iv
   -in 5factorial_id_rsa.pem.enc -out ~/5factorial_id_rsa.pem -d
-- cd scripts 
-- sudo ./prepare_env.sh 
-- ./start_dbs_test.sh
+- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+- cd scripts
+- sudo ./prepare_env.sh
+- "./start_dbs_test.sh"
+env:
+  global:
+  - secure: kw5Gq94U33RIHgiVQJEIgKH5cWoNy63tgdUxAFFYzM9ccUkyWfyk9r2EMPshl2BI51H53MjWuT/L9Yc2YOaraMqBy2uccCG6g9fUSiJMslMbVrHqvJoUuZRtPX5CPLf1bNGv7aCotPUuoI/QUzaEsBIA/N+XiaX1bXef8J8od8dYCe88acFZBFjZEdPfyJAgEAUISh7Q70hGe7uupSn/CRyaIqqAfgXLMzEL1P4PMEHzTvafe1WH4gwK2XnjbkJHKHmYk54iFzlQ5Q+DLVwj+mbbWJTDTYhrhFOcHLLfwLud9B2oebR14PofmcuXQ4fZ9aN8scYv7p57m/T3OFR3Q8QGsm2Asz/OA7hGANCbk9nh48VQKOTN+6LxtKgOWWObC7jhf9jT4ILwvpBz4PZEs40EAkv2VlhP83PZAsARoe6t2mO+GXsGd5pdXdoKsoif6TKGpSOujoTeaG5yg42NyKwDibfNdYL/vSimVohTkDzRmmyrTgwbqTwMf8e2K32YLNhUazhv85FAC7NUXY4JecxzoWIjrgqwkQeK/o7gos5xOoJ2eW5lK8fidaSxEjXbwC8kZ5+psRS3S3cCcM1NXblhJ52CNPd7Y4b9jDARiKgqguibzBslH6BA66vGSXc7uICSoVXXOk+9W9dgxbXexSFHinP40YmeTKTDlBxfzgc=
+  - secure: YJbi9lE35fHC2sIyOb6WvAYPrSXKOJsEeb7+chLW2Gb5+H7sC68BGlLacC1gNoiWDKw3mgZnxmnvGYRqJhOBRgWXCAN2axA/JGtss95CxES8PGltmZ9HuFJ7bMDfsK5M6n98LhIMkrJLETwGR5GJtGiRQ+l2KsUcG9ZXZGMwLu69mllp5uPUFkl3mE0uuUMRb8TrI9CSzBsAKn8B9nafnYUjryMIVmdSqBePTqoNZz7sDWQh7FNgmNcvcZsJrGeTLUbKh3FStIGU5VGJ8mg+/LdTDRzg4aSHrmBfhoHTck/hhxufWdw0tIfq/jtkRE8kIxcp9vTUr5ouRDf8TCWAQaFQRMxIc/d96nO5VFNlxCzOeHGbmk6UWNQJtFXxmbd9C/eVlO5mWZssMGXuaYHc52Lpooacf/Wb84ddDck4yTmvdSm+2Fm924JUBb6t0U+Eqn4hWX3/NP/7d5GK2IYEbqIJI04zrAfONtSjkcHWah61w399PooFFkjzMaqd9FRS40CUt4VHoZKMfbl6csivmQf2OWM89du61DNOl04B30kqU3QdzL2m5cAsBdrsvRhobVHj1NtngHaqYVz1kyMPoQZy+7XZrKP2rsF6fyESmRZ3BJCj4tYqBRhd4MGIcyVywmkIOFEHWbU88q0ql3GZsYULadXxc6PlQNsRm6zH2bA=
