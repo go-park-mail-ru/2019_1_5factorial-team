@@ -1,35 +1,56 @@
 version: '3'
 services:
-  #  TODO(): авторизация при подключении к бд
   mongo-user:
-    container_name: 5factorial-user-mongo
+    container_name: 5factorial-user-mongo-1
     command: mongod --port 27031
     image: mongo:4.0
     ports:
-      - '27061:27031' # map port to none standard port, to avoid conflicts with locally installed mongodb.
-#    logging:
-#      driver: "none"
+      - '27061:27031'
+
+  mongo-user-2:
+    container_name: 5factorial-user-mongo-2
+    command: mongod --port 27031
+    image: mongo:4.0
+    ports:
+      - '27071:27031'
+
+  mongo-user-3:
+    container_name: 5factorial-user-mongo-3
+    command: mongod --port 27031
+    image: mongo:4.0
+    ports:
+      - '27081:27031'
 
   mongo-session:
-    container_name: 5factorial-session-mongo
+    container_name: 5factorial-session-mongo-1
     command: mongod --port 27032
     image: mongo:4.0
     ports:
-      - '27062:27032' # map port to none standard port, to avoid conflicts with locally installed mongodb.
-#    logging:
-#      driver: "none"
+      - '27062:27032'
+
+  mongo-session-2:
+    container_name: 5factorial-session-mongo-2
+    command: mongod --port 27032
+    image: mongo:4.0
+    ports:
+      - '27072:27032'
+
+  mongo-session-3:
+    container_name: 5factorial-session-mongo-3
+    command: mongod --port 27032
+    image: mongo:4.0
+    ports:
+      - '27082:27032'
 
   mongo-chat:
     container_name: 5factorial-chat-global-mongo
     command: mongod --port 27033
     image: mongo:4.0
     ports:
-      - '27063:27033' # map port to none standard port, to avoid conflicts with locally installed mongodb.
-    logging:
-      driver: "none"
-  
+      - '27063:27033'
+
   auth-go:
-    container_name: 5factorial-back-auth
+    container_name: 5factorial-back-auth-1
     restart: always
     build:
       context: ../.
@@ -41,5 +62,31 @@ services:
     depends_on:
       - mongo-user
       - mongo-session
-#    logging:
-#      driver: "none"
+
+#  auth-go-2:
+#    container_name: 5factorial-back-auth-2
+#    restart: always
+#    build:
+#      context: ../.
+#      dockerfile: ./third-party/auth/Dockerfile
+#    volumes:
+#      - '/etc/5factorial:/etc/5factorial'
+#    ports:
+#      - '5002:5000'
+#    depends_on:
+#      - mongo-user-2
+#      - mongo-session-2
+#
+#  auth-go-3:
+#    container_name: 5factorial-back-auth-3
+#    restart: always
+#    build:
+#      context: ../.
+#      dockerfile: ./third-party/auth/Dockerfile
+#    volumes:
+#      - '/etc/5factorial:/etc/5factorial'
+#    ports:
+#      - '5003:5000'
+#    depends_on:
+#      - mongo-user-3
+#      - mongo-session-3

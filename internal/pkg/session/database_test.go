@@ -6,6 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/user"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/mgo.v2"
 	"testing"
 	"time"
 )
@@ -18,16 +19,16 @@ func InitDB() {
 	}
 
 	config.Get().DBConfig[0].Hostname = "localhost"
-	config.Get().DBConfig[0].MongoPort = "27061"
-	config.Get().DBConfig[0].TruncateTable = true
+	config.Get().DBConfig[0].MongoPort = "27071"
+	config.Get().DBConfig[0].TruncateTable = false
 
 	config.Get().DBConfig[1].Hostname = "localhost"
-	config.Get().DBConfig[1].MongoPort = "27062"
-	config.Get().DBConfig[1].TruncateTable = true
+	config.Get().DBConfig[1].MongoPort = "27072"
+	config.Get().DBConfig[1].TruncateTable = false
 
 	config.Get().DBConfig[2].Hostname = "localhost"
 	config.Get().DBConfig[2].MongoPort = "27063"
-	config.Get().DBConfig[2].TruncateTable = true
+	config.Get().DBConfig[2].TruncateTable = false
 
 	config.Get().AuthGRPCConfig.Hostname = "localhost"
 
@@ -35,41 +36,41 @@ func InitDB() {
 
 	database.InitConnection()
 
-	//// indexes user
-	//col, _ := database.GetCollection(config.Get().DBConfig[0].CollectionName)
-	//err = col.EnsureIndex(mgo.Index{
-	//	Key:    []string{"email"},
-	//	Unique: true,
-	//})
-	//if err != nil {
-	//	logrus.Fatal(err.Error())
-	//}
-	//
-	//err = col.EnsureIndex(mgo.Index{
-	//	Key:    []string{"nickname"},
-	//	Unique: true,
-	//})
-	//if err != nil {
-	//	logrus.Fatal(err.Error())
-	//}
-	//
-	//// indexes session
-	//col, _ = database.GetCollection(config.Get().DBConfig[1].CollectionName)
-	//err = col.EnsureIndex(mgo.Index{
-	//	Key:    []string{"user_id"},
-	//	Unique: true,
-	//})
-	//if err != nil {
-	//	logrus.Fatal(err.Error())
-	//}
-	//
-	//err = col.EnsureIndex(mgo.Index{
-	//	Key:    []string{"token"},
-	//	Unique: true,
-	//})
-	//if err != nil {
-	//	logrus.Fatal(err.Error())
-	//}
+	// indexes user
+	col, _ := database.GetCollection(config.Get().DBConfig[0].CollectionName)
+	err = col.EnsureIndex(mgo.Index{
+		Key:    []string{"email"},
+		Unique: true,
+	})
+	if err != nil {
+		logrus.Fatal(err.Error())
+	}
+
+	err = col.EnsureIndex(mgo.Index{
+		Key:    []string{"nickname"},
+		Unique: true,
+	})
+	if err != nil {
+		logrus.Fatal(err.Error())
+	}
+
+	// indexes session
+	col, _ = database.GetCollection(config.Get().DBConfig[1].CollectionName)
+	err = col.EnsureIndex(mgo.Index{
+		Key:    []string{"user_id"},
+		Unique: true,
+	})
+	if err != nil {
+		logrus.Fatal(err.Error())
+	}
+
+	err = col.EnsureIndex(mgo.Index{
+		Key:    []string{"token"},
+		Unique: true,
+	})
+	if err != nil {
+		logrus.Fatal(err.Error())
+	}
 }
 
 func TestSetToken(t *testing.T) {
@@ -113,7 +114,7 @@ func TestUpdateToken(t *testing.T) {
 
 	// #1
 	config.Get().CookieConfig.CookieTimeHours = config.Duration{Duration: 1 * time.Second}
-	time.Sleep(4 * time.Second)
+	//time.Sleep(2 * time.Second)
 	us, err = UpdateToken(us.Token)
 	if err != nil {
 		t.Error("#", 1, "no ERROR expected", "have:", err)

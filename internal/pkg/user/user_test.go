@@ -6,6 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/mgo.v2"
 	"strconv"
 	"testing"
 )
@@ -18,11 +19,11 @@ func InitDB() {
 	}
 
 	config.Get().DBConfig[0].Hostname = "localhost"
-	config.Get().DBConfig[0].MongoPort = "27061"
+	config.Get().DBConfig[0].MongoPort = "27081"
 	config.Get().DBConfig[0].TruncateTable = true
 
 	config.Get().DBConfig[1].Hostname = "localhost"
-	config.Get().DBConfig[1].MongoPort = "27062"
+	config.Get().DBConfig[1].MongoPort = "27082"
 	config.Get().DBConfig[1].TruncateTable = true
 
 	config.Get().DBConfig[2].Hostname = "localhost"
@@ -35,41 +36,41 @@ func InitDB() {
 
 	database.InitConnection()
 
-	//// indexes user
-	//col, _ := database.GetCollection(config.Get().DBConfig[0].CollectionName)
-	//err = col.EnsureIndex(mgo.Index{
-	//	Key:    []string{"email"},
-	//	Unique: true,
-	//})
-	//if err != nil {
-	//	logrus.Fatal(err.Error())
-	//}
-	//
-	//err = col.EnsureIndex(mgo.Index{
-	//	Key:    []string{"nickname"},
-	//	Unique: true,
-	//})
-	//if err != nil {
-	//	logrus.Fatal(err.Error())
-	//}
-	//
-	//// indexes session
-	//col, _ = database.GetCollection(config.Get().DBConfig[1].CollectionName)
-	//err = col.EnsureIndex(mgo.Index{
-	//	Key:    []string{"user_id"},
-	//	Unique: true,
-	//})
-	//if err != nil {
-	//	logrus.Fatal(err.Error())
-	//}
-	//
-	//err = col.EnsureIndex(mgo.Index{
-	//	Key:    []string{"token"},
-	//	Unique: true,
-	//})
-	//if err != nil {
-	//	logrus.Fatal(err.Error())
-	//}
+	// indexes user
+	col, _ := database.GetCollection(config.Get().DBConfig[0].CollectionName)
+	err = col.EnsureIndex(mgo.Index{
+		Key:    []string{"email"},
+		Unique: true,
+	})
+	if err != nil {
+		logrus.Fatal(err.Error())
+	}
+
+	err = col.EnsureIndex(mgo.Index{
+		Key:    []string{"nickname"},
+		Unique: true,
+	})
+	if err != nil {
+		logrus.Fatal(err.Error())
+	}
+
+	// indexes session
+	col, _ = database.GetCollection(config.Get().DBConfig[1].CollectionName)
+	err = col.EnsureIndex(mgo.Index{
+		Key:    []string{"user_id"},
+		Unique: true,
+	})
+	if err != nil {
+		logrus.Fatal(err.Error())
+	}
+
+	err = col.EnsureIndex(mgo.Index{
+		Key:    []string{"token"},
+		Unique: true,
+	})
+	if err != nil {
+		logrus.Fatal(err.Error())
+	}
 }
 
 var casesCreateUser = []struct {
@@ -200,7 +201,10 @@ var casesIdentifyUser = []struct {
 
 func TestIdentifyUser(t *testing.T) {
 	InitDB()
-	_, _ = addUser("Lula", "lula@gmail.com", "lula")
+	_, err := CreateUser("Lula", "lula@gmail.com", "lula")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	for i, val := range casesIdentifyUser {
 		res, err := IdentifyUser(val.loginOrEmail, val.password)
@@ -306,8 +310,10 @@ var casesUpdateUser = []struct {
 
 func TestUpdateUser(t *testing.T) {
 	InitDB()
-	u, _ := addUser("Lula", "lula@gmail.com", "lula")
-
+	u, err := addUser("Lula", "lula@gmail.com", "lula")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 	for i, val := range casesUpdateUserEmpty {
 		err := UpdateUser(val.id, val.newAvatar, val.oldPassword, val.newPassword)
 
@@ -462,7 +468,7 @@ func TestUpdateScore(t *testing.T) {
 		t.Error("#", 1, "RES expected:", lula.Score, "have:", u.Score)
 	}
 
- 	// #2
+	// #2
 	err = UpdateScore(lula.ID.Hex(), 50)
 	if err != nil {
 		t.Error("#", 1, "no ERROR expected", "have:", err)
@@ -473,7 +479,7 @@ func TestUpdateScore(t *testing.T) {
 		t.Error("#", 1, "no ERROR expected", "have:", err)
 	}
 
-	if u.Score != lula.Score + 50 {
+	if u.Score != lula.Score+50 {
 		t.Error("#", 1, "RES expected:", lula.Score, "have:", u.Score)
 	}
 
