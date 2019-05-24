@@ -14,25 +14,6 @@ type Ghost struct {
 	Symbols []Symbol `json:"symbols"`
 }
 
-const (
-	// ширина спрайта на призраков и на игроков (одинаковые)
-	DefaultSpriteWidth = 164
-
-	AxisLen             = 1440
-	PlayerLeftPosition  = (AxisLen - DefaultSpriteWidth) / 2
-	PlayerRightPosition = AxisLen / 2
-
-	DefaultRightPosition   = 1440
-	DefaultLeftPosition    = 0
-	DefaultMovementSpeed   = 80
-	DefaultLenSymbolsSlice = 6
-	DefaultDamage          = 1
-
-	// за 1 призрака при 4 символах, можно получить 100
-	ScoreKillGhost   = 60
-	ScoreMatchSymbol = 10
-)
-
 func NewGhost(startPosition int, damage uint32, speed int, symbolsLen int) Ghost {
 	g := Ghost{
 		X:       startPosition,
@@ -63,12 +44,6 @@ func NewRandomGhost() Ghost {
 		g.X = config.Get().GameConfig.DefaultRightPosition + config.Get().GameConfig.DefaultSpriteWidth
 		g.Speed = -config.Get().GameConfig.DefaultMovementSpeed
 	}
-
-	//if g.X > 0 {
-	//	g.Speed = -DefaultMovementSpeed
-	//} else {
-	//	g.Speed = DefaultMovementSpeed
-	//}
 
 	return g
 }
