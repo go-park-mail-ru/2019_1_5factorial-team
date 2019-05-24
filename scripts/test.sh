@@ -17,6 +17,3 @@ show_coverage()
 
 ./start_dbs_test.sh ; check_cover
 ./scripts/stop.sh
-
-
-
