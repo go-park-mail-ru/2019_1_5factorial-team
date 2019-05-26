@@ -12,6 +12,7 @@ require (
 	github.com/manveru/faker v0.0.0-20171103152722-9fbc68a78c4d
 	github.com/manveru/gobdd v0.0.0-20131210092515-f1a17fdd710b // indirect
 	github.com/pkg/errors v0.8.1
+	github.com/prometheus/client_golang v0.9.3
 	github.com/rossmcdonald/telegram_hook v0.0.0-20181023143956-eaf404d9475a
 	github.com/sirupsen/logrus v1.4.1
 	github.com/swaggo/files v0.0.0-20190110041405-30649e0721f8 // indirect

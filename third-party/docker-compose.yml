@@ -1,4 +1,7 @@
 version: '3'
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
 services:
   #  TODO(): авторизация при подключении к бд
   mongo-user:
@@ -101,3 +104,43 @@ services:
       - '5053:5053'
     depends_on:
       - auth-go
+
+  nodeexporter:
+    image: prom/node-exporter:latest
+    container_name: nodeexporter
+    volumes:
+      - '/proc:/host/proc:ro'
+      - '/sys:/host/sys:ro'
+      - '/:/rootfs:ro'
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+    expose:
+      - '9100'
+    ports:
+      - '9100:9100'
+
+  premetheus:
+    container_name: prom
+    restart: always
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    expose:
+      - '9090'
+    ports:
+      - '9090:9090'
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    expose:
+      - '3000'
+    ports:
+      - '3000:3000'

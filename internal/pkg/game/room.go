@@ -54,7 +54,7 @@ func NewRoom(maxPlayers uint, game *Game) *Room {
 		enemyEnd:   make(chan struct{}),
 
 		mu:     &sync.Mutex{},
-		ticker: time.NewTicker(1 * time.Second),
+		ticker: time.NewTicker(30 * time.Millisecond),
 		state: &RoomState{
 			Objects: gameLogic.NewGhostStack(),
 		},

@@ -16,6 +16,8 @@ jobs:
         - cd .. ; ls ; sleep 20 ; go test -v ./...
 
     - stage: "build"
+      name: "build dockers and tag latest"
+      if: TRAVIS_COMMIT_MESSAGE =~ .*BUILD.*
       script:
         - ls
         - docker build -t smetk/5factorial-auth:`git log -1 --pretty=%h`
@@ -41,6 +43,7 @@ jobs:
         - docker push smetk/5factorial-auth   ; docker push smetk/5factorial-core ;
           docker push smetk/5factorial-worker ; docker push smetk/5factorial-chat ;
           docker push smetk/5factorial-game
+
     - stage: "deploy"
       name: "restart service"
       if: TRAVIS_COMMIT_MESSAGE =~ .*BUILD.*
