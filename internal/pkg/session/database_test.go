@@ -84,7 +84,12 @@ func TestSetToken(t *testing.T) {
 		t.Error("#", 0, "no ERROR expected", "have:", err)
 	}
 
-	if expiration.Hour() != int(math.Abs(float64(now.Hour()+int(config.Get().CookieConfig.CookieTimeHours.Hours())-24))) {
+	check := now.Hour() + int(config.Get().CookieConfig.CookieTimeHours.Hours())
+	if check >= 24 {
+		check = (now.Hour() + int(config.Get().CookieConfig.CookieTimeHours.Hours()) - 24) * -1
+	}
+
+	if expiration.Hour() != check {
 		t.Error("#", 0, "wrong expiration time expected:",
 			int(math.Abs(float64(now.Hour()+int(config.Get().CookieConfig.CookieTimeHours.Hours())-24))),
 			"have:", expiration.Hour())
