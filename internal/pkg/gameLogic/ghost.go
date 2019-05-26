@@ -137,9 +137,12 @@ func (gq *GhostQueue) MoveAllGhosts() (hit bool) {
 	}
 
 	// коллизии, как хотела Надя
-	if gq.Items[0].Speed > 0 && gq.Items[0].X >= config.Get().GameConfig.PlayerLeftPosition-config.Get().GameConfig.DefaultSpriteWidth {
+	if gq.Items[0].Speed > 0 &&
+		//gq.Items[0].X >= config.Get().GameConfig.PlayerLeftPosition-config.Get().GameConfig.DefaultSpriteWidth {
+		gq.Items[0].X >= config.Get().GameConfig.PlayerLeftPosition {
 		hit = true
-	} else if gq.Items[0].Speed < 0 && gq.Items[0].X <= config.Get().GameConfig.PlayerRightPosition+config.Get().GameConfig.DefaultSpriteWidth {
+	} else if gq.Items[0].Speed < 0 &&
+		gq.Items[0].X <= config.Get().GameConfig.PlayerRightPosition+config.Get().GameConfig.DefaultSpriteWidth {
 		hit = true
 	}
 
