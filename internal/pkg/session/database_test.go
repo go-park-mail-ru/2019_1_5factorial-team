@@ -7,7 +7,6 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/mgo.v2"
-	"math"
 	"testing"
 	"time"
 )
@@ -91,7 +90,7 @@ func TestSetToken(t *testing.T) {
 
 	if expiration.Hour() != check {
 		t.Error("#", 0, "wrong expiration time expected:",
-			int(math.Abs(float64(now.Hour()+int(config.Get().CookieConfig.CookieTimeHours.Hours())-24))),
+			check,
 			"have:", expiration.Hour())
 	}
 
