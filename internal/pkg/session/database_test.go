@@ -85,7 +85,7 @@ func TestSetToken(t *testing.T) {
 
 	check := now.Hour() + int(config.Get().CookieConfig.CookieTimeHours.Hours())
 	if check >= 24 {
-		check = (now.Hour() + int(config.Get().CookieConfig.CookieTimeHours.Hours()) - 24) * -1
+		check = now.Hour() + int(config.Get().CookieConfig.CookieTimeHours.Hours()) - 24
 	}
 
 	if expiration.Hour() != check {
