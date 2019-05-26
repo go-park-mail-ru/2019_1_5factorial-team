@@ -45,7 +45,7 @@ services:
       - '/var/www/media/factorial:/var/www/media/factorial'
       - '/etc/5factorial:/etc/5factorial'
     ports:
-      - '5051:5051'
+      - '8001:5051'
     depends_on:
       - auth-go
 
@@ -66,7 +66,7 @@ services:
       #     - '/var/www/media/factorial:/var/www/media/factorial'
       - '/etc/5factorial:/etc/5factorial'
     ports:
-      - '5052:5052'
+      - '8002:5052'
     depends_on:
       - mongo-chat-global
       - auth-go
@@ -78,6 +78,6 @@ services:
     volumes:
       - '/etc/5factorial:/etc/5factorial'
     ports:
-      - '5053:5053'
+      - '8003:5053'
     depends_on:
       - auth-go
