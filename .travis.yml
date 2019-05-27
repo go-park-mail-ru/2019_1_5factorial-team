@@ -17,7 +17,7 @@ jobs:
 
     - stage: "build"
       name: "build dockers and tag latest"
-      if: TRAVIS_COMMIT_MESSAGE =~ .*BUILD.*
+#      if: TRAVIS_COMMIT_MESSAGE =~ .*BUILD.*
       script:
         - ls
         - docker build -t smetk/5factorial-auth:`git log -1 --pretty=%h`
