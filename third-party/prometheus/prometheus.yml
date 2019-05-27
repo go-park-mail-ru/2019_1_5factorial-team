@@ -6,9 +6,9 @@ scrape_configs:
   - job_name: 'core'
     static_configs:
       - targets:
-        - 'localhost:5051'
+        - 'server-go:5051'
 
   - job_name: 'system'
     static_configs:
       - targets:
-        - 'nodeexporter:9100'
+        - 'node_exporter:9100'

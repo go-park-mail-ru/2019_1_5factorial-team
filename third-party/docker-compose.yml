@@ -1,7 +1,4 @@
 version: '3'
-volumes:
-  prometheus_data: {}
-  grafana_data: {}
 services:
   #  TODO(): авторизация при подключении к бд
   mongo-user:
@@ -105,42 +102,28 @@ services:
     depends_on:
       - auth-go
 
-  nodeexporter:
-    image: prom/node-exporter:latest
-    container_name: nodeexporter
+  prometheus:
+    image: prom/prometheus
     volumes:
-      - '/proc:/host/proc:ro'
-      - '/sys:/host/sys:ro'
-      - '/:/rootfs:ro'
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:Z
     command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
-    expose:
-      - '9100'
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=20d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
     ports:
-      - '9100:9100'
-
-  premetheus:
-    container_name: prom
+      - 9090:9090
     restart: always
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus/:/etc/prometheus/
-    expose:
-      - '9090'
+
+  node_exporter:
+    image: prom/node-exporter
     ports:
-      - '9090:9090'
+      - 9100:9100
+    restart: always
 
   grafana:
-    container_name: grafana
-    image: grafana/grafana:latest
-    environment:
-      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
-      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
-      - GF_USERS_ALLOW_SIGN_UP=false
-    expose:
-      - '3000'
+    image: grafana/grafana
     ports:
-      - '3000:3000'
+      - 5000:3000
+    restart: always
