@@ -24,13 +24,13 @@ func New(port string) *MyGorgeousServer {
 	mgs := MyGorgeousServer{}
 	mgs.port = port
 
+	prometheus.MustRegister(stats.Hits)
+
 	return &mgs
 }
 
 func (mgs *MyGorgeousServer) Run() error {
 	address := ":" + mgs.port
-
-	prometheus.MustRegister(stats.Hits)
 
 	router := mux.NewRouter()
 	router.Use(middleware.CORSMiddleware)

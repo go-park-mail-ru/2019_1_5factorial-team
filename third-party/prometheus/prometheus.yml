@@ -7,7 +7,10 @@ scrape_configs:
     static_configs:
       - targets:
         - 'server-go:5051'
-
+  - job_name: 'core'
+      static_configs:
+        - targets:
+            - 'server-go:5051'
   - job_name: 'system'
     static_configs:
       - targets:

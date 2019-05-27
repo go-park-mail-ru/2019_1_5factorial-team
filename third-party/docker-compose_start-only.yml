@@ -30,7 +30,7 @@ services:
   auth-go:
     container_name: 5factorial-back-auth
     restart: always
-    image: smetk/5factorial-auth
+    image: smetk/5factorial-auth:latest
     volumes:
       - '/etc/5factorial:/etc/5factorial'
     depends_on:
@@ -40,7 +40,7 @@ services:
   server-go:
     container_name: 5factorial-back
     restart: always
-    image: smetk/5factorial-core
+    image: smetk/5factorial-core:latest
     volumes:
       - '/var/www/media/factorial:/var/www/media/factorial'
       - '/etc/5factorial:/etc/5factorial'
@@ -52,7 +52,7 @@ services:
   worker-go:
     container_name: 5factorial-worker
     restart: always
-    image: smetk/5factorial-worker
+    image: smetk/5factorial-worker:latest
     volumes:
       - '/etc/5factorial:/etc/5factorial'
     depends_on:
@@ -61,7 +61,7 @@ services:
   chat-go:
     container_name: 5factorial-back-chat
     restart: always
-    image: smetk/5factorial-chat
+    image: smetk/5factorial-chat:latest
     volumes:
       #     - '/var/www/media/factorial:/var/www/media/factorial'
       - '/etc/5factorial:/etc/5factorial'
@@ -74,7 +74,7 @@ services:
   game-go:
     container_name: 5factorial-back-game
     restart: always
-    image: smetk/5factorial-game
+    image: smetk/5factorial-game:latest
     volumes:
       - '/etc/5factorial:/etc/5factorial'
     ports:

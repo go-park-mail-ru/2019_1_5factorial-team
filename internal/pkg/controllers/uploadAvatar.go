@@ -84,7 +84,8 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	}
 
 	OkResponse(res, AvatarLinkResponse{
-		AvatarLink: "/static/" + resultFile,
+		//AvatarLink: "/static/" + resultFile,
+		AvatarLink: resultFile,
 	})
 
 	ctxLogger.Infof("OK response\n\t--avatar_link = /static/%s,\n\t--fileExtention = %s,\n\t--filetype = %s",
