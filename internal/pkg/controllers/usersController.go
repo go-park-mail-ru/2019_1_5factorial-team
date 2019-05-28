@@ -224,6 +224,7 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 // 	"avatar":
 //	"old_password":
 // 	"new_password":
+//easyjson:json
 type ProfileUpdateRequest struct {
 	Avatar      string `json:"avatar"`
 	OldPassword string `json:"old_password"`
@@ -303,6 +304,7 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		u.ID, u.Nickname, u.Email, u.Score, u.AvatarLink)
 }
 
+//easyjson:json
 type UsersCountInfoResponse struct {
 	Count int `json:"count"`
 }

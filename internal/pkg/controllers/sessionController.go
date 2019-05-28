@@ -137,7 +137,7 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 // 	"nickname":
 // 	"score":
 // 	"avatar_link":
-
+//easyjson:json
 type UserInfoResponse struct {
 	Email      string `json:"email"`
 	Nickname   string `json:"nickname"`
