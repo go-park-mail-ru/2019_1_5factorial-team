@@ -23,7 +23,7 @@ var testsSignIn = []TestCases{
 		url:            "/api/session",
 		body:           strings.NewReader(`{"loginOrEmail": "kek@email.kek"},`),
 		urlValues:      "",
-		expectedRes:    `{"error":"json parsing error: invalid character ',' after top-level value"}`,
+		expectedRes:    `{"error":"json parsing error: parse error: invalid character ',' after top-level value near offset 33 of ','"}`,
 		expectedStatus: http.StatusInternalServerError,
 		authCtx:        false,
 	},

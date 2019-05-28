@@ -66,6 +66,9 @@ func ParseRequestIntoStructEasy(auth bool, req *http.Request, requestStruct inte
 	defer req.Body.Close()
 
 	err = requestStruct.UnmarshalJSON(body)
+	if err != nil {
+		return http.StatusInternalServerError, errors.Wrap(err, "json parsing error")
+	}
 
 	return 0, nil
 }
