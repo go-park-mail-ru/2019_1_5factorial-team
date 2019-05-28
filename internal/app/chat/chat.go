@@ -27,6 +27,7 @@ func (mgc *MyGorgeousChat) Run() error {
 	address := ":" + mgc.port
 
 	chatRouter := mux.NewRouter()
+	chatRouter.Use(middleware.CheckStatus)
 	chatRouter.Use(middleware.CORSMiddleware)
 	chatRouter.Use(middleware.AuthMiddleware)
 	//chatRouter.Use(middleware.CheckLoginMiddleware)

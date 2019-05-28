@@ -15,9 +15,8 @@ import (
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
-		var userId string = ""
+		var userId = ""
 		authorized := false
-		//authGRPC := grpcAuth.GetClient()
 		authGRPC := grpcAuth.AuthGRPCClient
 		ctxGRPC := context.Background()
 
@@ -37,7 +36,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		cookie, err := req.Cookie(config.Get().CookieConfig.CookieName)
 		if err != nil {
-			//log.Println("no cookie found, user unauthorized")
 			logrus.WithField("cookie", cookie).Warn("no cookie found, user unauthorized")
 
 			return

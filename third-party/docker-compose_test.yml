@@ -43,7 +43,7 @@ services:
       - '27082:27032'
 
   mongo-chat:
-    container_name: 5factorial-chat-global-mongo
+    container_name: 5factorial-chat-global-mongo-test
     command: mongod --port 27033
     image: mongo:4.0
     ports:

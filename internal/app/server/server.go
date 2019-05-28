@@ -3,12 +3,10 @@ package server
 import (
 	_ "github.com/go-park-mail-ru/2019_1_5factorial-team/docs"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/stats"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/controllers"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/middleware"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
@@ -24,7 +22,7 @@ func New(port string) *MyGorgeousServer {
 	mgs := MyGorgeousServer{}
 	mgs.port = port
 
-	prometheus.MustRegister(stats.Hits)
+	//prometheus.MustRegister(stats.Hits)
 
 	return &mgs
 }
@@ -47,6 +45,7 @@ func (mgs *MyGorgeousServer) Run() error {
 	// main router with check cookie
 	mainRouter := router.PathPrefix("").Subrouter()
 	mainRouter.Use(middleware.AuthMiddleware)
+	mainRouter.Use(middleware.CheckStatus)
 
 	mainRouter.HandleFunc("/api/session/oauth/google", controllers.LoginFromGoogle).Methods("POST", "OPTIONS")
 	mainRouter.HandleFunc("/api/session/oauth/vk", controllers.LoginFromVK).Methods("POST", "OPTIONS")
