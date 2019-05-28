@@ -18,7 +18,7 @@ jobs:
     - stage: "build"
       name: "build dockers and tag latest"
       script:
-        - if [[ $TRAVIS_COMMIT_MESSAGE == .*BUILD.* ]]; ./scripts/build_dockers.sh ; fi ;
+        - if [[ $TRAVIS_COMMIT_MESSAGE == .*BUILD.* ]]; sudo ./scripts/build_dockers.sh ; fi ;
 
     - stage: "deploy"
       name: "restart service"
