@@ -16,6 +16,7 @@ import (
 // 	"login":
 // 	"password":
 // пока только логин, без почты
+//easyjson:json
 type signInRequest struct {
 	LoginOrEmail string `json:"loginOrEmail"`
 	Password     string `json:"password"`
@@ -39,7 +40,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	ctx := context.Background()
 
 	data := signInRequest{}
-	status, err := ParseRequestIntoStruct(true, req, &data)
+	status, err := ParseRequestIntoStructEasy(true, req, &data)
 	if err != nil {
 		ErrResponse(res, status, err.Error())
 

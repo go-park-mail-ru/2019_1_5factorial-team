@@ -53,6 +53,23 @@ func ParseRequestIntoStruct(auth bool, req *http.Request, requestStruct interfac
 	return 0, nil
 }
 
+func ParseRequestIntoStructEasy(auth bool, req *http.Request, requestStruct interface{ UnmarshalJSON(data []byte) error }) (int, error) {
+	isAuth := req.Context().Value("authorized").(bool)
+	if isAuth == auth {
+		return http.StatusBadRequest, errors.New("already auth, ctx.authorized shouldn't be " + strconv.FormatBool(auth))
+	}
+
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		return http.StatusInternalServerError, errors.Wrap(err, "body parsing error")
+	}
+	defer req.Body.Close()
+
+	err = requestStruct.UnmarshalJSON(body)
+
+	return 0, nil
+}
+
 func DropUserCookie(res http.ResponseWriter, req *http.Request) (int, error) {
 	currentSession, err := req.Cookie(config.Get().CookieConfig.CookieName)
 	if err == http.ErrNoCookie {

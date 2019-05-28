@@ -9,6 +9,7 @@ require (
 	github.com/gorilla/websocket v1.4.0
 	github.com/icrowley/fake v0.0.0-20180203215853-4178557ae428
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
+	github.com/mailru/easyjson v0.0.0-20190312143242-1de009706dbe
 	github.com/manveru/faker v0.0.0-20171103152722-9fbc68a78c4d
 	github.com/manveru/gobdd v0.0.0-20131210092515-f1a17fdd710b // indirect
 	github.com/pkg/errors v0.8.1
