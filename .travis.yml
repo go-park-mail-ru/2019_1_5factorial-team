@@ -23,12 +23,12 @@ jobs:
     - stage: "deploy"
       name: "restart service"
       script:
-        - if [[ $TRAVIS_COMMIT_MESSAGE =~ .*BUILD.* ]]; then ssh -i 5factorial_id_rsa.pem ubuntu@95.163.180.8 << EOF
+        - if [[ $TRAVIS_COMMIT_MESSAGE =~ .*BUILD.* ]]; then ssh -i ~/5factorial_id_rsa.pem ubuntu@95.163.180.8 << EOF
           cd backend/2019_1_5factorial-team
           git fetch --all
           git pull
           EOF
-          ; ssh -i ~/5factorial_id_rsa.pem ubuntu@95.163.180.8 sudo systemctl status 5factorial.service ; ssh -i ~/5factorial_id_rsa.pem ubuntu@95.163.180.8 sudo systemctl restart 5factorial.service; fi;
+          ; ssh -i ~/5factorial_id_rsa.pem ubuntu@95.163.180.8 sudo systemctl restart 5factorial.service; fi;
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_147bdc689a1a_key -iv $encrypted_147bdc689a1a_iv

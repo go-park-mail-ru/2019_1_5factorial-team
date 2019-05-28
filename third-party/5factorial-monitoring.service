@@ -5,7 +5,7 @@ After=docker.service
 
 [Service]
 User=root
-ExecStartPre=/usr/local/bin/docker-compose --file /home/ubuntu/backend/2019_1_5factorial-team/third-party/docker-compose_monitoring.yml down -v
+ExecStartPre=/usr/local/bin/docker-compose --file /home/ubuntu/backend/2019_1_5factorial-team/third-party/docker-compose_monitoring.yml pull
 ExecStart=/usr/local/bin/docker-compose --file /home/ubuntu/backend/2019_1_5factorial-team/third-party/docker-compose_monitoring.yml up
 ExecStop=/usr/local/bin/docker-compose --file /home/ubuntu/backend/2019_1_5factorial-team/third-party/docker-compose_monitoring.yml down -v
 
