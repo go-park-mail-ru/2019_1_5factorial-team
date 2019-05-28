@@ -18,12 +18,12 @@ jobs:
     - stage: "build"
       name: "build dockers and tag latest"
       script:
-        - if [[ $TRAVIS_COMMIT_MESSAGE == .*BUILD.* ]]; then sudo ./scripts/build_dockers.sh; fi;
+        - if [[ $TRAVIS_COMMIT_MESSAGE =~ .*BUILD.* ]]; then sudo ./scripts/build_dockers.sh; fi;
 
     - stage: "deploy"
       name: "restart service"
       script:
-        - if [[ $TRAVIS_COMMIT_MESSAGE == .*BUILD.* ]]; then ssh -i 5factorial_id_rsa.pem ubuntu@95.163.180.8 << EOF
+        - if [[ $TRAVIS_COMMIT_MESSAGE =~ .*BUILD.* ]]; then ssh -i 5factorial_id_rsa.pem ubuntu@95.163.180.8 << EOF
           cd backend/2019_1_5factorial-team
           git fetch --all
           git pull
