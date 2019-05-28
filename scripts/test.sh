@@ -16,4 +16,7 @@ show_coverage()
 }
 
 ./start_dbs_test.sh ; check_cover
-./scripts/stop.sh
+
+docker stop 5factorial-back-auth-1            5factorial-user-mongo-1    5factorial-session-mongo-1 \
+            5factorial-chat-global-mongo-test 5factorial-session-mongo-3 5factorial-session-mongo-3 \
+            5factorial-session-mongo-2        5factorial-user-mongo-2    5factorial-user-mongo-3

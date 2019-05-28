@@ -16,7 +16,7 @@ import (
 type Statistic struct {
 	Bad         *prometheus.CounterVec
 	Hits        prometheus.Counter
-	ActiveRooms prometheus.Counter
+	ActiveRooms prometheus.Gauge
 }
 
 var Stats = Statistic{}
@@ -31,7 +31,7 @@ func init() {
 		Help: "just dummy hits on service",
 	})
 
-	Stats.ActiveRooms = prometheus.NewCounter(prometheus.CounterOpts{
+	Stats.ActiveRooms = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: "active_rooms",
 		Help: "just dummy counter of room in game",
 	})
@@ -52,5 +52,5 @@ func (s *Statistic) AddActiveRoom() {
 }
 
 func (s *Statistic) RemoveActiveRoom() {
-	s.ActiveRooms.Desc()
+	s.ActiveRooms.Dec()
 }
