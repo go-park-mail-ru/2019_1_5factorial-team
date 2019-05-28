@@ -2,7 +2,8 @@
 
 check_cover()
 {
-    cd ../internal/pkg
+#    cd ../internal/pkg
+    cd ..
     sleep 15
     go test -coverpkg=./... -coverprofile=c.out ./...
     go tool cover -func c.out
@@ -17,6 +18,8 @@ show_coverage()
 
 ./start_dbs_test.sh ; check_cover
 
-docker stop 5factorial-back-auth-1            5factorial-user-mongo-1    5factorial-session-mongo-1 \
-            5factorial-chat-global-mongo-test 5factorial-session-mongo-3 5factorial-session-mongo-3 \
-            5factorial-session-mongo-2        5factorial-user-mongo-2    5factorial-user-mongo-3
+cd scripts
+./stop_dbs_test.sh
+#docker stop 5factorial-back-auth-1            5factorial-user-mongo-1    5factorial-session-mongo-1 \
+#            5factorial-chat-global-mongo-test 5factorial-session-mongo-3 5factorial-session-mongo-3 \
+#            5factorial-session-mongo-2        5factorial-user-mongo-2    5factorial-user-mongo-3

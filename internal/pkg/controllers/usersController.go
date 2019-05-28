@@ -24,6 +24,7 @@ import (
 // 	"login":
 //	"email":
 // 	"password":
+//easyjson:json
 type SingUpRequest struct {
 	Login    string `json:"login"`
 	Email    string `json:"email"`
@@ -103,7 +104,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	ctx := context.Background()
 
 	data := SingUpRequest{}
-	statusErr, err := ParseRequestIntoStruct(true, req, &data)
+	statusErr, err := ParseRequestIntoStructEasy(true, req, &data)
 	if err != nil {
 		ErrResponse(res, statusErr, err.Error())
 
@@ -234,6 +235,7 @@ type ProfileUpdateRequest struct {
 //	"nickname":
 // 	"score":
 //	"avatar_link":
+//easyjson:json
 type ProfileUpdateResponse struct {
 	Email      string `json:"email"`
 	Nickname   string `json:"nickname"`
@@ -258,7 +260,7 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 	ctx := context.Background()
 
 	data := ProfileUpdateRequest{}
-	status, err := ParseRequestIntoStruct(false, req, &data)
+	status, err := ParseRequestIntoStructEasy(false, req, &data)
 	if err != nil {
 		ErrResponse(res, status, err.Error())
 

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-./stop.sh
-
 cd ..
 cd third-party
 
