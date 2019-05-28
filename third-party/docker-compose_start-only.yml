@@ -82,32 +82,32 @@ services:
     depends_on:
       - auth-go
 
-#  #  MONITORING
-#  prometheus:
-#    container_name: 5factorial-monitoring-prometheus
-#    image: prom/prometheus
-#    restart: always
-#    volumes:
-#      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:Z
-#    command:
-#      - '--config.file=/etc/prometheus/prometheus.yml'
-#      - '--storage.tsdb.path=/prometheus'
-#      - '--storage.tsdb.retention=20d'
-#      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-#      - '--web.console.templates=/usr/share/prometheus/consoles'
-#    ports:
-#      - '8005:9090'
-#
-#  node_exporter:
-#    container_name: 5factorial-monitoring-node_exporter
-#    image: prom/node-exporter
-#    restart: always
-#    ports:
-#      - '9100:9100'
-#
-#  grafana:
-#    container_name: 5factorial-monitoring-grafana
-#    image: grafana/grafana
-#    restart: always
-#    ports:
-#      - '8004:3000'
+  #  MONITORING
+  prometheus:
+    container_name: 5factorial-monitoring-prometheus
+    image: prom/prometheus
+    restart: always
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:Z
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=20d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - '8005:9090'
+
+  node_exporter:
+    container_name: 5factorial-monitoring-node_exporter
+    image: prom/node-exporter
+    restart: always
+    ports:
+      - '9100:9100'
+
+  grafana:
+    container_name: 5factorial-monitoring-grafana
+    image: grafana/grafana
+    restart: always
+    ports:
+      - '8004:3000'
