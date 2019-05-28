@@ -14,6 +14,7 @@ import (
 
 // 'Content-Type': 'application/json; charset=utf-8'
 // 	"avatarlink":
+//easyjson:json
 type AvatarLinkResponse struct {
 	AvatarLink string `json:"avatar_link"`
 }

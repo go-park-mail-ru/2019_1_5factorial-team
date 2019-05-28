@@ -117,6 +117,7 @@ func validateChangingPasswords(oldPassword string, newPassword string, currentHa
 	return nil
 }
 
+//easyjson:json
 type Scores struct {
 	Nickname string `json:"nickname"`
 	Score    int    `json:"score"`

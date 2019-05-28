@@ -161,7 +161,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	cookie := session.CreateHttpCookie(cookieGRPC.Token, timeCookie)
 
 	http.SetCookie(res, cookie)
-	OkResponse(res, "signUp ok")
+	OkResponse(res, nil)
 
 	ctxLogger.Infof("OK response\n\t--id = %s,\n\t--nickname = %s,\n\t--email = %s,\n\t--score = %d",
 		u.ID, u.Nickname, u.Email, u.Score)

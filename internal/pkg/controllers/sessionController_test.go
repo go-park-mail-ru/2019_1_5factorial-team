@@ -53,7 +53,7 @@ var testsSignIn = []TestCases{
 		url:            "/api/session",
 		body:           strings.NewReader(`{"loginOrEmail": "kekkekkek", "password": "password"}`),
 		urlValues:      "",
-		expectedRes:    `"ok auth"`,
+		expectedRes:    ``,
 		expectedStatus: http.StatusOK,
 		authCtx:        false,
 	},

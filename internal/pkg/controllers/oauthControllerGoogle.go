@@ -33,5 +33,5 @@ func LoginFromGoogle(res http.ResponseWriter, req *http.Request) {
 	cookie := session.CreateHttpCookie(randToken, expiration)
 
 	http.SetCookie(res, cookie)
-	OkResponse(res, "oauth ok")
+	OkResponse(res, nil)
 }

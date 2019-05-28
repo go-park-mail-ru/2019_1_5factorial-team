@@ -75,7 +75,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	cookie := session.CreateHttpCookie(cookieGRPC.Token, timeCookie)
 
 	http.SetCookie(res, cookie)
-	OkResponse(res, "ok auth")
+	OkResponse(res, nil)
 
 	ctxLogger.Infof("OK response\n\t--id = %s,\n\t--nickname = %s,\n\t--email = %s,\n\t--score = %d",
 		u.ID, u.Nickname, u.Email, u.Score)
@@ -127,7 +127,7 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	OkResponse(res, "ok logout")
+	OkResponse(res, nil)
 
 	ctxLogger.Info("OK response, cookie set expired, session deleted")
 }
@@ -204,6 +204,6 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 func IsSessionValid(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 
-	OkResponse(res, "session is valid")
+	OkResponse(res, nil)
 	ctxLogger.Info("session is valid")
 }

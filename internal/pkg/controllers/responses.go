@@ -43,9 +43,12 @@ func addEasyJSONBody(res http.ResponseWriter, bodyMessage interface{ MarshalJSON
 	res.Write(blob)
 }
 
-func OkResponse(res http.ResponseWriter, bodyMessage interface{}) {
+func OkResponse(res http.ResponseWriter, bodyMessage interface{ MarshalJSON() ([]byte, error) }) {
 	addOkHeader(res)
-	addBody(res, bodyMessage)
+	if bodyMessage != nil {
+		addEasyJSONBody(res, bodyMessage)
+		//addBody(res, bodyMessage)
+	}
 }
 
 func addErrHeader(res http.ResponseWriter, errCode int) {
