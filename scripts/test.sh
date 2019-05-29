@@ -5,8 +5,10 @@ check_cover()
 #    cd ../internal/pkg
     cd ..
     sleep 15
-    go test -coverpkg=./... -coverprofile=c.out ./...
-    go tool cover -func c.out
+    go test -coverpkg=./internal/... -coverprofile=cover.out.tmp ./internal/...
+    cat cover.out.tmp | grep -v "_easyjson.go" > cover.out.tmp2
+    cat cover.out.tmp2 | grep -v ".pb.go" > cover.out
+    go tool cover -func cover.out
 }
 
 show_coverage()
