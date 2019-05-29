@@ -22,7 +22,7 @@ var testsGetLeaderboard = []TestCases{
 		url:            "/api/user/score?limit=1000&offset=1000",
 		body:           nil,
 		urlValues:      "",
-		expectedRes:    `{"error":"limit * (offset - 1) \u003e users count"}`,
+		expectedRes:    `{"error":"rpc error: code = Unknown desc = limit * (offset - 1) \u003e users count"}`,
 		expectedStatus: http.StatusBadRequest,
 		authCtx:        false,
 	},

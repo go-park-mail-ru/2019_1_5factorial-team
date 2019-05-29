@@ -88,6 +88,7 @@ func (p *Player) Listen() {
 			return
 
 		case message := <-p.out:
+			//p.conn.WriteMessage()
 			err := p.conn.WriteJSON(message)
 			if err != nil {
 				log.Error("p.Listen cant send message ", err.Error())

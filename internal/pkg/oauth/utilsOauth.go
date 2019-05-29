@@ -26,7 +26,6 @@ type YandexUser struct {
 }
 
 func GetOauthUser(service string, contents []byte) (string, string, error) {
-
 	switch service {
 	case "vk":
 		userInfo := VkResponse{}
@@ -67,9 +66,9 @@ func GetOauthUser(service string, contents []byte) (string, string, error) {
 func GetApiUrl(token string, service string) string {
 	switch service {
 	case "vk":
-		return ("https://api.vk.com/method/users.get?fields=email,photo_50&access_token=" + token + "&v=5.52")
+		return "https://api.vk.com/method/users.get?fields=email,photo_50&access_token=" + token + "&v=5.52"
 	case "google":
-		return ("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token)
+		return "https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token
 	case "yandex":
 		return "https://login.yandex.ru/info"
 	default:

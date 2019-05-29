@@ -2,6 +2,8 @@
 # Created by https://www.gitignore.io/api/go,macos,jetbrains+all,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=go,macos,jetbrains+all,visualstudiocode
 
+*.html
+
 ### Go ###
 # Binaries for programs and plugins
 *.exe
@@ -17,7 +19,7 @@
 *.out
 
 ### Go Patch ###
-/vendor/
+# /vendor/
 /Godeps/
 
 ### JetBrains+all ###

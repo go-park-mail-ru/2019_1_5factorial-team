@@ -25,17 +25,17 @@ services:
     ports:
       - '27052:27032' # map port to none standard port, to avoid conflicts with locally installed mongodb.
 
-  mongo-chat-global:
-    container_name: 5factorial-chat-global-mongo
-    command: mongod --port 27033
-    image: mongo:4.0
-    #    environment:
-    #      MONGO_INITDB_ROOT_USERNAME: 'user'
-    #      MONGO_INITDB_ROOT_PASSWORD: 'user'
-    volumes:
-      - '/data/db/chat_global:/data/db'
-    ports:
-      - '27053:27033' # map port to none standard port, to avoid conflicts with locally installed mongodb.
+#  mongo-chat-global:
+#    container_name: 5factorial-chat-global-mongo
+#    command: mongod --port 27033
+#    image: mongo:4.0
+#    #    environment:
+#    #      MONGO_INITDB_ROOT_USERNAME: 'user'
+#    #      MONGO_INITDB_ROOT_PASSWORD: 'user'
+#    volumes:
+#      - '/data/db/chat_global:/data/db'
+#    ports:
+#      - '27053:27033' # map port to none standard port, to avoid conflicts with locally installed mongodb.
 
   auth-go:
     container_name: 5factorial-back-auth
@@ -59,7 +59,7 @@ services:
       - '/var/www/media/factorial:/var/www/media/factorial'
       - '/etc/5factorial:/etc/5factorial'
     ports:
-      - '5051:5051'
+      - '8001:5051'
     depends_on:
       - auth-go
 
@@ -74,20 +74,20 @@ services:
     depends_on:
       - mongo-session
 
-  chat-go:
-    container_name: 5factorial-back-chat
-    restart: always
-    build:
-      context: ../.
-      dockerfile: ./third-party/chat/Dockerfile
-    volumes:
-      #     - '/var/www/media/factorial:/var/www/media/factorial'
-      - '/etc/5factorial:/etc/5factorial'
-    ports:
-      - '5052:5052'
-    depends_on:
-      - mongo-chat-global
-      - auth-go
+#  chat-go:
+#    container_name: 5factorial-back-chat
+#    restart: always
+#    build:
+#      context: ../.
+#      dockerfile: ./third-party/chat/Dockerfile
+#    volumes:
+#      #     - '/var/www/media/factorial:/var/www/media/factorial'
+#      - '/etc/5factorial:/etc/5factorial'
+#    ports:
+#      - '8002:5052'
+#    depends_on:
+#      - mongo-chat-global
+#      - auth-go
 
   game-go:
     container_name: 5factorial-back-game
@@ -98,6 +98,36 @@ services:
     volumes:
       - '/etc/5factorial:/etc/5factorial'
     ports:
-      - '5053:5053'
+      - '8003:5053'
     depends_on:
       - auth-go
+
+  #  MONITORING
+  prometheus:
+    container_name: 5factorial-monitoring-prometheus
+    image: prom/prometheus
+    restart: always
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:Z
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=20d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - '8005:9090'
+
+  node_exporter:
+    container_name: 5factorial-monitoring-node_exporter
+    image: prom/node-exporter
+    restart: always
+    ports:
+      - '9100:9100'
+
+  grafana:
+    container_name: 5factorial-monitoring-grafana
+    image: grafana/grafana
+    restart: always
+    ports:
+      - '8004:3000'

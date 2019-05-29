@@ -9,6 +9,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 )
 
@@ -31,15 +32,20 @@ func (mgg *MyGorgeousGame) Run() error {
 	address := ":" + mgg.port
 	log.Println(address)
 
-	gameRouter := mux.NewRouter()
-	gameRouter.Use(middleware.CORSMiddleware)
+	router := mux.NewRouter()
+	router.Use(middleware.CORSMiddleware)
+	router.Use(middleware.PanicMiddleware)
+	router.Path("/metrics").Handler(promhttp.Handler())
+
+
+	gameRouter := router.PathPrefix("").Subrouter()
+	//gameRouter.Use(middleware.CheckStatus)
 	gameRouter.Use(middleware.AuthMiddleware)
 	gameRouter.Use(middleware.CheckLoginMiddleware)
-	gameRouter.Use(middleware.PanicMiddleware)
 
 	gameRouter.HandleFunc("/api/game/ws", controllers.Play).Methods("GET", "OPTIONS")
 
-	err := http.ListenAndServe(address, gameRouter)
+	err := http.ListenAndServe(address, router)
 	if err != nil {
 		return errors.Wrap(err, "server Run error")
 	}

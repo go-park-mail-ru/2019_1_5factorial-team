@@ -16,7 +16,7 @@ import (
 // 	"nickname":
 // 	"score":
 // 	"avatar_link":
-
+//easyjson:json
 type GetLeaderboardResponse struct {
 	Scores []user.Scores `json:"scores"`
 }

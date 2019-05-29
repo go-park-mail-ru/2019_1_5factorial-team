@@ -51,7 +51,6 @@ func UpdateToken(token string) (UserSession, error) {
 }
 
 // при взятии токена, проверяет его на время
-//TODO(): убрать этот метод из игры (перевести игру и чат на gRPC)
 func GetId(token string) (string, error) {
 	us, err := GetSessionByToken(token)
 	if err != nil {

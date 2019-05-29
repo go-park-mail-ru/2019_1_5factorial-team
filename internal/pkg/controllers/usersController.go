@@ -24,6 +24,7 @@ import (
 // 	"login":
 //	"email":
 // 	"password":
+//easyjson:json
 type SingUpRequest struct {
 	Login    string `json:"login"`
 	Email    string `json:"email"`
@@ -46,6 +47,26 @@ func ParseRequestIntoStruct(auth bool, req *http.Request, requestStruct interfac
 	}
 
 	err = json.Unmarshal(body, &requestStruct)
+	if err != nil {
+		return http.StatusInternalServerError, errors.Wrap(err, "json parsing error")
+	}
+
+	return 0, nil
+}
+
+func ParseRequestIntoStructEasy(auth bool, req *http.Request, requestStruct interface{ UnmarshalJSON(data []byte) error }) (int, error) {
+	isAuth := req.Context().Value("authorized").(bool)
+	if isAuth == auth {
+		return http.StatusBadRequest, errors.New("already auth, ctx.authorized shouldn't be " + strconv.FormatBool(auth))
+	}
+
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		return http.StatusInternalServerError, errors.Wrap(err, "body parsing error")
+	}
+	defer req.Body.Close()
+
+	err = requestStruct.UnmarshalJSON(body)
 	if err != nil {
 		return http.StatusInternalServerError, errors.Wrap(err, "json parsing error")
 	}
@@ -83,7 +104,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	ctx := context.Background()
 
 	data := SingUpRequest{}
-	statusErr, err := ParseRequestIntoStruct(true, req, &data)
+	statusErr, err := ParseRequestIntoStructEasy(true, req, &data)
 	if err != nil {
 		ErrResponse(res, statusErr, err.Error())
 
@@ -140,7 +161,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	cookie := session.CreateHttpCookie(cookieGRPC.Token, timeCookie)
 
 	http.SetCookie(res, cookie)
-	OkResponse(res, "signUp ok")
+	OkResponse(res, nil)
 
 	ctxLogger.Infof("OK response\n\t--id = %s,\n\t--nickname = %s,\n\t--email = %s,\n\t--score = %d",
 		u.ID, u.Nickname, u.Email, u.Score)
@@ -203,6 +224,7 @@ func GetUser(res http.ResponseWriter, req *http.Request) {
 // 	"avatar":
 //	"old_password":
 // 	"new_password":
+//easyjson:json
 type ProfileUpdateRequest struct {
 	Avatar      string `json:"avatar"`
 	OldPassword string `json:"old_password"`
@@ -214,6 +236,7 @@ type ProfileUpdateRequest struct {
 //	"nickname":
 // 	"score":
 //	"avatar_link":
+//easyjson:json
 type ProfileUpdateResponse struct {
 	Email      string `json:"email"`
 	Nickname   string `json:"nickname"`
@@ -238,20 +261,13 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 	ctx := context.Background()
 
 	data := ProfileUpdateRequest{}
-	status, err := ParseRequestIntoStruct(false, req, &data)
+	status, err := ParseRequestIntoStructEasy(false, req, &data)
 	if err != nil {
 		ErrResponse(res, status, err.Error())
 
 		ctxLogger.Error(errors.Wrap(err, "ParseRequestIntoStruct error"))
 		return
 	}
-
-	//flagValidNewPassword := validator.ValidUpdatePassword(data.NewPassword)
-	//if !flagValidNewPassword {
-	//	ErrResponse(res, http.StatusBadRequest, "invalid new password")
-	//	ctxLogger.Error(errors.Wrap(err, "err in user data"))
-	//	return
-	//}
 
 	userId := req.Context().Value("userID").(string)
 
@@ -288,6 +304,7 @@ func UpdateProfile(res http.ResponseWriter, req *http.Request) {
 		u.ID, u.Nickname, u.Email, u.Score, u.AvatarLink)
 }
 
+//easyjson:json
 type UsersCountInfoResponse struct {
 	Count int `json:"count"`
 }

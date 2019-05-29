@@ -2,12 +2,24 @@
 
 check_cover()
 {
-#    sleep 30
+#    cd ../internal/pkg
+    cd ..
+    sleep 15
     go test -coverpkg=./... -coverprofile=c.out ./...
     go tool cover -func c.out
 }
 
-./start_dbs_test.sh
+show_coverage()
+{
+    go test -v -coverprofile cover.out ./...
+    go tool cover -html=cover.out -o cover.html
+    open cover.html
+}
 
+./start_dbs_test.sh ; check_cover
 
-
+cd scripts
+./stop_dbs_test.sh
+#docker stop 5factorial-back-auth-1            5factorial-user-mongo-1    5factorial-session-mongo-1 \
+#            5factorial-chat-global-mongo-test 5factorial-session-mongo-3 5factorial-session-mongo-3 \
+#            5factorial-session-mongo-2        5factorial-user-mongo-2    5factorial-user-mongo-3
