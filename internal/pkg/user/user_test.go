@@ -482,5 +482,50 @@ func TestUpdateScore(t *testing.T) {
 	if u.Score != lula.Score+50 {
 		t.Error("#", 1, "RES expected:", lula.Score, "have:", u.Score)
 	}
+}
 
+var casesMarshalJSON = []struct {
+	nick  string
+	score int
+	res   []uint8
+	err   string
+}{
+	{
+		nick:  "",
+		score: 0,
+		res:   []uint8{123, 34, 110, 105, 99, 107, 110, 97, 109, 101, 34, 58, 34, 34, 44, 34, 115, 99, 111, 114, 101, 34, 58, 48, 125},
+		err:   "",
+	},
+}
+
+func TestScores_MarshalJSON(t *testing.T) {
+	for i, val := range casesMarshalJSON {
+		sc := Scores{
+			Nickname: val.nick,
+			Score:    val.score,
+		}
+		res, err := sc.MarshalJSON()
+		if err != nil {
+			if err.Error() != val.err {
+				t.Error("#", i, "ERROR expected:", val.err, "have:", err)
+				continue
+			}
+		}
+
+		if len(res) != len(val.res) {
+			t.Error("#", i, "RES expected:", val.res, "have:", res)
+			continue
+		}
+
+		for j, it := range res {
+			if it != val.res[j] {
+				t.Error("#", i, "RES expected:", val.res, "have:", res)
+				continue
+			}
+		}
+		//if res != val.res {
+		//	t.Error("#", i, "RES expected:", val.res, "have:", res)
+		//	continue
+		//}
+	}
 }
