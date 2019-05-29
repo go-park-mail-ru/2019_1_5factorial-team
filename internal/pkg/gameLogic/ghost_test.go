@@ -2,8 +2,20 @@ package gameLogic
 
 import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
+	"github.com/sirupsen/logrus"
 	"testing"
 )
+
+func InitConfig() {
+	configPath := "/etc/5factorial/"
+	err := config.Init(configPath)
+	if err != nil {
+		logrus.Fatal(err.Error())
+	}
+
+	log.InitLogs()
+}
 
 func TestNewRandomGhost(t *testing.T) {
 	for i := 0; i < 10; i++ {
@@ -118,8 +130,102 @@ func TestGhost_Move(t *testing.T) {
 		g := NewLeftGhost()
 		before := g.X
 		g.Move()
-		if g.X != before + g.Speed {
+		if g.X != before+g.Speed {
 			t.Error("#", i, "not moved")
 		}
+	}
+}
+
+func TestNewGhostStack(t *testing.T) {
+	if len(NewGhostStack().Items) != 0 {
+		t.Error("#", 0, "not empty queue")
+	}
+}
+
+func TestGhostQueue_PushBack(t *testing.T) {
+	nq := NewGhostStack()
+	gh := NewRandomGhost()
+
+	nq.PushBack(gh)
+	if nq.Items[len(nq.Items)-1].Speed != gh.Speed {
+		t.Error("not valid speed")
+	}
+	if nq.Items[len(nq.Items)-1].X != gh.X {
+		t.Error("not valid X")
+	}
+	if nq.Items[len(nq.Items)-1].Damage != gh.Damage {
+		t.Error("not valid damage")
+	}
+}
+
+func TestGhostQueue_PopBack(t *testing.T) {
+	nq := NewGhostStack()
+	gh := NewRandomGhost()
+	ghL := NewRandomGhost()
+	nq.PushBack(gh)
+	nq.PushBack(ghL)
+
+	sizeBefore := len(nq.Items) - 1
+	nq.PopBack()
+	if len(nq.Items)-1 == sizeBefore {
+		t.Error("element not popped")
+	}
+}
+
+func TestGhostQueue_AddNewGhost(t *testing.T) {
+	nq := NewGhostStack()
+	nq.AddNewGhost()
+
+	if len(nq.Items) == 0 {
+		t.Error("item wasnt generate")
+	}
+
+	nq.PopBack()
+
+	nq.PushBack(NewLeftGhost())
+	nq.AddNewGhost()
+	if nq.Items[1].Speed < 0 {
+		t.Error("item generated wrong ghost, wanted right, got left")
+	}
+
+	nq.PopBack()
+	nq.PopBack()
+
+	nq.PushBack(NewRightGhost())
+	nq.AddNewGhost()
+	if nq.Items[1].Speed > 0 {
+		t.Error("item generated wrong ghost, wanted left, got right")
+	}
+}
+
+func TestGhostQueue_MoveAllGhosts(t *testing.T) {
+	InitConfig()
+	// зависит от дефолтных конфигов
+	nq := NewGhostStack()
+
+	nq.MoveAllGhosts()
+	nq.PopFront()
+
+	nq.AddNewGhost()
+	nq.AddNewGhost()
+
+	for i := 0; i < 10; i++ {
+		if nq.MoveAllGhosts() {
+			nq.PopFront()
+		}
+	}
+
+	if len(nq.Items) != 0 {
+		t.Error("check default vars")
+	}
+}
+
+func TestGhostQueue_Len(t *testing.T) {
+	nq := NewGhostStack()
+	nq.AddNewGhost()
+	nq.AddNewGhost()
+
+	if nq.Len() != 2 {
+		t.Error("wrong size of items, have:", nq.Len(), "exp:", 2)
 	}
 }
