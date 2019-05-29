@@ -25,7 +25,7 @@ func NewPlayerCharacter(token string, grpcClient grpcAuth.AuthCheckerClient) (Pl
 	uID, err := grpcClient.GetIDFromSession(ctx, &grpcAuth.Cookie{Token: token, Expiration: ""})
 	if err != nil {
 		log.Error(errors.Wrap(err, "cant create user, GetID"))
-		return PlayerCharacter{}, nil
+		return PlayerCharacter{}, errors.Wrap(err, "cant get user")
 	}
 
 	u, err := grpcClient.GetUserByID(ctx, &grpcAuth.User{ID: uID.ID})

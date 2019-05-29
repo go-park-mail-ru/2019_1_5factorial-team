@@ -229,3 +229,20 @@ func TestGhostQueue_Len(t *testing.T) {
 		t.Error("wrong size of items, have:", nq.Len(), "exp:", 2)
 	}
 }
+
+func TestGhostQueue_PopSymbol(t *testing.T) {
+	InitConfig()
+	// зависит от дефолтных конфигов
+	nq := NewGhostStack()
+
+	nq.MoveAllGhosts()
+	nq.PopFront()
+
+	nq.AddNewGhost()
+	nq.AddNewGhost()
+
+	score := nq.PopSymbol(LR)
+	if score%config.Get().GameConfig.ScoreMatchSymbol != 0 {
+		t.Error("have score != n*20")
+	}
+}

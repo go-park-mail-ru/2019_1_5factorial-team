@@ -1,4 +1,4 @@
-package server
+package chat
 
 import (
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
@@ -25,7 +25,7 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func TestMyGorgeousServer_Run(t *testing.T) {
+func TestMyGorgeousChat_Run(t *testing.T) {
 	err := config.Init("/etc/5factorial/")
 	if err != nil {
 		log.Fatal(err.Error())

@@ -3,6 +3,7 @@
 # Edit at https://www.gitignore.io/?templates=go,macos,jetbrains+all,visualstudiocode
 
 *.html
+*.jpg
 
 ### Go ###
 # Binaries for programs and plugins
