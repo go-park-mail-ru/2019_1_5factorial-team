@@ -271,20 +271,3 @@ func (r *Room) Close() {
 	r.mu.Unlock()
 	r.game.CloseRoom(r.ID)
 }
-
-func (r *Room) PrintStates() {
-	log.Printf("================= room id = %s =================", r.ID)
-
-	//log.Printf("players:")
-	//for i, val := range r.Players {
-	//	log.Printf("\t%s: %v", i, val)
-	//}
-
-	log.Printf("state:\t\nplayers:")
-	for i, val := range r.state.Players {
-		log.Printf("\t\t%d: %v", i, val)
-	}
-	log.Printf("\t\nghosts:\n%v", r.state.Objects)
-
-	log.Printf("================= =================")
-}

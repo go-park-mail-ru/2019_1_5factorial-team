@@ -134,3 +134,26 @@ func TestSignOut(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 }
+
+var testsIsSessionValid = []TestCases{
+	// authCtx может быть только тру из-за миддлвара
+	{
+		routerPath:     "/api/session",
+		method:         "GET",
+		url:            "/api/session",
+		body:           nil,
+		urlValues:      "",
+		expectedRes:    ``,
+		expectedStatus: http.StatusOK,
+		authCtx:        true,
+		userIDCtx:      "",
+	},
+}
+
+func TestIsSessionValid(t *testing.T) {
+	//MainInit()
+	err := testHandler(IsSessionValid, testsIsSessionValid, t)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+}

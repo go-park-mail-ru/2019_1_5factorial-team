@@ -2,16 +2,18 @@
 
 check_cover()
 {
-#    cd ../internal/pkg
     cd ..
     sleep 15
-    go test -coverpkg=./... -coverprofile=c.out ./...
-    go tool cover -func c.out
+    go test -coverpkg=./internal/... -coverprofile=cover.out.tmp ./internal/...
+    cat cover.out.tmp | grep -v "_easyjson.go" | grep -v ".pb.go" | \
+    grep -v "workerSession.go" | \
+    grep -v "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/chat" | \
+    grep -v "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/chat" > cover.out
+    go tool cover -func cover.out
 }
 
 show_coverage()
 {
-    go test -v -coverprofile cover.out ./...
     go tool cover -html=cover.out -o cover.html
     open cover.html
 }

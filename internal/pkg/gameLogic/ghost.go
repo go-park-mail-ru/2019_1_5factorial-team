@@ -96,6 +96,7 @@ func (gq *GhostQueue) PopBack() {
 }
 
 func (gq *GhostQueue) AddNewGhost() {
+	// всего может быть 2 призрака на экране АХТУНГ
 	gq.mu.Lock()
 	defer gq.mu.Unlock()
 
