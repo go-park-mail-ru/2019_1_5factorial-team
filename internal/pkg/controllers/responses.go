@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"net/http"
 )
 
@@ -17,17 +17,47 @@ func addOkHeader(res http.ResponseWriter) {
 func addBody(res http.ResponseWriter, bodyMessage interface{}) {
 	marshalBody, err := json.Marshal(bodyMessage)
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
+
 		return
 	}
 
 	res.Write(marshalBody)
 }
 
-func OkResponse(res http.ResponseWriter, bodyMessage interface{}) {
-	addOkHeader(res)
-	addBody(res, bodyMessage)
+func addEasyJSONBody(res http.ResponseWriter, bodyMessage interface{ MarshalJSON() ([]byte, error) }) {
+	//marshalBody, err := json.Marshal(bodyMessage)
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
+	//
+	//res.Write(marshalBody)
+	blob, err := bodyMessage.MarshalJSON()
+	if err != nil {
+		log.Error(err)
+
+		return
+	}
+
+	res.Write(blob)
 }
+
+func OkResponse(res http.ResponseWriter, bodyMessage interface{ MarshalJSON() ([]byte, error) }) {
+	addOkHeader(res)
+	if bodyMessage != nil {
+		addEasyJSONBody(res, bodyMessage)
+		//addBody(res, bodyMessage)
+	}
+}
+
+//func OkResponse(res http.ResponseWriter, bodyMessage interface{}) {
+//	addOkHeader(res)
+//	if bodyMessage != nil {
+//		//addEasyJSONBody(res, bodyMessage)
+//		addBody(res, bodyMessage)
+//	}
+//}
 
 func addErrHeader(res http.ResponseWriter, errCode int) {
 	res.WriteHeader(errCode)

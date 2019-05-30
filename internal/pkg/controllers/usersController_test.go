@@ -44,7 +44,7 @@ var testsSignUp = []TestCases{
 		url:            "/api/user",
 		body:           strings.NewReader(`{"email": "kek@email.kek",}`),
 		urlValues:      "",
-		expectedRes:    `{"error":"json parsing error: invalid character '}' looking for beginning of object key string"}`,
+		expectedRes:    `{"error":"json parsing error: parse error: syntax error near offset 26 of '{\"email\": \"kek@email.kek\",}'"}`,
 		expectedStatus: http.StatusInternalServerError,
 		authCtx:        false,
 	},
@@ -64,18 +64,8 @@ var testsSignUp = []TestCases{
 		url:            "/api/user",
 		body:           strings.NewReader(`{"login": "kekkekkek", "email": "kek@email.kek","password": "password"}`),
 		urlValues:      "",
-		expectedRes:    `{"error":"Cannot create user: error while adding new user: E11000 duplicate key error collection: user.profile index: nickname_1 dup key: { : \"kekkekkek\" }"}`,
-		expectedStatus: http.StatusBadRequest,
-		authCtx:        false,
-	},
-	{
-		routerPath:     "/api/user",
-		method:         "POST",
-		url:            "/api/user",
-		body:           strings.NewReader(`{"login": "kekkekkek", "email": "kek@email.kek","password": "password"}`),
-		urlValues:      "",
-		expectedRes:    `{"error":"Cannot create user: error while adding new user: E11000 duplicate key error collection: user.profile index: nickname_1 dup key: { : \"kekkekkek\" }"}`,
-		expectedStatus: http.StatusBadRequest,
+		expectedRes:    `{"error":"login conflict"}`,
+		expectedStatus: http.StatusConflict,
 		authCtx:        false,
 	},
 	{
@@ -84,8 +74,18 @@ var testsSignUp = []TestCases{
 		url:            "/api/user",
 		body:           strings.NewReader(`{"login": "kekkekkek1", "email": "kek@email1.kek","password": "password"}`),
 		urlValues:      "",
-		expectedRes:    `"signUp ok"`,
+		expectedRes:    ``,
 		expectedStatus: http.StatusOK,
+		authCtx:        false,
+	},
+	{
+		routerPath:     "/api/user",
+		method:         "POST",
+		url:            "/api/user",
+		body:           strings.NewReader(`{"login": "kekkekkek123", "email": "kek@email1.kek","password": "password"}`),
+		urlValues:      "",
+		expectedRes:    `{"error":"email conflict"}`,
+		expectedStatus: http.StatusConflict,
 		authCtx:        false,
 	},
 }
@@ -121,6 +121,57 @@ var testsGetUser = []TestCases{
 func TestGetUser(t *testing.T) {
 	//MainInit()
 	err := testHandler(GetUser, testsGetUser, t)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+var testsUpdateProfile = []TestCases{
+	{
+		routerPath:     "/api/user",
+		method:         "PUT",
+		url:            "/api/user",
+		body:           strings.NewReader(`{"avatar": "kekkekkek1", "old_password": "1","new_password": "password"}`),
+		urlValues:      "",
+		expectedRes:    `{"error":"already auth, ctx.authorized shouldn't be false"}`,
+		expectedStatus: http.StatusBadRequest,
+		authCtx:        false,
+	},
+	{
+		routerPath:     "/api/user",
+		method:         "PUT",
+		url:            "/api/user",
+		body:           strings.NewReader(`{"avatar": "kekkekkek1", "old_password": "1","new_password": "password"`),
+		urlValues:      "",
+		expectedRes:    `{"error":"json parsing error: EOF"}`,
+		expectedStatus: http.StatusInternalServerError,
+		authCtx:        true,
+	},
+	{
+		routerPath:     "/api/user",
+		method:         "PUT",
+		url:            "/api/user",
+		body:           strings.NewReader(`{"avatar": "kekkekkek1", "old_password": "1","new_password": "password"}`),
+		urlValues:      "",
+		expectedRes:    `{"error":"rpc error: code = Unknown desc = update user error: id isn't mongo's hex"}`,
+		expectedStatus: http.StatusBadRequest,
+		authCtx:        true,
+	},
+	{
+		routerPath:     "/api/user",
+		method:         "PUT",
+		url:            "/api/user",
+		body:           strings.NewReader(`{"avatar": "kekkekkek1", "old_password": "1","new_password": "password"}`),
+		urlValues:      "",
+		expectedRes:    `{"error":"rpc error: code = Unknown desc = update user error: user with this id not found"}`,
+		expectedStatus: http.StatusBadRequest,
+		authCtx:        true,
+		userIDCtx:      "5556c0d9b49cd4582aaad41c",
+	},
+}
+
+func TestUpdateProfile(t *testing.T) {
+	err := testHandler(UpdateProfile, testsUpdateProfile, t)
 	if err != nil {
 		t.Errorf(err.Error())
 	}

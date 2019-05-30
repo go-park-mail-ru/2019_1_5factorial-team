@@ -189,7 +189,7 @@ func Init(configsDir string) error {
 
 	instance.StaticServerConfig.MaxUploadSize = instance.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
 
-	instance.GameConfig.PlayerLeftPosition = (instance.GameConfig.AxisLen - instance.GameConfig.DefaultSpriteWidth) / 2
+	instance.GameConfig.PlayerLeftPosition = instance.GameConfig.AxisLen / 2 - instance.GameConfig.DefaultSpriteWidth
 	instance.GameConfig.PlayerRightPosition = instance.GameConfig.AxisLen / 2
 	return nil
 }

@@ -54,7 +54,7 @@ func NewRoom(maxPlayers uint, game *Game) *Room {
 		enemyEnd:   make(chan struct{}),
 
 		mu:     &sync.Mutex{},
-		ticker: time.NewTicker(1 * time.Second),
+		ticker: time.NewTicker(200 * time.Millisecond),
 		state: &RoomState{
 			Objects: gameLogic.NewGhostStack(),
 		},
@@ -234,13 +234,6 @@ func (r *Room) Close() {
 
 	r.ticker.Stop()
 
-	//grpcConn, err := grpcAuth.CreateConnection()
-	//if err != nil {
-	//	log.Error(errors.Wrap(err, "cant connect to auth grpc, NewUser"))
-	//}
-	//defer grpcConn.Close()
-	//
-	//AuthGRPC := grpcAuth.NewAuthCheckerClient(grpcConn)
 	ctx := context.Background()
 
 	// добавляю юзерам очки их персонажей
@@ -248,13 +241,6 @@ func (r *Room) Close() {
 		if _, ok := r.Players[p.Token]; ok {
 			r.Players[p.Token].Score = p.Score
 
-			//id, err := session.GetId(p.Token)
-			//if err != nil {
-			//	log.Error("cant get player id from session, token=%s, err=%s", p.Token, err.Error())
-			//
-			//	r.Players[p.Token].Score = 0
-			//	continue
-			//}
 			uID, err := r.game.GRPC.GetIDFromSession(ctx, &grpcAuth.Cookie{Token: p.Token, Expiration: ""})
 			if err != nil {
 				log.Error(errors.Wrap(err, "cant create user, GetID"))
@@ -262,7 +248,6 @@ func (r *Room) Close() {
 				continue
 			}
 
-			//err = user.UpdateScore(uID.ID, p.Score)
 			_, err = r.game.GRPC.UpdateScore(ctx, &grpcAuth.UpdateScoreReq{ID: uID.ID, Score: int32(p.Score)})
 			if err != nil {
 				log.Error("cant update user score, user id=%s, token=%s, score=%d, err=%s",
@@ -285,21 +270,4 @@ func (r *Room) Close() {
 
 	r.mu.Unlock()
 	r.game.CloseRoom(r.ID)
-}
-
-func (r *Room) PrintStates() {
-	log.Printf("================= room id = %s =================", r.ID)
-
-	//log.Printf("players:")
-	//for i, val := range r.Players {
-	//	log.Printf("\t%s: %v", i, val)
-	//}
-
-	log.Printf("state:\t\nplayers:")
-	for i, val := range r.state.Players {
-		log.Printf("\t\t%d: %v", i, val)
-	}
-	log.Printf("\t\nghosts:\n%v", r.state.Objects)
-
-	log.Printf("================= =================")
 }

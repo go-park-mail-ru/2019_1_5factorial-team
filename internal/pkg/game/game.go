@@ -1,6 +1,7 @@
 package game
 
 import (
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/stats"
 	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
@@ -82,6 +83,7 @@ func (g *Game) AddRoom(room *Room) {
 
 func (g *Game) AddEmptyRoom(room *Room) {
 	g.mu.Lock()
+	stats.Stats.AddActiveRoom()
 	g.emptyRooms[room.ID] = room
 	g.mu.Unlock()
 }
@@ -97,6 +99,7 @@ func (g *Game) MakeRoomFull(room *Room) {
 
 func (g *Game) CloseRoom(ID string) {
 	g.mu.Lock()
+	stats.Stats.RemoveActiveRoom()
 	if _, ok := g.rooms[ID]; !ok {
 		log.Println("deleted empty room")
 		delete(g.emptyRooms, ID)

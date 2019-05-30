@@ -17,6 +17,9 @@ type User struct {
 
 func CreateUser(nickname string, email string, password string) (User, error) {
 	// TODO(smet1): добавить валидацию на повторение ника и почты
+	if nickname == "" || email == "" || password == "" {
+		return User{}, errors.New("empty field")
+	}
 
 	u, err := addUser(nickname, email, password)
 	if err != nil {
@@ -114,12 +117,21 @@ func validateChangingPasswords(oldPassword string, newPassword string, currentHa
 	return nil
 }
 
+//easyjson:json
 type Scores struct {
 	Nickname string `json:"nickname"`
 	Score    int    `json:"score"`
 }
 
 func GetUsersScores(limit int, offset int) ([]Scores, error) {
+	if limit < 0 {
+		return nil, errors.New("invalid limit value")
+	}
+
+	if offset < 0 {
+		return nil, errors.New("invalid offset value")
+	}
+
 	begin := limit * (offset - 1)
 	end := limit * offset
 

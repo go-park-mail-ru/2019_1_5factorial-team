@@ -40,12 +40,13 @@ func InitConnection() {
 		collection := session.DB(val.DatabaseName).C(val.CollectionName)
 
 		// очистка коллекции по конфигу
-		if n, _ := collection.Count(); n != 0 && val.TruncateTable {
+		if n, err := collection.Count(); n != 0 && err == nil && val.TruncateTable {
 			logrus.Warn("truncating db", val.CollectionName)
 			err = collection.DropCollection()
 			if err != nil {
 				session.Close()
-				logrus.Fatal("db truncate: ", err, val)
+				//logrus.Fatal("db truncate: ", err, val)
+				logrus.Warn("db truncate: ", err, val)
 			}
 		}
 

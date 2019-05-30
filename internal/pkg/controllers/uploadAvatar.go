@@ -14,6 +14,7 @@ import (
 
 // 'Content-Type': 'application/json; charset=utf-8'
 // 	"avatarlink":
+//easyjson:json
 type AvatarLinkResponse struct {
 	AvatarLink string `json:"avatar_link"`
 }
@@ -84,7 +85,8 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	}
 
 	OkResponse(res, AvatarLinkResponse{
-		AvatarLink: "/static/" + resultFile,
+		//AvatarLink: "/static/" + resultFile,
+		AvatarLink: resultFile,
 	})
 
 	ctxLogger.Infof("OK response\n\t--avatar_link = /static/%s,\n\t--fileExtention = %s,\n\t--filetype = %s",

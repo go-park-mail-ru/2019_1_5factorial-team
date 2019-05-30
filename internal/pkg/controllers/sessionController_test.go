@@ -23,7 +23,7 @@ var testsSignIn = []TestCases{
 		url:            "/api/session",
 		body:           strings.NewReader(`{"loginOrEmail": "kek@email.kek"},`),
 		urlValues:      "",
-		expectedRes:    `{"error":"json parsing error: invalid character ',' after top-level value"}`,
+		expectedRes:    `{"error":"json parsing error: parse error: invalid character ',' after top-level value near offset 33 of ','"}`,
 		expectedStatus: http.StatusInternalServerError,
 		authCtx:        false,
 	},
@@ -53,7 +53,7 @@ var testsSignIn = []TestCases{
 		url:            "/api/session",
 		body:           strings.NewReader(`{"loginOrEmail": "kekkekkek", "password": "password"}`),
 		urlValues:      "",
-		expectedRes:    `"ok auth"`,
+		expectedRes:    ``,
 		expectedStatus: http.StatusOK,
 		authCtx:        false,
 	},
@@ -130,6 +130,29 @@ var testsSignOut = []TestCases{
 func TestSignOut(t *testing.T) {
 	//MainInit()
 	err := testHandler(SignOut, testsSignOut, t)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+var testsIsSessionValid = []TestCases{
+	// authCtx может быть только тру из-за миддлвара
+	{
+		routerPath:     "/api/session",
+		method:         "GET",
+		url:            "/api/session",
+		body:           nil,
+		urlValues:      "",
+		expectedRes:    ``,
+		expectedStatus: http.StatusOK,
+		authCtx:        true,
+		userIDCtx:      "",
+	},
+}
+
+func TestIsSessionValid(t *testing.T) {
+	//MainInit()
+	err := testHandler(IsSessionValid, testsIsSessionValid, t)
 	if err != nil {
 		t.Errorf(err.Error())
 	}

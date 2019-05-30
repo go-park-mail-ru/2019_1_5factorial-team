@@ -16,9 +16,10 @@ import (
 // 	"login":
 // 	"password":
 // пока только логин, без почты
+//easyjson:json
 type signInRequest struct {
-	LoginOrEmail    string `json:"loginOrEmail"`
-	Password string `json:"password"`
+	LoginOrEmail string `json:"loginOrEmail"`
+	Password     string `json:"password"`
 }
 
 // SignIn godoc
@@ -39,7 +40,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	ctx := context.Background()
 
 	data := signInRequest{}
-	status, err := ParseRequestIntoStruct(true, req, &data)
+	status, err := ParseRequestIntoStructEasy(true, req, &data)
 	if err != nil {
 		ErrResponse(res, status, err.Error())
 
@@ -74,7 +75,7 @@ func SignIn(res http.ResponseWriter, req *http.Request) {
 	cookie := session.CreateHttpCookie(cookieGRPC.Token, timeCookie)
 
 	http.SetCookie(res, cookie)
-	OkResponse(res, "ok auth")
+	OkResponse(res, nil)
 
 	ctxLogger.Infof("OK response\n\t--id = %s,\n\t--nickname = %s,\n\t--email = %s,\n\t--score = %d",
 		u.ID, u.Nickname, u.Email, u.Score)
@@ -126,7 +127,7 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	OkResponse(res, "ok logout")
+	OkResponse(res, nil)
 
 	ctxLogger.Info("OK response, cookie set expired, session deleted")
 }
@@ -136,7 +137,7 @@ func SignOut(res http.ResponseWriter, req *http.Request) {
 // 	"nickname":
 // 	"score":
 // 	"avatar_link":
-
+//easyjson:json
 type UserInfoResponse struct {
 	Email      string `json:"email"`
 	Nickname   string `json:"nickname"`
@@ -203,6 +204,6 @@ func GetUserFromSession(res http.ResponseWriter, req *http.Request) {
 func IsSessionValid(res http.ResponseWriter, req *http.Request) {
 	ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 
-	OkResponse(res, "session is valid")
+	OkResponse(res, nil)
 	ctxLogger.Info("session is valid")
 }

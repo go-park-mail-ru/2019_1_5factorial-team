@@ -1,43 +1,56 @@
 version: '3'
 services:
-  #  TODO(): авторизация при подключении к бд
   mongo-user:
-    container_name: 5factorial-user-mongo
+    container_name: 5factorial-user-mongo-1
     command: mongod --port 27031
     image: mongo:4.0
-    #    environment:
-    #      MONGO_INITDB_ROOT_USERNAME: 'user'
-    #      MONGO_INITDB_ROOT_PASSWORD: 'user'
     ports:
-      - '27061:27031' # map port to none standard port, to avoid conflicts with locally installed mongodb.
-    logging:
-      driver: "none"
+      - '27061:27031'
+
+  mongo-user-2:
+    container_name: 5factorial-user-mongo-2
+    command: mongod --port 27031
+    image: mongo:4.0
+    ports:
+      - '27071:27031'
+
+  mongo-user-3:
+    container_name: 5factorial-user-mongo-3
+    command: mongod --port 27031
+    image: mongo:4.0
+    ports:
+      - '27081:27031'
 
   mongo-session:
-    container_name: 5factorial-session-mongo
+    container_name: 5factorial-session-mongo-1
     command: mongod --port 27032
     image: mongo:4.0
-    #    environment:
-    #      MONGO_INITDB_ROOT_USERNAME: 'user'
-    #      MONGO_INITDB_ROOT_PASSWORD: 'user'
     ports:
-      - '27062:27032' # map port to none standard port, to avoid conflicts with locally installed mongodb.
-    logging:
-      driver: "none"
+      - '27062:27032'
 
-  mongo-cha6:
-    container_name: 5factorial-chat-mongo
+  mongo-session-2:
+    container_name: 5factorial-session-mongo-2
+    command: mongod --port 27032
+    image: mongo:4.0
+    ports:
+      - '27072:27032'
+
+  mongo-session-3:
+    container_name: 5factorial-session-mongo-3
+    command: mongod --port 27032
+    image: mongo:4.0
+    ports:
+      - '27082:27032'
+
+  mongo-chat:
+    container_name: 5factorial-chat-global-mongo-test
     command: mongod --port 27033
     image: mongo:4.0
-    #    environment:
-    #      MONGO_INITDB_ROOT_USERNAME: 'user'
-    #      MONGO_INITDB_ROOT_PASSWORD: 'user'
     ports:
-      - '27063:27033' # map port to none standard port, to avoid conflicts with locally installed mongodb.
-    logging:
-      driver: "none"
+      - '27063:27033'
+
   auth-go:
-    container_name: 5factorial-back-auth
+    container_name: 5factorial-back-auth-1
     restart: always
     build:
       context: ../.
@@ -49,3 +62,17 @@ services:
     depends_on:
       - mongo-user
       - mongo-session
+
+  mongo-user-4:
+    container_name: 5factorial-user-mongo-4
+    command: mongod --port 27031
+    image: mongo:4.0
+    ports:
+      - '27091:27031'
+
+  mongo-session-4:
+    container_name: 5factorial-session-mongo-4
+    command: mongod --port 27032
+    image: mongo:4.0
+    ports:
+      - '27092:27032'
