@@ -61,7 +61,7 @@ func OauthUser(token string, service string) (int, error, string, time.Time) {
 	// TODO(mrocumare) после прикручивания базы прописать GetUser и CreateUser
 	searchingUser, err := user.IdentifyUser(uuid, DefaultPassword)
 	if err != nil && errors.Cause(err).Error() == PreCreateUserErrorString {
-		searchingUser, err = user.CreateUser(name, uuid, DefaultPassword)
+		searchingUser, err = user.CreateUser(name, uuid, DefaultPassword, "")
 		if err != nil {
 			return http.StatusBadRequest, errors.Wrap(err, "err in user data"), "", time.Time{}
 		}

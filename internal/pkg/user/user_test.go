@@ -94,7 +94,7 @@ var casesCreateUser = []struct {
 			Email:      "qwerty@qwe.rty",
 			Nickname:   "qwerty",
 			Score:      0,
-			AvatarLink: "",
+			AvatarLink: "000-default-avatar",
 		},
 		err: "",
 	},
@@ -103,7 +103,7 @@ var casesCreateUser = []struct {
 func TestCreateUser(t *testing.T) {
 	InitDB()
 	for _, val := range casesCreateUser {
-		res, err := CreateUser(val.want.Nickname, val.want.Email, val.password)
+		res, err := CreateUser(val.want.Nickname, val.want.Email, val.password, "")
 
 		if err != nil {
 			if errors.Cause(err).Error() != val.err {
@@ -171,7 +171,7 @@ var casesIdentifyUser = []struct {
 			Email:      "lula@gmail.com",
 			Nickname:   "Lula",
 			Score:      0,
-			AvatarLink: "",
+			AvatarLink: "000-default-avatar",
 		},
 		err: "",
 	},
@@ -182,7 +182,7 @@ var casesIdentifyUser = []struct {
 			Email:      "lula@gmail.com",
 			Nickname:   "Lula",
 			Score:      0,
-			AvatarLink: "",
+			AvatarLink: "000-default-avatar",
 		},
 		err: "",
 	},
@@ -201,7 +201,7 @@ var casesIdentifyUser = []struct {
 
 func TestIdentifyUser(t *testing.T) {
 	InitDB()
-	_, err := CreateUser("Lula", "lula@gmail.com", "lula")
+	_, err := CreateUser("Lula", "lula@gmail.com", "lula", "")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -310,7 +310,7 @@ var casesUpdateUser = []struct {
 
 func TestUpdateUser(t *testing.T) {
 	InitDB()
-	u, err := addUser("Lula", "lula@gmail.com", "lula")
+	u, err := addUser("Lula", "lula@gmail.com", "lula", "")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -375,9 +375,9 @@ var casesGetUsersScores = []struct {
 
 func TestGetUsersScores(t *testing.T) {
 	InitDB()
-	_, _ = addUser("Lula", "lula@gmail.com", "lula")
-	_, _ = addUser("Lula1", "lula1@gmail.com", "lula")
-	_, _ = addUser("Lula2", "lula2@gmail.com", "lula")
+	_, _ = addUser("Lula", "lula@gmail.com", "lula", "")
+	_, _ = addUser("Lula1", "lula1@gmail.com", "lula", "")
+	_, _ = addUser("Lula2", "lula2@gmail.com", "lula", "")
 
 	for i, val := range casesGetUsersScores {
 		res, err := GetUsersScores(val.limit, val.offset)
@@ -424,7 +424,7 @@ func TestGetUsersCount(t *testing.T) {
 
 	for i, val := range casesGetUsersCount {
 		for i := 0; i < val.insert; i++ {
-			_, _ = addUser("Lula"+strconv.Itoa(i), "lula"+strconv.Itoa(i)+"@gmail.com", "lula")
+			_, _ = addUser("Lula"+strconv.Itoa(i), "lula"+strconv.Itoa(i)+"@gmail.com", "lula", "")
 		}
 
 		res, err := GetUsersCount()
@@ -445,7 +445,7 @@ func TestGetUsersCount(t *testing.T) {
 
 func TestUpdateScore(t *testing.T) {
 	InitDB()
-	lula, _ := addUser("Lula", "lula@gmail.com", "lula")
+	lula, _ := addUser("Lula", "lula@gmail.com", "lula", "")
 
 	// #0
 	err := UpdateScore("dsgsdfsd", 0)

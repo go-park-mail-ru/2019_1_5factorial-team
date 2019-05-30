@@ -75,7 +75,7 @@ func InitDB() {
 
 func TestSetToken(t *testing.T) {
 	InitDB()
-	lula, _ := user.CreateUser("Lula", "lula@gmail.com", "lula")
+	lula, _ := user.CreateUser("Lula", "lula@gmail.com", "lula", "")
 	// #0
 	now := time.Now()
 	token, expiration, err := SetToken(lula.ID.Hex())
@@ -103,7 +103,7 @@ func TestUpdateToken(t *testing.T) {
 	InitDB()
 	config.Get().CookieConfig.CookieTimeHours = config.Duration{Duration: 2 * time.Second}
 
-	lula, _ := user.CreateUser("Lula", "lula@gmail.com", "lula")
+	lula, _ := user.CreateUser("Lula", "lula@gmail.com", "lula", "")
 	// #0
 	token, exp, err := SetToken(lula.ID.Hex())
 	if err != nil {
@@ -140,7 +140,7 @@ func TestUpdateToken(t *testing.T) {
 
 func TestDeleteToken(t *testing.T) {
 	InitDB()
-	lula, _ := user.CreateUser("Lula", "lula@gmail.com", "lula")
+	lula, _ := user.CreateUser("Lula", "lula@gmail.com", "lula", "")
 
 	// #0
 	token, _, err := SetToken(lula.ID.Hex())
@@ -162,7 +162,7 @@ func TestDeleteToken(t *testing.T) {
 
 func TestGetId(t *testing.T) {
 	InitDB()
-	lula, _ := user.CreateUser("Lula", "lula@gmail.com", "lula")
+	lula, _ := user.CreateUser("Lula", "lula@gmail.com", "lula", "")
 
 	// #0
 	token, _, err := SetToken(lula.ID.Hex())

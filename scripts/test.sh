@@ -5,10 +5,7 @@ check_cover()
     cd ..
     sleep 15
     go test -coverpkg=./internal/... -coverprofile=cover.out.tmp ./internal/...
-    cat cover.out.tmp | grep -v "_easyjson.go" | grep -v ".pb.go" | \
-    grep -v "workerSession.go" | \
-    grep -v "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/chat" | \
-    grep -v "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/chat" > cover.out
+    cat cover.out.tmp | grep -v -E "_easyjson.go|.pb.go|chat|cmd|HelloWorld" > cover.out
     go tool cover -func cover.out
 }
 

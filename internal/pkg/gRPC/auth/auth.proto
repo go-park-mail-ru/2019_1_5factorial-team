@@ -29,6 +29,7 @@ message UserNew {
     string nickname = 1;
     string email = 2;
     string password = 3;
+    string avatar = 4;
 }
 
 message UpdateUserReq {
