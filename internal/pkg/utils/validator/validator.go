@@ -4,7 +4,7 @@ import "regexp"
 
 const ExpEmail = `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`
 const ExpLoginPassword = `^[a-z0-9._-]{4,20}$`
-const ExpAvatar = `^[0-9]{3}-default-avatar$`
+const ExpAvatar = `^[0-9]{3}-default-avatar.png$`
 
 func ValidNewUser(login string, email string, password string) bool {
 	expEmail := regexp.MustCompile(ExpEmail)
