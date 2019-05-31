@@ -8,6 +8,7 @@ const (
 	MessageMove    MessageType = "MOVE"
 	MessageConnect MessageType = "CONNECTED"
 	MessageEnd     MessageType = "END"
+	MessageLink    MessageType = "LINK"
 )
 
 type Message struct {

@@ -26,7 +26,7 @@ import (
 //
 //}
 
-func GetNotification(res http.ResponseWriter, req *http.Request)  {
+func GetNotification(res http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Error("cant get body request")

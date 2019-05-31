@@ -44,7 +44,7 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, "invalid file in request")
 
-		ctxLogger.Info(errors.Wrap(err, "invalid file in request"))
+		ctxLogger.Error(errors.Wrap(err, "invalid file in request"))
 		return
 	}
 
@@ -53,7 +53,7 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		ErrResponse(res, http.StatusBadRequest, "invalid file cant ReadAll")
 
-		ctxLogger.Info(errors.Wrap(err, "invalid file cant ReadAll"))
+		ctxLogger.Error(errors.Wrap(err, "invalid file cant ReadAll"))
 		return
 	}
 
@@ -61,19 +61,19 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	if !fileproc.CheckFileType(filetype) {
 		ErrResponse(res, http.StatusBadRequest, "invalid file type")
 
-		ctxLogger.Info(errors.Wrap(err, "invalid file type"))
+		ctxLogger.Error(errors.Wrap(err, "invalid file type"))
 		return
 	}
 
 	//  забиваю на имя файла генерю новое
 	fileName := fileproc.RandToken(12)
 	fileExtension := filepath.Ext(headers.Filename)
-	if err != nil {
-		ErrResponse(res, http.StatusInternalServerError, "cant read file type")
-
-		ctxLogger.Info(errors.Wrap(err, "cant read file type"))
-		return
-	}
+	//if err != nil {
+	//	ErrResponse(res, http.StatusInternalServerError, "cant read file type")
+	//
+	//	ctxLogger.Info(errors.Wrap(err, "cant read file type"))
+	//	return
+	//}
 
 	// записываем файл
 	resultFile, err := fileproc.CreateResultFile(fileName, fileExtension, filetype, fileBytes)
@@ -85,8 +85,8 @@ func UploadAvatar(res http.ResponseWriter, req *http.Request) {
 	}
 
 	OkResponse(res, AvatarLinkResponse{
-		//AvatarLink: "/static/" + resultFile,
-		AvatarLink: resultFile,
+		AvatarLink: "/static/" + resultFile,
+		//AvatarLink: resultFile,
 	})
 
 	ctxLogger.Infof("OK response\n\t--avatar_link = /static/%s,\n\t--fileExtention = %s,\n\t--filetype = %s",

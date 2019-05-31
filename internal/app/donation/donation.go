@@ -28,7 +28,7 @@ func (mgg *DonateNotification) Run() error {
 	//router.Use(middleware.CORSMiddleware)
 	router.Use(middleware.PanicMiddleware)
 
-	router.HandleFunc("/api/push", controllers.GetNotification)
+	router.HandleFunc("/api/push", controllers.GetNotification).Methods("POST")
 	//gameRouter.HandleFunc("/api/game/ws", controllers.Play).Methods("GET", "OPTIONS")
 
 	err := http.ListenAndServe(address, router)

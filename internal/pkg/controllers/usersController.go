@@ -118,7 +118,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	if !flagValidUser {
 		ErrResponse(res, http.StatusBadRequest, "invalid user data")
 
-		ctxLogger.Error(errors.Wrap(err, "err in user data"))
+		ctxLogger.Error(errors.New("err in user data, didn't pass validator"))
 		return
 	}
 
@@ -135,7 +135,9 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 		Nickname: data.Login,
 		Email:    data.Email,
 		Password: data.Password,
+		Avatar:   data.AvatarLink,
 	})
+
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {

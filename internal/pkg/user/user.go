@@ -22,7 +22,7 @@ func CreateUser(nickname string, email string, password string, avatar string) (
 	}
 
 	if avatar == "" {
-		avatar = "000-default-avatar"
+		avatar = "000-default-avatar.png"
 	}
 
 	u, err := addUser(nickname, email, password, avatar)
