@@ -88,7 +88,7 @@ LOOP:
 			room.AddPlayer(player)
 			player.SendMessage(&Message{
 				Type:    MessageLink,
-				Payload: fmt.Sprintf("https://5factorial.tech/%s", room.ID),
+				Payload: fmt.Sprintf("https://5factorial.tech/api/game/connect?room=%s", room.ID),
 			})
 
 		case playerWithLink := <-g.registerUniqueLink:
