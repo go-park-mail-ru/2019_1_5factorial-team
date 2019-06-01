@@ -15,8 +15,6 @@ import (
 	"time"
 )
 
-// ось X (-100; 100) => игроки стоят в нуле
-
 // нужон ли тайм?
 type RoomState struct {
 	Players     []gameLogic.PlayerCharacter
@@ -56,8 +54,7 @@ func NewRoom(maxPlayers uint, game *Game) *Room {
 		enemyEnd:   make(chan struct{}),
 		pause:      false,
 		mu:         &sync.Mutex{},
-		//ticker: time.NewTicker(50 * time.Millisecond),
-		ticker: time.NewTicker(config.Get().GameConfig.TickerTime.Duration),
+		ticker:     time.NewTicker(config.Get().GameConfig.TickerTime.Duration),
 		state: &RoomState{
 			Objects: gameLogic.NewGhostStack(),
 		},
@@ -73,11 +70,11 @@ func (r *Room) Run() {
 	for {
 		select {
 		case in := <-r.playerInput:
-			if r.playerCnt != r.MaxPlayers || r.pause{
+			if r.playerCnt != r.MaxPlayers || r.pause {
 				log.Println("skip player input, bcs game not started, waiting second player OR room paused")
 				for _, player := range r.Players {
 					player.SendMessage(&Message{
-						Type: MessagePause,
+						Type:    MessagePause,
 						Payload: nil,
 					})
 				}
@@ -121,6 +118,13 @@ func (r *Room) endGame(player *Player) {
 	delete(r.Players, player.Token)
 	log.Printf("player %s was removed from room", player.Token)
 
+	pc := ""
+	if r.state.Players[0].Token == player.Token {
+		pc = r.state.Players[0].Nick
+	} else {
+		pc = r.state.Players[1].Nick
+	}
+
 	// TODO(): убираем вышедшему игроку очки, а оставшемуся очки делим на 2
 	// TODO(): добавить баланс (хочу очки деленные на 100 прибавлять к балансу)
 	// TODO(): записывать в борду максимальный счет
@@ -128,7 +132,7 @@ func (r *Room) endGame(player *Player) {
 	for _, players := range r.Players {
 		players.SendMessage(&Message{
 			Type:    MessageEnd,
-			Payload: fmt.Sprintf("player %s has left, GAME OVER", player.Token),
+			Payload: fmt.Sprintf("player %s has left, GAME OVER", pc),
 		})
 	}
 
