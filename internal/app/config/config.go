@@ -193,6 +193,10 @@ func Init(configsDir string) error {
 
 	instance.GameConfig.PlayerLeftPosition = instance.GameConfig.AxisLen/2 - instance.GameConfig.DefaultSpriteWidth
 	instance.GameConfig.PlayerRightPosition = instance.GameConfig.AxisLen / 2
+
+	if instance.GameConfig.TickerTime.Duration == 0 {
+		instance.GameConfig.TickerTime.Duration = 50 * time.Millisecond
+	}
 	return nil
 }
 
