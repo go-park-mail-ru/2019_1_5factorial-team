@@ -75,6 +75,12 @@ func (r *Room) Run() {
 		case in := <-r.playerInput:
 			if r.playerCnt != r.MaxPlayers || r.pause{
 				log.Println("skip player input, bcs game not started, waiting second player OR room paused")
+				for _, player := range r.Players {
+					player.SendMessage(&Message{
+						Type: MessagePause,
+						Payload: nil,
+					})
+				}
 				continue
 			}
 			// TODO(): если игра не началась или закончилась, но юзер шлет мувы, то они записываются
