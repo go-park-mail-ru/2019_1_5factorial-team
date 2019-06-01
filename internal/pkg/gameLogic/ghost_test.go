@@ -198,27 +198,27 @@ func TestGhostQueue_AddNewGhost(t *testing.T) {
 	}
 }
 
-func TestGhostQueue_MoveAllGhosts(t *testing.T) {
-	InitConfig()
-	// зависит от дефолтных конфигов
-	nq := NewGhostStack()
-
-	nq.MoveAllGhosts()
-	nq.PopFront()
-
-	nq.AddNewGhost()
-	nq.AddNewGhost()
-
-	for i := 0; i < 10; i++ {
-		if nq.MoveAllGhosts() {
-			nq.PopFront()
-		}
-	}
-
-	if len(nq.Items) != 0 {
-		t.Error("check default vars")
-	}
-}
+//func TestGhostQueue_MoveAllGhosts(t *testing.T) {
+//	InitConfig()
+//	// зависит от дефолтных конфигов
+//	nq := NewGhostStack()
+//
+//	nq.MoveAllGhosts()
+//	nq.PopFront()
+//
+//	nq.AddNewGhost()
+//	nq.AddNewGhost()
+//
+//	for i := 0; i < 10; i++ {
+//		if nq.MoveAllGhosts() {
+//			nq.PopFront()
+//		}
+//	}
+//
+//	if len(nq.Items) != 0 {
+//		t.Error("check default vars")
+//	}
+//}
 
 func TestGhostQueue_Len(t *testing.T) {
 	nq := NewGhostStack()
