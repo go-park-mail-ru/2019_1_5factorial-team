@@ -3,7 +3,7 @@ version: '3'
 networks:
   default:
     external:
-      name: third-party_default
+      name: 5factorial-net
 
 services:
   #  MONITORING

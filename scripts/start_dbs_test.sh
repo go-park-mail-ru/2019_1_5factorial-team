@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-./stop.sh
+./stop_dbs_test.sh
 
 cd ..
 cd third-party

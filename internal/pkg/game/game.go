@@ -174,3 +174,11 @@ func (g *Game) MakeUniqueRoomFull(room *Room) {
 	g.rooms[room.ID] = room
 	g.mu.Unlock()
 }
+
+func (g *Game) CheckRoomLink(roomID string) bool {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	_, ok := g.emptyRoomsUnique[roomID]
+	return ok
+}

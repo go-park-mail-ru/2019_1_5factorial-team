@@ -1,4 +1,9 @@
 version: '3'
+networks:
+  default:
+    external:
+      name: 5factorial-net
+
 services:
   mongo-user:
     container_name: 5factorial-user-mongo

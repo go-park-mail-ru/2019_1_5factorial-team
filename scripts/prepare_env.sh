@@ -119,3 +119,8 @@ check_dir "/data/db/session"
 check_dir "/data/db/chat_global"
 
 echo "== OK"
+
+# /////////////////////////////////////////
+echo "Creating docker network"
+
+sudo docker network create 5factorial-net
