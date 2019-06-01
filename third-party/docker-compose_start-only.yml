@@ -1,4 +1,9 @@
 version: '3'
+networks:
+  default:
+    external:
+      name: 5factorial-net
+
 services:
   mongo-user:
     container_name: 5factorial-user-mongo
@@ -18,14 +23,14 @@ services:
     ports:
       - '27052:27032' # map port to none standard port, to avoid conflicts with locally installed mongodb.
 
-  mongo-chat-global:
-    container_name: 5factorial-chat-global-mongo
-    command: mongod --port 27033
-    image: mongo:4.0
-    volumes:
-      - '/data/db/chat_global:/data/db'
-    ports:
-      - '27053:27033' # map port to none standard port, to avoid conflicts with locally installed mongodb.
+#  mongo-chat-global:
+#    container_name: 5factorial-chat-global-mongo
+#    command: mongod --port 27033
+#    image: mongo:4.0
+#    volumes:
+#      - '/data/db/chat_global:/data/db'
+#    ports:
+#      - '27053:27033' # map port to none standard port, to avoid conflicts with locally installed mongodb.
 
   auth-go:
     container_name: 5factorial-back-auth
@@ -58,18 +63,18 @@ services:
     depends_on:
       - mongo-session
 
-  chat-go:
-    container_name: 5factorial-back-chat
-    restart: always
-    image: smetk/5factorial-chat:latest
-    volumes:
-      #     - '/var/www/media/factorial:/var/www/media/factorial'
-      - '/etc/5factorial:/etc/5factorial'
-    ports:
-      - '8002:5052'
-    depends_on:
-      - mongo-chat-global
-      - auth-go
+#  chat-go:
+#    container_name: 5factorial-back-chat
+#    restart: always
+#    image: smetk/5factorial-chat:latest
+#    volumes:
+#      #     - '/var/www/media/factorial:/var/www/media/factorial'
+#      - '/etc/5factorial:/etc/5factorial'
+#    ports:
+#      - '8002:5052'
+#    depends_on:
+#      - mongo-chat-global
+#      - auth-go
 
   game-go:
     container_name: 5factorial-back-game

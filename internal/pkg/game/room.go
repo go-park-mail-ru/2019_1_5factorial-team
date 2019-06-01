@@ -3,6 +3,7 @@ package game
 import (
 	"context"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gameLogic"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
@@ -13,8 +14,6 @@ import (
 	"sync"
 	"time"
 )
-
-// ось X (-100; 100) => игроки стоят в нуле
 
 // нужон ли тайм?
 type RoomState struct {
@@ -37,6 +36,7 @@ type Room struct {
 	state      *RoomState
 	playerCnt  uint
 	gameTime   float64
+	pause      bool
 
 	playersInputs []gameLogic.Symbol
 	playerInput   chan *gameLogic.Symbol
@@ -52,9 +52,9 @@ func NewRoom(maxPlayers uint, game *Game) *Room {
 		unregister: make(chan *Player),
 		dead:       make(chan *Player),
 		enemyEnd:   make(chan struct{}),
-
-		mu:     &sync.Mutex{},
-		ticker: time.NewTicker(200 * time.Millisecond),
+		pause:      false,
+		mu:         &sync.Mutex{},
+		ticker:     time.NewTicker(config.Get().GameConfig.TickerTime.Duration),
 		state: &RoomState{
 			Objects: gameLogic.NewGhostStack(),
 		},
@@ -70,8 +70,14 @@ func (r *Room) Run() {
 	for {
 		select {
 		case in := <-r.playerInput:
-			if r.playerCnt != r.MaxPlayers {
-				log.Println("skip player input, bcs game not started, waiting second player")
+			if r.playerCnt != r.MaxPlayers || r.pause {
+				log.Println("skip player input, bcs game not started, waiting second player OR room paused")
+				for _, player := range r.Players {
+					player.SendMessage(&Message{
+						Type:    MessagePause,
+						Payload: nil,
+					})
+				}
 				continue
 			}
 			// TODO(): если игра не началась или закончилась, но юзер шлет мувы, то они записываются
@@ -95,7 +101,7 @@ func (r *Room) Run() {
 			r.addPlayerToState(player)
 
 		case <-r.ticker.C:
-			if r.playerCnt != r.MaxPlayers {
+			if r.playerCnt != r.MaxPlayers || r.pause {
 				continue
 			}
 
@@ -112,6 +118,13 @@ func (r *Room) endGame(player *Player) {
 	delete(r.Players, player.Token)
 	log.Printf("player %s was removed from room", player.Token)
 
+	pc := ""
+	if r.state.Players[0].Token == player.Token {
+		pc = r.state.Players[0].Nick
+	} else {
+		pc = r.state.Players[1].Nick
+	}
+
 	// TODO(): убираем вышедшему игроку очки, а оставшемуся очки делим на 2
 	// TODO(): добавить баланс (хочу очки деленные на 100 прибавлять к балансу)
 	// TODO(): записывать в борду максимальный счет
@@ -119,7 +132,7 @@ func (r *Room) endGame(player *Player) {
 	for _, players := range r.Players {
 		players.SendMessage(&Message{
 			Type:    MessageEnd,
-			Payload: fmt.Sprintf("player %s has left, GAME OVER", player.Token),
+			Payload: fmt.Sprintf("player %s has left, GAME OVER", pc),
 		})
 	}
 
@@ -212,7 +225,7 @@ func (r *Room) updateRoomState() {
 		}
 	}
 
-	log.Println("tick")
+	//log.Println("tick")
 }
 
 func (r *Room) SendMessageAllPlayers() {
@@ -227,6 +240,20 @@ func (r *Room) AddPlayer(player *Player) {
 func (r *Room) RemovePlayer(player *Player) {
 	//player.CloseConn()
 	r.unregister <- player
+}
+
+func (r *Room) Pause() {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.pause = true
+}
+
+func (r *Room) Resume() {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.pause = false
 }
 
 func (r *Room) Close() {

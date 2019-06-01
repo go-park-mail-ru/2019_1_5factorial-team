@@ -42,7 +42,7 @@ var funcs = []func(*testing.T){
 
 func TestControllers(t *testing.T) {
 	MainInit()
-	_, _ = user.CreateUser("kekkekkek", "kek.k.ek", "password")
+	_, _ = user.CreateUser("kekkekkek", "kek.k.ek", "password", "")
 	//for _, test := range funcs {
 	//	test(t)
 	//}

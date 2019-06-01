@@ -52,7 +52,7 @@ func findUserById(id string) (User, error) {
 	return u, nil
 }
 
-func addUser(nickname string, email string, password string) (User, error) {
+func addUser(nickname string, email string, password string, avatar string) (User, error) {
 	hashPassword, err := GetPasswordHash(password)
 	if err != nil {
 		return User{}, errors.Wrap(err, "Hasher password error")
@@ -64,7 +64,7 @@ func addUser(nickname string, email string, password string) (User, error) {
 		Nickname:     nickname,
 		HashPassword: hashPassword,
 		Score:        0,
-		AvatarLink:   "",
+		AvatarLink:   avatar,
 	}
 
 	col, err := database.GetCollection(collectionName)

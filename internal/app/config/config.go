@@ -82,6 +82,8 @@ type LogrusConfig struct {
 type GameConfig struct {
 	MaxRooms uint32 `json:"max_rooms"`
 
+	TickerTime Duration `json:"ticker_time"`
+
 	// спрайты
 	DefaultSpriteWidth int `json:"default_sprite_width"`
 
@@ -189,8 +191,12 @@ func Init(configsDir string) error {
 
 	instance.StaticServerConfig.MaxUploadSize = instance.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
 
-	instance.GameConfig.PlayerLeftPosition = instance.GameConfig.AxisLen / 2 - instance.GameConfig.DefaultSpriteWidth
+	instance.GameConfig.PlayerLeftPosition = instance.GameConfig.AxisLen/2 - instance.GameConfig.DefaultSpriteWidth
 	instance.GameConfig.PlayerRightPosition = instance.GameConfig.AxisLen / 2
+
+	if instance.GameConfig.TickerTime.Duration == 0 {
+		instance.GameConfig.TickerTime.Duration = 50 * time.Millisecond
+	}
 	return nil
 }
 

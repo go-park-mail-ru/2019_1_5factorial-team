@@ -13,8 +13,6 @@ import (
 	"net/http"
 )
 
-const roomsCount uint32 = 10
-
 type MyGorgeousGame struct {
 	port string
 }
@@ -37,13 +35,14 @@ func (mgg *MyGorgeousGame) Run() error {
 	router.Use(middleware.PanicMiddleware)
 	router.Path("/metrics").Handler(promhttp.Handler())
 
-
 	gameRouter := router.PathPrefix("").Subrouter()
 	//gameRouter.Use(middleware.CheckStatus)
 	gameRouter.Use(middleware.AuthMiddleware)
 	gameRouter.Use(middleware.CheckLoginMiddleware)
 
 	gameRouter.HandleFunc("/api/game/ws", controllers.Play).Methods("GET", "OPTIONS")
+	gameRouter.HandleFunc("/api/game/friend", controllers.CreateUniqueRoom).Methods("GET", "OPTIONS")
+	gameRouter.HandleFunc("/api/game/connect", controllers.ConnectRoomByLink).Methods("GET", "OPTIONS")
 
 	err := http.ListenAndServe(address, router)
 	if err != nil {

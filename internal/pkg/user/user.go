@@ -15,13 +15,17 @@ type User struct {
 	AvatarLink   string        `bson:"avatar_link"`
 }
 
-func CreateUser(nickname string, email string, password string) (User, error) {
+func CreateUser(nickname string, email string, password string, avatar string) (User, error) {
 	// TODO(smet1): добавить валидацию на повторение ника и почты
 	if nickname == "" || email == "" || password == "" {
 		return User{}, errors.New("empty field")
 	}
 
-	u, err := addUser(nickname, email, password)
+	if avatar == "" {
+		avatar = "000-default-avatar.png"
+	}
+
+	u, err := addUser(nickname, email, password, avatar)
 	if err != nil {
 		err = errors.Wrap(err, "Cannot create user")
 		return User{}, err
