@@ -92,6 +92,8 @@ func ConnectRoomByLink(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	ctxLogger.Warn("==getting", roomID)
+
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,

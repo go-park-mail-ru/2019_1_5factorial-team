@@ -92,7 +92,7 @@ LOOP:
 			})
 
 		case playerWithLink := <-g.registerUniqueLink:
-			log.Printf("adding user by link to unique room = %d", playerWithLink.RoomID)
+			log.Printf("adding user by link to unique room = %s", playerWithLink.RoomID)
 			if room, ok := g.emptyRoomsUnique[playerWithLink.RoomID]; ok {
 				room.AddPlayer(playerWithLink.Player)
 				g.MakeUniqueRoomFull(room)
