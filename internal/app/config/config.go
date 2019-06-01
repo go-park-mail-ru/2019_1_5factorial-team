@@ -82,6 +82,8 @@ type LogrusConfig struct {
 type GameConfig struct {
 	MaxRooms uint32 `json:"max_rooms"`
 
+	TickerTime Duration `json:"ticker_time"`
+
 	// спрайты
 	DefaultSpriteWidth int `json:"default_sprite_width"`
 

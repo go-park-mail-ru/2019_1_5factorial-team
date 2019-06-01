@@ -3,6 +3,7 @@ package game
 import (
 	"context"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
 	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gameLogic"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/session"
@@ -37,6 +38,7 @@ type Room struct {
 	state      *RoomState
 	playerCnt  uint
 	gameTime   float64
+	pause      bool
 
 	playersInputs []gameLogic.Symbol
 	playerInput   chan *gameLogic.Symbol
@@ -52,9 +54,10 @@ func NewRoom(maxPlayers uint, game *Game) *Room {
 		unregister: make(chan *Player),
 		dead:       make(chan *Player),
 		enemyEnd:   make(chan struct{}),
-
-		mu:     &sync.Mutex{},
-		ticker: time.NewTicker(50 * time.Millisecond),
+		pause:      false,
+		mu:         &sync.Mutex{},
+		//ticker: time.NewTicker(50 * time.Millisecond),
+		ticker: time.NewTicker(config.Get().GameConfig.TickerTime.Duration),
 		state: &RoomState{
 			Objects: gameLogic.NewGhostStack(),
 		},
@@ -70,8 +73,8 @@ func (r *Room) Run() {
 	for {
 		select {
 		case in := <-r.playerInput:
-			if r.playerCnt != r.MaxPlayers {
-				log.Println("skip player input, bcs game not started, waiting second player")
+			if r.playerCnt != r.MaxPlayers || r.pause{
+				log.Println("skip player input, bcs game not started, waiting second player OR room paused")
 				continue
 			}
 			// TODO(): если игра не началась или закончилась, но юзер шлет мувы, то они записываются
@@ -95,7 +98,7 @@ func (r *Room) Run() {
 			r.addPlayerToState(player)
 
 		case <-r.ticker.C:
-			if r.playerCnt != r.MaxPlayers {
+			if r.playerCnt != r.MaxPlayers || r.pause {
 				continue
 			}
 
@@ -227,6 +230,20 @@ func (r *Room) AddPlayer(player *Player) {
 func (r *Room) RemovePlayer(player *Player) {
 	//player.CloseConn()
 	r.unregister <- player
+}
+
+func (r *Room) Pause() {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.pause = true
+}
+
+func (r *Room) Resume() {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.pause = false
 }
 
 func (r *Room) Close() {

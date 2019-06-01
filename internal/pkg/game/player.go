@@ -100,7 +100,31 @@ func (p *Player) Listen() {
 		case message := <-p.in:
 			log.Printf("from player = %s, income: %#v", p.Token, message)
 
-			if message.Type != "MOVE" {
+			switch message.Type {
+			case MessagePause:
+				p.room.Pause()
+
+			case MessageResume:
+				p.room.Resume()
+
+			case MessageMove:
+				button, err := gameLogic.MatchSymbol(message.Pressed)
+				if err != nil {
+					err = p.conn.WriteJSON(Message{
+						Type:    MessageErr,
+						Payload: "not valid input",
+					})
+					if err != nil {
+						log.Error("p.Listen cant send message in match symbol", err.Error())
+
+						p.CloseConn()
+					}
+
+					continue
+				}
+				p.room.playerInput <- &button
+
+			default:
 				log.Println("not valid user input")
 
 				err := p.conn.WriteJSON(Message{
@@ -112,25 +136,44 @@ func (p *Player) Listen() {
 
 					p.CloseConn()
 				}
-
-				continue
 			}
 
-			button, err := gameLogic.MatchSymbol(message.Pressed)
-			if err != nil {
-				err = p.conn.WriteJSON(Message{
-					Type:    MessageErr,
-					Payload: "not valid input",
-				})
-				if err != nil {
-					log.Error("p.Listen cant send message in match symbol", err.Error())
-
-					p.CloseConn()
-				}
-
-				continue
-			}
-			p.room.playerInput <- &button
+			//if message.Type == MessagePause {
+			//	p.room.Pause()
+			//	continue
+			//}
+			//
+			//if message.Type != "MOVE" {
+			//	log.Println("not valid user input")
+			//
+			//	err := p.conn.WriteJSON(Message{
+			//		Type:    MessageErr,
+			//		Payload: "not valid input",
+			//	})
+			//	if err != nil {
+			//		log.Error("p.Listen cant send message before match symbol", err.Error())
+			//
+			//		p.CloseConn()
+			//	}
+			//
+			//	continue
+			//}
+			//
+			//button, err := gameLogic.MatchSymbol(message.Pressed)
+			//if err != nil {
+			//	err = p.conn.WriteJSON(Message{
+			//		Type:    MessageErr,
+			//		Payload: "not valid input",
+			//	})
+			//	if err != nil {
+			//		log.Error("p.Listen cant send message in match symbol", err.Error())
+			//
+			//		p.CloseConn()
+			//	}
+			//
+			//	continue
+			//}
+			//p.room.playerInput <- &button
 		}
 	}
 }
