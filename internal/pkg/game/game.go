@@ -151,6 +151,7 @@ func (g *Game) CloseRoom(ID string) {
 	if _, ok := g.rooms[ID]; !ok {
 		log.Println("deleted empty room")
 		delete(g.emptyRooms, ID)
+		delete(g.emptyRoomsUnique, ID)
 	}
 	delete(g.rooms, ID)
 	g.mu.Unlock()
