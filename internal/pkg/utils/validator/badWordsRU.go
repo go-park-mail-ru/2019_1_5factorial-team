@@ -102,15 +102,18 @@ func init() {
 		regExp = fmt.Sprintf(`%s)|`, regExp)
 		//fmt.Println(regExp)
 	}
-	fmt.Println(regExp)
+	//fmt.Println(regExp)
 
-	//expBadCompile = regexp.MustCompile(regExp)
+	expBadCompile = regexp.MustCompile(regExp)
 }
 
 func ReplaceBadWords(input string) string {
 
 	//return string(expBadCompile.ReplaceAll([]byte(input), []byte("***")))
 
+	if expBadCompile == nil {
+		panic("nil compiled regexp")
+	}
 	return string(expBadCompile.ReplaceAllFunc([]byte(input), func(bytes []byte) []byte {
 		return []byte(strings.Repeat("*", len(string(bytes))/2))
 	}))
