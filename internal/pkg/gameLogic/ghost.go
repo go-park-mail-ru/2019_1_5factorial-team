@@ -187,6 +187,8 @@ func (gq *GhostQueue) PopSymbol(sym Symbol) int {
 		gq.Items = newItems
 	}
 
+	log.Println(gq.Items)
+
 	return score
 }
 

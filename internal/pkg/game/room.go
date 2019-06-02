@@ -105,11 +105,15 @@ func (r *Room) Run() {
 				continue
 			}
 
+			r.mu.Lock()
+
 			r.updateRoomState()
 
 			for _, player := range r.Players {
 				player.SendState(r.state)
 			}
+
+			r.mu.Unlock()
 		}
 	}
 }

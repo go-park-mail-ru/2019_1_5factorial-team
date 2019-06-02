@@ -99,12 +99,12 @@ func (s *Server) NotificationProcessor() {
 			continue
 		}
 
-		log.Printf("got notification %v \n", notification)
+		log.Printf("got notification %v \n, SENDING...\n", notification)
 
 		//TODO: send notification to user map
 		s.users.SendMessages(notification.Message)
 
-		// do not spam notificationds
+		// do not spam notifications
 		time.Sleep(config.Get().DonationConfig.SleepBetweenNotifications.Duration)
 	}
 }
@@ -112,8 +112,8 @@ func (s *Server) NotificationProcessor() {
 func (s *Server) UsersProcessor() {
 	for {
 		user := <-s.registerUserCh
-		log.Println("new user to notify ", user)
 		s.users.Add(user)
+		log.Println("new user to notify ", user)
 	}
 }
 
