@@ -110,7 +110,7 @@ copy_configs ./../configs/core /etc/5factorial/core
 echo "-- OK"
 
 echo "/etc/5factorial/donation"
-copy_configs ./../configs/donation /etc/5factoiral/donation
+copy_configs ./../configs/donation /etc/5factorial/donation
 
 echo "/etc/5factorial"
 copy_configs ./../configs /etc/5factorial
