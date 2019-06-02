@@ -1,6 +1,9 @@
 package validator
 
-import "regexp"
+import (
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
+	"regexp"
+)
 
 const ExpEmail = `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`
 const ExpLoginPassword = `^[a-z0-9._-]{4,20}$`
@@ -15,6 +18,17 @@ var (
 func ValidNewUser(login string, email string, password string) bool {
 	//expEmail := regexp.MustCompile(ExpEmail)
 	//expLopPassw := regexp.MustCompile(ExpLoginPassword)
+
+	if !expEmail.MatchString(email) {
+		log.Println("expEmail.MatchString(email)")
+	}
+	if !expLopPassword.MatchString(login) {
+		log.Println("expLopPassword.MatchString(login)")
+	}
+	if !expLopPassword.MatchString(password) {
+		log.Println("expLopPassword.MatchString(password)")
+	}
+
 	if expEmail.MatchString(email) && expLopPassword.MatchString(login) && expLopPassword.MatchString(password) {
 		return true
 	}
