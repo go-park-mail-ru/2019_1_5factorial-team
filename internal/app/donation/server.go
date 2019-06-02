@@ -34,6 +34,7 @@ func (mgg *MyFabulousDonation) Run() error {
 
 	router := mux.NewRouter()
 	router.Use(middleware.PanicMiddleware)
+	router.Use(middleware.AuthMiddleware)
 
 	router.HandleFunc("/api/donation/ws", donationInstance.GetWssHandler()).Methods("GET", "OPTIONS") // TODO: implementirovat'
 
