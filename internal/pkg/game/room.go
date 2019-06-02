@@ -194,6 +194,8 @@ func (r *Room) updateRoomState() {
 		r.rakePlayerInputs()
 	}
 
+	r.state.Objects.CheckValid()
+
 	if r.state.Objects.Len() < 2 && rand.Float64() < 1-math.Pow(0.993, r.gameTime) {
 		// игровая логика
 		//r.state.Objects.PushBack(gameLogic.NewRandomGhost())
