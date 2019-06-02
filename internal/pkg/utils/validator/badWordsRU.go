@@ -104,7 +104,7 @@ func init() {
 	}
 	fmt.Println(regExp)
 
-	expBadCompile = regexp.MustCompile(regExp)
+	//expBadCompile = regexp.MustCompile(regExp)
 }
 
 func ReplaceBadWords(input string) string {

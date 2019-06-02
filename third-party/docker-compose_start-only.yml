@@ -91,5 +91,7 @@ services:
     container_name: 5factorial-back-ndex
     restart: always
     image: smetk/5factorial-donation:latest
+    volumes:
+      - '/etc/5factorial:/etc/5factorial'
     ports:
       - '8004:5054'
