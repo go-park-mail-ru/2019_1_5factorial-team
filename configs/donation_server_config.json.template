@@ -1,0 +1,6 @@
+{
+  "notification_secret": "",
+  "minimum_amount_for_donation": 100,
+  "sleep_between_notifications": "15s",
+  "access_token": ""
+}
