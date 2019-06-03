@@ -2,17 +2,18 @@ package donation
 
 import (
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
-	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/app/config"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/log"
+	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 
 	"github.com/gorilla/websocket"
 )
@@ -122,6 +123,7 @@ func (s *Server) GetWssHandler() http.HandlerFunc {
 		// TODO: check this function
 		ctxLogger := req.Context().Value("logger").(*logrus.Entry)
 
+		// TODO(smet1): ping-pong or ws will be close on timeout
 		upgrader := websocket.Upgrader{
 			ReadBufferSize:  1024,
 			WriteBufferSize: 1024,

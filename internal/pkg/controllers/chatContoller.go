@@ -1,13 +1,14 @@
 package controllers
 
 import (
+	"net/http"
+
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/chat"
 	grpcAuth "github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/gRPC/auth"
 	"github.com/go-park-mail-ru/2019_1_5factorial-team/internal/pkg/utils/panicWorker"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"net/http"
 )
 
 func ConnectToGlobalChat(res http.ResponseWriter, req *http.Request) {
@@ -15,6 +16,7 @@ func ConnectToGlobalChat(res http.ResponseWriter, req *http.Request) {
 	authGRPC := req.Context().Value("authGRPC").(grpcAuth.AuthCheckerClient)
 
 	var user *chat.User
+	// TODO(smet1): ping-pong or ws will be close on timeout
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
