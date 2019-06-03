@@ -4,7 +4,7 @@ FROM golang:alpine AS build
 WORKDIR /server
 COPY . .
 
-RUN go build -mod=vendor cmd/game/main.go
+RUN go build -mod=vendor cmd/donation/main.go
 
 # Копируем на чистый образ
 FROM alpine

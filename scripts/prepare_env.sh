@@ -46,6 +46,9 @@ copy_file_from_template $1/static_server_config.json $2/static_server_config.jso
 echo "-- $1/user_faker_config -> $2"
 copy_file_from_template $1/user_faker_config.json $2/user_faker_config.json
 
+echo "-- $1/donation_server_config -> $2"
+copy_file_from_template $1/donation_server_config.json $2/donation_server_config.json
+
 return 0
 }
 
@@ -83,6 +86,7 @@ check_dir "/etc/5factorial/auth"
 check_dir "/etc/5factorial/chat"
 check_dir "/etc/5factorial/game"
 check_dir "/etc/5factorial/core"
+check_dir "/etc/5factorial/donation"
 
 echo "== OK"
 
@@ -104,6 +108,9 @@ echo "-- OK"
 echo "/etc/5factorial/core"
 copy_configs ./../configs/core /etc/5factorial/core
 echo "-- OK"
+
+echo "/etc/5factorial/donation"
+copy_configs ./../configs/donation /etc/5factorial/donation
 
 echo "/etc/5factorial"
 copy_configs ./../configs /etc/5factorial

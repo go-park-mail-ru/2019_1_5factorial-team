@@ -187,6 +187,8 @@ func (gq *GhostQueue) PopSymbol(sym Symbol) int {
 		gq.Items = newItems
 	}
 
+	log.Println(gq.Items)
+
 	return score
 }
 
@@ -195,4 +197,18 @@ func (gq *GhostQueue) Len() int {
 	defer gq.mu.Unlock()
 
 	return len(gq.Items)
+}
+
+func (gq *GhostQueue) CheckValid() {
+	gq.mu.Lock()
+	defer gq.mu.Unlock()
+
+	newItems := make([]Ghost, 0, 2)
+	for _, i := range gq.Items {
+		if len(i.Symbols) != 0 {
+			newItems = append(newItems, i)
+		}
+	}
+
+	gq.Items = newItems
 }

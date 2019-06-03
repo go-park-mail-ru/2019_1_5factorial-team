@@ -114,6 +114,13 @@ type AuthGRPCConfig struct {
 	Port     string `json:"port"`
 }
 
+type DonationConfig struct {
+	NotificationSecret        string   `json:"notification_secret"`
+	MinimumAmountForDonation  int      `json:"minimum_amount_for_donation"`
+	SleepBetweenNotifications Duration `json:"sleep_between_notifications"`
+	AccessToken               string   `json:"access_token"`
+}
+
 // TODO(): есть смысл объединить в 1 файл конфига
 // структура сервера, собирает все вышеперечисленные структуры
 type ServerConfig struct {
@@ -125,6 +132,7 @@ type ServerConfig struct {
 	GameConfig         GameConfig
 	ChatConfig         ChatConfig
 	AuthGRPCConfig     AuthGRPCConfig
+	DonationConfig     DonationConfig
 
 	configPath string
 }
@@ -169,6 +177,10 @@ var configs = []valueAndPath{
 	{
 		from: "auth_grpc_config.json",
 		to:   &instance.AuthGRPCConfig,
+	},
+	{
+		from: "donation_server_config.json",
+		to:   &instance.DonationConfig,
 	},
 }
 

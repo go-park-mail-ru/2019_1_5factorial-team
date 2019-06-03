@@ -105,11 +105,15 @@ func (r *Room) Run() {
 				continue
 			}
 
+			r.mu.Lock()
+
 			r.updateRoomState()
 
 			for _, player := range r.Players {
 				player.SendState(r.state)
 			}
+
+			r.mu.Unlock()
 		}
 	}
 }
@@ -189,6 +193,8 @@ func (r *Room) updateRoomState() {
 	if len(r.playersInputs) != 0 {
 		r.rakePlayerInputs()
 	}
+
+	//r.state.Objects.CheckValid()
 
 	if r.state.Objects.Len() < 2 && rand.Float64() < 1-math.Pow(0.993, r.gameTime) {
 		// игровая логика
