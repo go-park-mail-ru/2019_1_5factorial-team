@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var testsUploadAvatar= []TestCases{
+var testsUploadAvatar = []TestCases{
 	{
 		routerPath:     "/api/user",
 		method:         "PUT",

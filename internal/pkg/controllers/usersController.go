@@ -26,9 +26,10 @@ import (
 // 	"password":
 //easyjson:json
 type SingUpRequest struct {
-	Login    string `json:"login"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Login      string `json:"login"`
+	Email      string `json:"email"`
+	Password   string `json:"password"`
+	AvatarLink string `json:"avatar_link"`
 }
 
 type SignUpResponse struct {
@@ -116,7 +117,15 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	flagValidUser := validator.ValidNewUser(data.Login, data.Email, data.Password)
 	if !flagValidUser {
 		ErrResponse(res, http.StatusBadRequest, "invalid user data")
-		ctxLogger.Error(errors.Wrap(err, "err in user data"))
+
+		ctxLogger.Error(errors.New("err in user data, didn't pass validator"))
+		return
+	}
+
+	if !validator.ValidateAvatarDefault(data.AvatarLink) {
+		ErrResponse(res, http.StatusBadRequest, "invalid avatar")
+
+		ctxLogger.Error(errors.Wrap(err, "invalid avatar"))
 		return
 	}
 
@@ -126,7 +135,9 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 		Nickname: data.Login,
 		Email:    data.Email,
 		Password: data.Password,
+		Avatar:   data.AvatarLink,
 	})
+
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {

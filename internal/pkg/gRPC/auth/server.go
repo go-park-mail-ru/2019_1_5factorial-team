@@ -99,7 +99,7 @@ func (a *Auth) GetIDFromSession(ctx context.Context, cookie *Cookie) (*UserID, e
 }
 
 func (a *Auth) CreateUser(ctx context.Context, data *UserNew) (*User, error) {
-	u, err := user.CreateUser(data.Nickname, data.Email, data.Password)
+	u, err := user.CreateUser(data.Nickname, data.Email, data.Password, data.Avatar)
 	if err != nil {
 		log.Error(errors.Wrap(err, "err in user data, AuthGRPC"))
 

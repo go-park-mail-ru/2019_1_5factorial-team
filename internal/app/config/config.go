@@ -82,6 +82,8 @@ type LogrusConfig struct {
 type GameConfig struct {
 	MaxRooms uint32 `json:"max_rooms"`
 
+	TickerTime Duration `json:"ticker_time"`
+
 	// спрайты
 	DefaultSpriteWidth int `json:"default_sprite_width"`
 
@@ -112,6 +114,13 @@ type AuthGRPCConfig struct {
 	Port     string `json:"port"`
 }
 
+type DonationConfig struct {
+	NotificationSecret        string   `json:"notification_secret"`
+	MinimumAmountForDonation  int      `json:"minimum_amount_for_donation"`
+	SleepBetweenNotifications Duration `json:"sleep_between_notifications"`
+	AccessToken               string   `json:"access_token"`
+}
+
 // TODO(): есть смысл объединить в 1 файл конфига
 // структура сервера, собирает все вышеперечисленные структуры
 type ServerConfig struct {
@@ -123,6 +132,7 @@ type ServerConfig struct {
 	GameConfig         GameConfig
 	ChatConfig         ChatConfig
 	AuthGRPCConfig     AuthGRPCConfig
+	DonationConfig     DonationConfig
 
 	configPath string
 }
@@ -168,6 +178,10 @@ var configs = []valueAndPath{
 		from: "auth_grpc_config.json",
 		to:   &instance.AuthGRPCConfig,
 	},
+	{
+		from: "donation_server_config.json",
+		to:   &instance.DonationConfig,
+	},
 }
 
 // считывание всех конфигов по пути `configsDir`
@@ -189,8 +203,12 @@ func Init(configsDir string) error {
 
 	instance.StaticServerConfig.MaxUploadSize = instance.StaticServerConfig.MaxUploadSizeMB * 1024 * 1024
 
-	instance.GameConfig.PlayerLeftPosition = instance.GameConfig.AxisLen / 2 - instance.GameConfig.DefaultSpriteWidth
+	instance.GameConfig.PlayerLeftPosition = instance.GameConfig.AxisLen/2 - instance.GameConfig.DefaultSpriteWidth
 	instance.GameConfig.PlayerRightPosition = instance.GameConfig.AxisLen / 2
+
+	if instance.GameConfig.TickerTime.Duration == 0 {
+		instance.GameConfig.TickerTime.Duration = 50 * time.Millisecond
+	}
 	return nil
 }
 

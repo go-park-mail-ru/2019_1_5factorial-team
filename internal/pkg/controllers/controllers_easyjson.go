@@ -304,6 +304,8 @@ func easyjson650569b1DecodeGithubComGoParkMailRu201915factorialTeamInternalPkgCo
 			out.Email = string(in.String())
 		case "password":
 			out.Password = string(in.String())
+		case "avatar_link":
+			out.AvatarLink = string(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -347,6 +349,16 @@ func easyjson650569b1EncodeGithubComGoParkMailRu201915factorialTeamInternalPkgCo
 			out.RawString(prefix)
 		}
 		out.String(string(in.Password))
+	}
+	{
+		const prefix string = ",\"avatar_link\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		out.String(string(in.AvatarLink))
 	}
 	out.RawByte('}')
 }

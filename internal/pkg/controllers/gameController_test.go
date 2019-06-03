@@ -8,24 +8,24 @@ import (
 var testsPlay = []TestCases{
 	// authCtx может быть только тру из-за миддлвара
 	{
-		routerPath:     "/api/game/ws",
-		method:         "GET",
-		url:            "/api/game/ws",
-		body:           nil,
-		urlValues:      "",
-		expectedRes:    `Bad Request
+		routerPath: "/api/game/ws",
+		method:     "GET",
+		url:        "/api/game/ws",
+		body:       nil,
+		urlValues:  "",
+		expectedRes: `Bad Request
 `,
 		expectedStatus: http.StatusBadRequest,
 		authCtx:        false,
 		userIDCtx:      "",
 	},
 	{
-		routerPath:     "/api/game/ws",
-		method:         "GET",
-		url:            "/api/game/ws",
-		body:           nil,
-		urlValues:      "",
-		expectedRes:    `Bad Request
+		routerPath: "/api/game/ws",
+		method:     "GET",
+		url:        "/api/game/ws",
+		body:       nil,
+		urlValues:  "",
+		expectedRes: `Bad Request
 `,
 		expectedStatus: http.StatusBadRequest,
 		authCtx:        true,

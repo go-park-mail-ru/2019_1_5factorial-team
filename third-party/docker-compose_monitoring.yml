@@ -3,7 +3,7 @@ version: '3'
 networks:
   default:
     external:
-      name: third-party_default
+      name: 5factorial-net
 
 services:
   #  MONITORING
@@ -20,7 +20,7 @@ services:
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
     ports:
-      - '8005:9090'
+      - '8009:9090'
 
   node_exporter:
     container_name: 5factorial-monitoring-node_exporter
@@ -34,4 +34,4 @@ services:
     image: grafana/grafana
     restart: always
     ports:
-      - '8004:3000'
+      - '8008:3000'

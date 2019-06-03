@@ -57,3 +57,28 @@ func TestValidLogin(t *testing.T) {
 		}
 	}
 }
+
+var validateMessage = []struct {
+	msg  string
+	want string
+}{
+	{"", ""},
+	{"хуй", "***"},
+	{"ахуенно", "****нно"},
+	{"пиздато", "*****то"},
+	{"ахуенно заебись", "**********бись"},
+	{"мудак", "*****"},
+	{"яндекс", "******"},
+	{"ЯнДеКс", "******"},
+	{"БлЯдь", "***дь"},
+
+}
+
+func TestReplaceBadWords(t *testing.T) {
+	for _, val := range validateMessage {
+		res := ReplaceBadWords(val.msg)
+		if res != val.want {
+			t.Error("expected", val.want, "have", res)
+		}
+	}
+}

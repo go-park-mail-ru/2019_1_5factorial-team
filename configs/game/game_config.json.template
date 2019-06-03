@@ -1,13 +1,15 @@
 {
   "max_rooms": 10,
 
+  "ticker_time": "50ms",
+
   "default_sprite_width": 164,
 
   "axis_len": 1440,
 
   "default_right_position": 1440,
   "default_left_position": 0,
-  "default_movement_speed": 80,
+  "default_movement_speed": 5,
   "default_len_symbols_slice": 6,
   "default_damage": 1,
 
