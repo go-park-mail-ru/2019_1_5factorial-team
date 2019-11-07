@@ -35,6 +35,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}()
 
 		cookie, err := req.Cookie(config.Get().CookieConfig.CookieName)
+		cookie.Path = "/"
 		if err != nil {
 			logrus.WithField("cookie", cookie).Warn("no cookie found, user unauthorized")
 
